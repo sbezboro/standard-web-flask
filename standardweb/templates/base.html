@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+    <title>{% block title %}Standard Survival Minecraft Server{% endblock %}</title>
+    <meta name="description" content="{% block description %}The website for the Standard Survival Minecraft Server, a vanilla-inspired survival server with a unique twist.{% endblock %}">
+    {% if noindex %}
+    <meta name="robots" content="noindex">
+    {% endif %}
+
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tipsy.css') }}">
+    
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-32372174-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+    <script type="text/javascript" src="{{ url_for('static', filename='js/all.min.js') }}"></script>
+    <script>
+        !function(r,n,e){var t={"notifier.plugins.jquery.version":"0.0.1"};n._rollbar.push({_rollbarParams:t});r(e).ajaxError(function(r,e,t,u){
+        var o=e.status;var a=t.url;n._rollbar.push({level:"warning",msg:"jQuery ajax error for url "+a,jquery_status:o,jquery_url:a,jquery_thrown_error:u,
+        jquery_ajax_error:true})});var u=r.fn.ready;r.fn.ready=function(r){return u.call(this,function(){try{r()}catch(e){n._rollbar.push(e)}})};var o={};
+        var a=r.fn.on;r.fn.on=function(r,e,t,u){var f=function(r){var e=function(){try{return r.apply(this,arguments)}catch(e){n._rollbar.push(e);
+        return null}};o[r]=e;return e};if(e&&typeof e==="function"){e=f(e)}else if(t&&typeof t==="function"){t=f(t)}else if(u&&typeof u==="function"){
+        u=f(u)}return a.call(this,r,e,t,u)};var f=r.fn.off;r.fn.off=function(r,n,e){if(n&&typeof n==="function"){n=o[n];delete o[n]}else{e=o[e];
+        delete o[e]}return f.call(this,r,n,e)}}(jQuery,window,document);
+    </script>
+    
+    <!--[if lte IE 8]><script type="text/javascript" src="{{ url_for('static', filename='js/excanvas.min.js') }}"></script><![endif]-->
+    {% block script_files %}{% endblock %}
+</head>
+
+<body>
+    <div id="header">
+        <div id="inner">
+            <div class="desktop">
+                <a href="/" class="strong {% block select_index %}{% endblock %}">Standard Survival</a>
+                <a class="{% block select_ranking %}{% endblock %}" href="/{% if server %}{{ server.id }}{% else %}2{% endif %}/ranking">Ranking</a>
+                <a class="{% block select_leaderboards %}{% endblock %}" href="/{% if server %}{{ server.id }}{% else %}2{% endif %}/leaderboards">Leaderboards</a>
+                <a class="{% block select_forum %}{% endblock %}" href="/forum/">Forum</a>
+                <a class="{% block select_chat %}{% endblock %}" href="/chat">Live Chat</a>
+                {% if user and user.is_superuser %}<a href="/analytics">Analytics</a>{% endif %}
+                {% if user and user.is_superuser %}<a href="/server-admin">Server Admin</a>{% endif %}
+                <div id="right">
+                    {% if user and user.is_authenticated %}
+                        {% if not user.is_superuser %}
+                            <a class="{% block select_player %}{% endblock %}" href="/player/{{ user.username }}">{{ user.username|face_thumb }}{{ user.username }}</a>
+                        {% endif %}
+                        <a href="/logout">Log out</a>
+                    {% else %}
+                        <a href="#" onclick="alert('Log in to the Minecraft server (standardsurvival.com) and type /register to create an account!')">Sign up</a>
+                        <a class="{% block select_login %}{% endblock %}" href="/login?next={{ request.path }}">Log in</a>
+                    {% endif %}
+                    <form class="form-inline" method="GET" action="/search">
+                        <input class="placeholder" type="text" name="q" placeholder="Player search" value="{{ query }}"/>
+                    </form>
+                </div>
+            </div>
+            <div class="mobile">
+                <div class="mobile-nav">
+                    <a href="#" class="btn extender" data-target="mobile-nav-menu">=</a>
+                </div>
+                <ul id="mobile-nav-menu" style="display:none;">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/ranking">Ranking</a></li>
+                    <li><a href="/leaderboards">Leaderboards</a></li>
+                    <li><a href="/forum">Forum</a></li>
+                    <li><a href="/chat">Live Chat</a></li>
+                    {% if user and user.is_superuser %}<li><a href="/analytics">Analytics</a></li>{% endif %}
+                    {% if user and user.is_superuser %}<li><a href="/server-admin">Server Admin</a></li>{% endif %}
+                        <li>&nbsp;</li>
+                    {% if user and user.is_authenticated %}
+                        {% if not user.is_superuser %}
+                            <li><a href="/player/{{ user.username }}">{{ user.username|face_thumb }} {{ user.username }}</a></li>
+                        {% endif %}
+                        <li><a href="/logout">Log out</a></li>
+                    {% else %}
+                        <li><a href="#" onclick="alert('Log in to the Minecraft server (standardsurvival.com) and type /register to create an account!')">Sign up</a></li>
+                        <li><a href="/login?next={{ request.path }}">Log in</a></li>
+                    {% endif %}
+                    <li><form class="form-inline" method="GET" action="/search">
+                        <input class="placeholder" type="text" name="q" placeholder="Player search" value="{{ query }}"/>
+                    </form></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="container">
+        {% block content %}{% endblock %}
+    </div>
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("abbr.timeago").timeago();
+            $(".placeholder").placeholder();
+            $(".tooltip").tipsy();
+        });
+        
+        $.ajaxSetup ({
+            cache: false
+        });
+    </script>
+</body>
+</html>
