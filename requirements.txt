@@ -1,4 +1,5 @@
 Flask==0.10.1
+Flask-DebugToolbar==0.9.0
 Flask-SQLAlchemy==1.0
 Flask-WTF==0.9.4
 Jinja2==2.7.2
