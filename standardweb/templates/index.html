@@ -46,10 +46,10 @@
         function loadPlayerList() {
             if ($("#refreshButton").hasClass("button")) {
                 $("#refreshButton").removeClass("button");
-                $("#refreshImage").attr("src", "{{STATIC_URL}}images/spinner.gif");
+                $("#refreshImage").attr("src", "{{url_for('static', filename='images/spinner.gif') }}");
                 $("#player-list").fadeTo(0, 0.25).load('player_list', function(response, status, xhr) {
                     $("#refreshButton").addClass("button");
-                    $("#refreshImage").attr("src", "{{STATIC_URL}}images/refresh.png");
+                    $("#refreshImage").attr("src", "{{url_for('static', filename='images/refresh.png') }}");
                     $("#player-list").fadeTo(100, 1);
                 });
             }
@@ -64,7 +64,7 @@
             });
             
             var clipboard = new ZeroClipboard($address, {
-                moviePath: "/static/flash/ZeroClipboard.swf"
+                moviePath: "{{ url_for('static', filename='flash/ZeroClipboard.swf') }}"
             });
             
             clipboard.on('complete', function(client, args) {
