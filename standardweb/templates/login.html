@@ -7,8 +7,7 @@
   <div id="main">
     <div class="center-section">
       <form id="login-form" action="/login" method="post">
-        <input type="hidden" name="next" value="{{request.args.next}}">
-        {{ csrf_token() }}
+        {{ form.hidden_tag() }}
         <h2>Log in</h2>
         <fieldset>
           {% include 'includes/messages.html' %}

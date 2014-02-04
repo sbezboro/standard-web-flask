@@ -9,8 +9,6 @@ from standardweb import app
 from standardweb.lib import csrf
 from standardweb.models import User
 
-import os
-
 
 @app.before_request
 def user_session():
@@ -27,19 +25,10 @@ def csrf_protect():
             token = session.get('csrf_token')
 
             if not token or token != request.form.get('csrf_token'):
-                session.pop('csrf_token', None)
+                csrf.regenerate_token()
                 abort(403)
-
-
-def _generate_csrf_token_field():
-    if 'csrf_token' not in session:
-        session['csrf_token'] = os.urandom(40).encode('hex')
-
-    return Markup('<input type="hidden" name="csrf_token" value="%s" />' % session['csrf_token'])
-
-app.jinja_env.globals['csrf_token'] = _generate_csrf_token_field
 
 
 @app.context_processor
 def inject_user():
-    return dict(user=g.user)
+    return dict(user=getattr(g, 'user', None))

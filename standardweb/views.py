@@ -21,12 +21,13 @@ def login():
     if form.validate_on_submit():
         username = request.form['username']
         password = request.form['password']
+        next = request.form.get('next')
 
         user = User.query.filter_by(username=username).first()
 
         if user and user.check_password(password):
             session['user_id'] = user.id
-            return redirect(url_for('index'))
+            return redirect(next or url_for('index'))
         else:
             flash('Invalid username/password combination', 'error')
 
