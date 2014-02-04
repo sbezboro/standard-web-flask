@@ -3,12 +3,19 @@ from standardweb.lib import helpers as h
 
 from pbkdf2 import pbkdf2_bin
 
-import base64
 import binascii
 import hashlib
 import os
 
-class User(db.Model):
+
+class Base(object):
+    def save(self, commit=True):
+        db.session.add(self)
+        if commit:
+            db.session.commit()
+
+
+class User(db.Model, Base):
     __tablename__ = 'auth_user'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -17,11 +24,16 @@ class User(db.Model):
     password = db.Column(db.String(128))
     is_superuser = db.Column(db.Boolean)
 
-    def check_password(self, password):
+    def check_password(self, plaintext_password):
         algorithm, iterations, salt, hash_val = self.password.split('$', 3)
-        expected = self._make_password(password, salt=salt, iterations=int(iterations))
+        expected = self._make_password(plaintext_password, salt=salt, iterations=int(iterations))
 
         return h.safe_str_cmp(self.password, expected)
+
+    def set_password(self, plaintext_password, commit=True):
+        password = self._make_password(plaintext_password)
+        self.password = password
+        self.save(commit=commit)
 
     def _make_password(self, password, salt=None, iterations=None):
         if not salt:
