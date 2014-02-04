@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Standard Survival Minecraft Server{% endblock %}
+
+{% block select_login %}selected{% endblock %}
+{% block content %}
+  <div id="main">
+    <div class="center-section">
+      <form id="login-form" action="/login" method="post">
+        <input type="hidden" name="next" value="{{request.args.next}}">
+        {{ csrf_token() }}
+        <h2>Log in</h2>
+        <fieldset>
+          {{ form.non_field_errors }}
+          <div class="control-group">
+            <label class="control-label">{{ form.username.label }}</label>
+            <div class="control">{{ form.username() }}</div>
+          </div>
+          
+          <div class="control-group">
+            <label class="control-label">{{ form.password.label }}</label>
+            <div class="control">{{ form.password() }}</div>
+          </div>
+          
+          <div class="control-group">
+            <div class="control">
+              <input class="btn" type="submit" value="Log in">
+            </div>
+          </div>
+          <hr>
+          <p class="help">
+            To create an account or change your password, log into the Minecraft server and type the <code>/register</code> command.
+          </p>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+

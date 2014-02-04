@@ -1,15 +1,12 @@
-from flask.ext.sqlalchemy import SQLAlchemy
-
-from standardweb import app
+from standardweb import db
 from standardweb.lib import helpers as h
 
-from pbkdf2 import pbkdf2_hex
+from pbkdf2 import pbkdf2_bin
 
+import base64
 import binascii
 import hashlib
 import os
-
-db = SQLAlchemy(app)
 
 class User(db.Model):
     __tablename__ = 'auth_user'
@@ -33,5 +30,6 @@ class User(db.Model):
         if not iterations:
             iterations = 10000
 
-        hash_val = pbkdf2_hex(bytes(password), bytes(salt), iterations, hashfunc=hashlib.sha256)
+        hash_val = pbkdf2_bin(bytes(password), bytes(salt), iterations, keylen=32, hashfunc=hashlib.sha256)
+        hash_val = hash_val.encode('base64').strip()
         return '%s$%s$%s$%s' % ('pbkdf2_sha256', iterations, salt, hash_val)

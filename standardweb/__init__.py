@@ -1,25 +1,11 @@
 from flask import Flask
-
-from jinja2.nodes import MarkSafe
+from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-import standardweb.middlewares
-import standardweb.models
-import standardweb.views
+db = SQLAlchemy(app)
 
-def _face_image(username, size):
-    cls = 'face-thumb' if size == 16 else 'face-large'
-    return '<img src="/faces/%(size)d/%(username)s.png" class="%(cls)s" width="%(size)d" height="%(size)d" alt="%(username)s">' \
-           % {'size': size, 'cls': cls, 'username': username}
-
-
-@app.template_filter('face_thumb')
-def face_thumb(username):
-    return MarkSafe(_face_image(username, 16))
-
-
-@app.template_filter('face_large')
-def face_large(username):
-    return MarkSafe(_face_image(username, 64))
-
+import middleware
+import models
+import template_filters
+import views
