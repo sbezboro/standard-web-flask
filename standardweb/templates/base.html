@@ -42,7 +42,7 @@
                 {% if user and user.is_superuser %}<a href="/analytics">Analytics</a>{% endif %}
                 {% if user and user.is_superuser %}<a href="/server-admin">Server Admin</a>{% endif %}
                 <div id="right">
-                    {% if user and user.is_authenticated %}
+                    {% if user %}
                         {% if not user.is_superuser %}
                             <a class="{% block select_player %}{% endblock %}" href="/player/{{ user.username }}">{{ user.username|face_thumb }}{{ user.username }}</a>
                         {% endif %}
@@ -69,7 +69,7 @@
                     {% if user and user.is_superuser %}<li><a href="/analytics">Analytics</a></li>{% endif %}
                     {% if user and user.is_superuser %}<li><a href="/server-admin">Server Admin</a></li>{% endif %}
                         <li>&nbsp;</li>
-                    {% if user and user.is_authenticated %}
+                    {% if user %}
                         {% if not user.is_superuser %}
                             <li><a href="/player/{{ user.username }}">{{ user.username|face_thumb }} {{ user.username }}</a></li>
                         {% endif %}

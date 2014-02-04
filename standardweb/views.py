@@ -1,4 +1,4 @@
-from flask import abort
+from flask import flash
 from flask import redirect
 from flask import request
 from flask import render_template
@@ -6,7 +6,6 @@ from flask import session
 from flask import url_for
 
 from standardweb import app
-
 from standardweb.forms import LoginForm
 from standardweb.models import User
 
@@ -27,10 +26,9 @@ def login():
 
         if user and user.check_password(password):
             session['user_id'] = user.id
-
             return redirect(url_for('index'))
         else:
-            abort(403)
+            flash('Invalid username/password combination', 'error')
 
     return render_template('login.html', form=form)
 

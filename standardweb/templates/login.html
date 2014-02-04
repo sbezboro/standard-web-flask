@@ -11,7 +11,7 @@
         {{ csrf_token() }}
         <h2>Log in</h2>
         <fieldset>
-          {{ form.non_field_errors }}
+          {% include 'includes/messages.html' %}
           <div class="control-group">
             <label class="control-label">{{ form.username.label }}</label>
             <div class="control">{{ form.username() }}</div>

@@ -823,6 +823,10 @@ a:hover {
     font-size: 14px;
 }
 
+fieldset > .alert {
+    margin-top: 0px;
+}
+
 .alert.error {
     background-color: #f2dede;
     color: #b94a48;
