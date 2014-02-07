@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ player.displayname }} {% if player.nickname %}({{ player.username }}){% endif %} - {{ server.address }} - Standard Survival Minecraft Server
+{% endblock %}
+
+{% block description %}{{ player.displayname }}'s rank info, kills, deaths and playtime info on {{ server.address }}{% endblock %}
+
+{% block select_player %}{% if user.username == username %}selected{% endif %}{% endblock %}
+{% block content %}
+    {% if player %}
+    <div id="sub-header">
+        <div class="player-header">
+            <h1>
+                {{ player.username|face_large }}
+                {% if player.nickname_html %}
+                    {{ player.nickname_html|safe }}
+                    <span class="small">
+                        ({{ player.username }})
+                    </span>
+                {% else %}
+                    {{ player.username }}
+                {% endif %}
+                
+                {% if banned %}
+                    <span class="banned">BANNED</span>
+                {% endif %}
+            </h1>
+        </div>
+    </div>
+    <div class="nav-header">
+        <div class="inner">
+            <ul>
+                {% for s in servers %}
+                <li {% if s == server %}class="selected"{% endif %}>
+                    <a class="tooltip" href="/{{s.id}}/player/{{ player.username }}" title="Address: {{ s.address }}">{{ s.name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+    <div id="main">
+        {% if player %}
+            {% if first_seen %}
+            <div class="player-stat-section">
+                <h2>Server rank</h2>
+                {{ rank }}
+            </div>
+            <div class="player-stat-section">
+                <h2>First seen</h2>
+                <abbr class="timeago" title="{{ first_seen }}"></abbr>
+            </div>
+            <div class="player-stat-section">
+                <h2>Last seen</h2>
+                {% if online_now %}
+                Now
+                {% else %}
+                <abbr class="timeago" title="{{ last_seen }}"></abbr>
+                {% endif %}
+            </div>
+            <div class="player-stat-section">
+                <h2>Time played</h2>
+                {{ time_spent }}
+            </div>
+            {% if pvp_logs %}
+                <div class="player-stat-section">
+                    <h2>PVP logs</h2>
+                    {{ pvp_logs }}
+                </div>
+                <div class="clear"></div>
+            {% endif %}
+            <div class="player-stat-section">
+                <h2>PVP kills</h2>
+                {{ pvp_kill_count }}
+                <br/>
+                <br/>
+                {% for kill in pvp_kills %}
+                    {% with killer = kill.player %}
+                        <div class="stat-row">
+                            <div class="player">
+                                <a href="/{{ server.id }}/player/{{ killer.username }}">
+                                    {{ killer.username|face_thumb }}
+                                    <div class="username">
+                                        {{ killer.displayname_html|safe }}
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="count">{{ kill.count }}</div>
+                            <div class="clear"></div>
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            <div class="player-stat-section">
+                <h2>PVP deaths</h2>
+                {{ pvp_death_count }}
+                <br/>
+                <br/>
+                {% for death in pvp_deaths %}
+                    {% with victim = death.player %}
+                        <div class="stat-row">
+                            <div class="player">
+                                <a href="/{{ server.id }}/player/{{ victim.username }}">
+                                    {{ victim.username|face_thumb }}
+                                    <div class="username">
+                                        {{ victim.displayname_html|safe }}
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="count">{{ death.count }}</div>
+                            <div class="clear"></div>
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            <div class="player-stat-section">
+                <h2>Other kills</h2>
+                {{ other_kill_count }}
+                <br/>
+                <br/>
+                {% for kill in other_kills %}
+                    <div class="stat-row">
+                        {{ kill.type }}
+                        <div class="count">{{ kill.count }}</div>
+                        <div class="clear"></div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="player-stat-section">
+                <h2>Other deaths</h2>
+                {{ other_death_count }}
+                <br/>
+                <br/>
+                {% for death in other_deaths %}
+                    <div class="stat-row">
+                        {{ death.type }}
+                        <div class="count">{{ death.count }}</div>
+                        <div class="clear"></div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <h2>{{ player.displayname_html|safe }} has not played on this server yet!</h2>
+            {% endif %}
+            <div class="clear"></div>
+        {% else %}
+            <h2>No record of {{ username }} on any server</h2>
+        {% endif %}
+    </div>
+{% endblock %}
