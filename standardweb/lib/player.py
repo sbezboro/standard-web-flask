@@ -3,6 +3,8 @@ from datetime import timedelta
 
 from standardweb.models import *
 
+from sqlalchemy.orm import joinedload
+
 
 def get_server_data(server, player):
     """
@@ -24,7 +26,8 @@ def get_server_data(server, player):
     other_kill_count = 0
     other_death_count = 0
 
-    deaths = DeathCount.query.filter_by(server_id=server.id, victim_id=player.id)
+    deaths = DeathCount.query.filter_by(server_id=server.id, victim_id=player.id) \
+        .options(joinedload('killer')).options(joinedload('death_type'))
 
     for death in deaths:
         if death.killer:
@@ -40,7 +43,8 @@ def get_server_data(server, player):
             })
             other_death_count += death.count
 
-    kills = KillCount.query.filter_by(server_id=server.id, killer_id=player.id)
+    kills = KillCount.query.filter_by(server_id=server.id, killer_id=player.id) \
+        .options(joinedload('kill_type'))
 
     for kill in kills:
         other_kills.append({
@@ -49,7 +53,8 @@ def get_server_data(server, player):
         })
         other_kill_count += kill.count
 
-    kills = DeathCount.query.filter_by(server_id=server.id, killer_id=player.id)
+    kills = DeathCount.query.filter_by(server_id=server.id, killer_id=player.id) \
+        .options(joinedload('victim')).options(joinedload('death_type'))
 
     for kill in kills:
         pvp_kills.append({
