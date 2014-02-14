@@ -3,6 +3,7 @@ from flask import flash
 from flask import redirect
 from flask import request
 from flask import render_template
+from flask import send_file
 from flask import session
 from flask import url_for
 
@@ -10,6 +11,18 @@ from standardweb import app
 from standardweb.forms import LoginForm
 from standardweb.lib import player as libplayer
 from standardweb.models import *
+
+from datetime import datetime
+from datetime import timedelta
+
+import StringIO
+
+from PIL import Image
+
+import requests
+
+
+PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
 
 @app.route('/')
 def index():
@@ -87,3 +100,57 @@ def player(username, server_id=None):
     retval.update(data)
 
     return render_template(template, **retval)
+
+@app.route('/face/<username>.png')
+@app.route('/face/<int:size>/<username>.png')
+def face(username, size=16):
+    size = int(size)
+
+    if size != 16 and size != 64:
+        abort(404)
+
+    path = '%s/standardweb/faces/%s/%s.png' % (PROJECT_PATH, size, username)
+
+    image = None
+
+    url = 'http://s3.amazonaws.com/MinecraftSkins/%s.png' % username
+
+    try:
+        resp = requests.get(url, timeout=1)
+    except:
+        pass
+    else:
+        if resp.status_code == 200:
+            last_modified = resp.headers['Last-Modified']
+            last_modified_date = datetime.strptime(last_modified, '%a, %d %b %Y %H:%M:%S %Z')
+
+            try:
+                file_date = datetime.utcfromtimestamp(os.path.getmtime(path))
+            except:
+                file_date = None
+
+            if not file_date or last_modified_date > file_date \
+                or datetime.utcnow() - file_date > timedelta(days=1):
+                image = libplayer.extract_face(Image.open(StringIO.StringIO(resp.content)), size)
+                image.save(path)
+            else:
+                image = Image.open(path)
+
+    if not image:
+        try:
+            # try opening existing image if it exists on disk if any of the above fails
+            image = Image.open(path)
+        except IOError:
+            pass
+
+    if not image:
+        image = libplayer.extract_face(Image.open(PROJECT_PATH + '/static/images/char.png'), size)
+        image.save(path)
+
+    tmp = StringIO.StringIO()
+    image.save(tmp, 'PNG')
+    tmp.seek(0)
+
+    resp = send_file(tmp, mimetype="image/png")
+
+    return resp

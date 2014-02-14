@@ -6,6 +6,20 @@ from standardweb.models import *
 from sqlalchemy.orm import joinedload
 
 
+def extract_face(image, size):
+    try:
+        pix = image.load()
+        for x in xrange(8, 16):
+            for y in xrange(8, 16):
+                # apply head accessory for non-transparent pixels
+                if pix[x + 32, y][3] > 1:
+                    pix[x, y] = pix[x + 32, y]
+    except:
+        pass
+
+    return image.crop((8, 8, 16, 16)).resize((size, size))
+
+
 def get_server_data(server, player):
     """
     Returns a dict of all the data for a particular player on
