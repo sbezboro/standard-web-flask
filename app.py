@@ -20,4 +20,4 @@ if __name__ == '__main__':
             from flask_debugtoolbar import DebugToolbarExtension
             DebugToolbarExtension(app)
 
-        app.run()
+        app.run(threaded=True)

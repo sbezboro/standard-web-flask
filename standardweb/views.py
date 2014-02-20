@@ -1,5 +1,6 @@
 from flask import abort
 from flask import flash
+from flask import make_response
 from flask import redirect
 from flask import request
 from flask import render_template
@@ -9,6 +10,7 @@ from flask import url_for
 
 from standardweb import app
 from standardweb.forms import LoginForm
+from standardweb.lib import cache
 from standardweb.lib import player as libplayer
 from standardweb.models import *
 
@@ -101,8 +103,18 @@ def player(username, server_id=None):
 
     return render_template(template, **retval)
 
+def _last_modified_func(username, size=16):
+    path = '%s/standardweb/faces/%s/%s.png' % (PROJECT_PATH, size, username)
+
+    try:
+        return datetime.utcfromtimestamp(os.path.getmtime(path))
+    except:
+        return None
+
+
 @app.route('/face/<username>.png')
 @app.route('/face/<int:size>/<username>.png')
+@cache.last_modified(_last_modified_func)
 def face(username, size=16):
     size = int(size)
 
@@ -111,9 +123,9 @@ def face(username, size=16):
 
     path = '%s/standardweb/faces/%s/%s.png' % (PROJECT_PATH, size, username)
 
-    image = None
-
     url = 'http://s3.amazonaws.com/MinecraftSkins/%s.png' % username
+
+    image = None
 
     try:
         resp = requests.get(url, timeout=1)
@@ -144,13 +156,11 @@ def face(username, size=16):
             pass
 
     if not image:
-        image = libplayer.extract_face(Image.open(PROJECT_PATH + '/static/images/char.png'), size)
+        image = libplayer.extract_face(Image.open(PROJECT_PATH + '/standardweb/static/images/char.png'), size)
         image.save(path)
 
     tmp = StringIO.StringIO()
     image.save(tmp, 'PNG')
     tmp.seek(0)
 
-    resp = send_file(tmp, mimetype="image/png")
-
-    return resp
+    return send_file(tmp, mimetype="image/png")
