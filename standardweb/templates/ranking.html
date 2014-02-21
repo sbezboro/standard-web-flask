@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Ranking - {{ server.address }} - Standard Survival Minecraft Server{% endblock %}
+
+{% block description %}A list of the top 10 and top 40 players on the Minecraft server {{ server.address }} based on time spent{% endblock %}
+
+{% block select_ranking %}selected{% endblock %}
+{% block content %}
+    <div class="nav-header">
+        <div class="inner">
+            <ul>
+                {% for s in servers %}
+                <li {% if server == s %}class="selected"{% endif %}>
+                    <a class="tooltip" href="/{{s.id}}/ranking" title="Address: {{ s.address }}">{{ s.name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div id="main">
+        <h2>Top 10 Players</h2>
+        <table class="ranking-table">
+        {% for player, time_spent, online_now in ranking %}
+            <tr>
+                <td class="rank">
+                    {{ loop.index }}
+                </td>
+                <td class="username">
+                    <a href="/{{ server.id }}/player/{{ player.username }}">
+                        {{ player.username|face_thumb }}
+                        {{ player.displayname_html|safe }}
+                    </a>
+                    {% if online_now %}
+                        <img src="/static/images/online.png" alt="Online now!" title="Online now!">
+                    {% endif %}
+                </td>
+                <td class="timeSpent">
+                    {{ time_spent }}
+                </td>
+            </tr>
+        {% if loop.index == 10 %}
+        </table>
+        <br>
+        <h2>Top 40 Players</h2>
+        <table class="ranking-table">
+        {% endif %}
+        {% endfor %}
+        </table>
+    </div>
+{% endblock %}

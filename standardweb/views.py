@@ -1,6 +1,5 @@
 from flask import abort
 from flask import flash
-from flask import make_response
 from flask import redirect
 from flask import request
 from flask import render_template
@@ -12,6 +11,7 @@ from standardweb import app
 from standardweb.forms import LoginForm
 from standardweb.lib import cache
 from standardweb.lib import player as libplayer
+from standardweb.lib import server as libserver
 from standardweb.models import *
 
 from datetime import datetime
@@ -67,7 +67,8 @@ def player(username, server_id=None):
         abort(404)
 
     if not server_id:
-        return redirect(url_for('player', username=username, server_id=2))
+        return redirect(url_for('player', username=username,
+                                server_id=app.config['MAIN_SERVER_ID']))
 
     server = Server.query.get(server_id)
 
@@ -103,7 +104,27 @@ def player(username, server_id=None):
 
     return render_template(template, **retval)
 
-def _last_modified_func(username, size=16):
+
+@app.route('/ranking')
+@app.route('/<int:server_id>/ranking')
+def ranking(server_id=None):
+    if not server_id:
+        return redirect(url_for('ranking', server_id=app.config['MAIN_SERVER_ID']))
+
+    server = Server.query.get(server_id)
+
+    ranking = libserver.get_ranking_data(server)
+
+    retval = {
+        'server': server,
+        'servers': Server.query.all(),
+        'ranking': ranking
+    }
+
+    return render_template('ranking.html', **retval)
+
+
+def _face_last_modified(username, size=16):
     path = '%s/standardweb/faces/%s/%s.png' % (PROJECT_PATH, size, username)
 
     try:
@@ -114,7 +135,7 @@ def _last_modified_func(username, size=16):
 
 @app.route('/face/<username>.png')
 @app.route('/face/<int:size>/<username>.png')
-@cache.last_modified(_last_modified_func)
+@cache.last_modified(_face_last_modified)
 def face(username, size=16):
     size = int(size)
 

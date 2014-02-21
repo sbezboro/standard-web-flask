@@ -118,6 +118,9 @@ class PlayerStats(db.Model, Base):
     banned = db.Column(db.Boolean)
     pvp_logs = db.Column(db.INTEGER)
 
+    server = db.relationship('Server', foreign_keys='PlayerStats.server_id')
+    player = db.relationship('Player', foreign_keys='PlayerStats.player_id')
+
     def get_rank(self):
         return PlayerStats.query.filter(PlayerStats.server_id == self.server_id,
                                         PlayerStats.time_spent > self.time_spent,
