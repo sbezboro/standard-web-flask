@@ -10,7 +10,7 @@ import hashlib
 import os
 
 
-def _get_or_create(cls, **kwargs):
+def _get_or_create(cls, commit=True, **kwargs):
     query = cls.query.filter_by(**kwargs)
 
     instance = query.first()
@@ -23,7 +23,8 @@ def _get_or_create(cls, **kwargs):
             instance = cls(**kwargs)
 
             db.session.add(instance)
-            db.session.commit()
+            if commit:
+                db.session.commit()
 
             return instance, True
         except IntegrityError:
@@ -32,11 +33,18 @@ def _get_or_create(cls, **kwargs):
 
             return instance, False
 
+
 class Base(object):
     def save(self, commit=True):
         db.session.add(self)
         if commit:
             db.session.commit()
+
+    @classmethod
+    def factory(cls, commit=True, **kwargs):
+        instance, created = _get_or_create(cls, commit=commit, **kwargs)
+
+        return instance
 
 
 class User(db.Model, Base):
@@ -93,13 +101,6 @@ class Player(db.Model, Base):
     @property
     def displayname_html(self):
         return self.nickname_html if self.nickname else self.username
-
-    @property
-    def forum_profile(self):
-        try:
-            return self.djangobb_profile.get()
-        except:
-            return None
 
     @property
     def last_seen(self):
@@ -169,10 +170,10 @@ class DeathCount(db.Model, Base):
 
     @classmethod
     def increment(cls, server, death_type, victim, killer):
-        death_count, created = _get_or_create(cls, server=server,
-                                              death_type=death_type,
-                                              victim=victim,
-                                              killer=killer)
+        death_count = cls.factory(server=server,
+                                  death_type=death_type,
+                                  victim=victim,
+                                  killer=killer)
         death_count.count += 1
         death_count.save()
 
@@ -192,8 +193,55 @@ class KillCount(db.Model, Base):
 
     @classmethod
     def increment(cls, server, kill_type, killer):
-        kill_count, created = _get_or_create(cls, server=server,
-                                             kill_type=kill_type,
-                                             killer=killer)
+        kill_count = cls.factory(server=server,
+                                 kill_type=kill_type,
+                                 killer=killer)
         kill_count.count += 1
         kill_count.save()
+
+
+class MaterialType(db.Model, Base):
+    __tablename__ = 'standardweb_materialtype'
+
+    id = db.Column(db.INTEGER, primary_key=True)
+    type = db.Column(db.String(32), unique=True)
+    displayname = db.Column(db.String(64))
+
+
+class OreDiscoveryEvent(db.Model, Base):
+    __tablename__ = 'standardweb_orediscoveryevent'
+
+    id = db.Column(db.INTEGER, primary_key=True)
+    timestamp = db.Column(db.DATETIME)
+    server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
+    player_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_minecraftplayer.id'))
+    material_type_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_materialtype.id'))
+    x = db.Column(db.INTEGER)
+    y = db.Column(db.INTEGER)
+    z = db.Column(db.INTEGER)
+
+    server = db.relationship('Server', foreign_keys='OreDiscoveryEvent.server_id')
+    player = db.relationship('Player', foreign_keys='OreDiscoveryEvent.player_id')
+    material_type = db.relationship('MaterialType', foreign_keys='OreDiscoveryEvent.material_type_id')
+
+
+class OreDiscoveryCount(db.Model, Base):
+    __tablename__ = 'standardweb_orediscoverycount'
+
+    id = db.Column(db.INTEGER, primary_key=True)
+    server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
+    player_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_minecraftplayer.id'))
+    material_type_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_materialtype.id'))
+    count = db.Column(db.INTEGER, default=0)
+
+    server = db.relationship('Server', foreign_keys='OreDiscoveryCount.server_id')
+    player = db.relationship('Player', foreign_keys='OreDiscoveryCount.player_id')
+    material_type = db.relationship('MaterialType', foreign_keys='OreDiscoveryCount.material_type_id')
+
+    @classmethod
+    def increment(cls, server, material_type, player):
+        ore_count, created = cls.factory(server=server,
+                                         material_type=material_type,
+                                         player=player)
+        ore_count.count += 1
+        ore_count.save()

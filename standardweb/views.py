@@ -8,8 +8,10 @@ from flask import session
 from flask import url_for
 
 from standardweb import app
+from standardweb import cache
 from standardweb.forms import LoginForm
-from standardweb.lib import cache
+from standardweb.lib import cache as libcache
+from standardweb.lib import leaderboards as libleaderboards
 from standardweb.lib import player as libplayer
 from standardweb.lib import server as libserver
 from standardweb.models import *
@@ -58,6 +60,15 @@ def login():
 def logout():
     session.pop('user_id', None)
     return redirect(url_for('index'))
+
+
+@app.route('/player_list')
+def player_list():
+    server = Server.query.get(app.config['MAIN_SERVER_ID'])
+
+    stats = libserver.get_player_list_data(server)
+
+    return render_template('includes/playerlist.html', stats=stats)
 
 
 @app.route('/player/<username>')
@@ -124,6 +135,43 @@ def ranking(server_id=None):
     return render_template('ranking.html', **retval)
 
 
+@app.route('/leaderboards')
+@app.route('/<int:server_id>/leaderboards')
+def leaderboards(server_id=None):
+    if not server_id:
+        return redirect(url_for('leaderboards', server_id=app.config['MAIN_SERVER_ID']))
+
+    server = Server.query.get(server_id)
+
+    kill_leaderboards = []
+    ore_leaderboards = []
+
+    libleaderboards.get_kill_leaderboards(server, 'enderdragon', 'Ender Dragon Kills', kill_leaderboards)
+    libleaderboards.get_kill_leaderboards(server, 'wither', 'Wither Kills', kill_leaderboards)
+    libleaderboards.get_kill_leaderboards(server, 'creeper', 'Creeper Kills', kill_leaderboards)
+    libleaderboards.get_ore_leaderboards(server, 'DIAMOND_ORE', 'Diamond Ore Discoveries', ore_leaderboards, subtitle='Since (2013/11/20)')
+    libleaderboards.get_ore_leaderboards(server, 'EMERALD_ORE', 'Emerald Ore Discoveries', ore_leaderboards, subtitle='Since (2013/11/20)')
+    libleaderboards.get_ore_leaderboards(server, 'LAPIS_ORE', 'Lapis Ore Discoveries', ore_leaderboards, subtitle='Since (2013/11/20)')
+    libleaderboards.get_ore_leaderboards(server, 'REDSTONE_ORE', 'Redstone Ore Discoveries', ore_leaderboards, subtitle='Since (2013/12/4)')
+
+    leaderboard_sections = [{
+        'active': True,
+        'name': 'Kills',
+        'leaderboards': kill_leaderboards
+    }, {
+        'name': 'Ores',
+        'leaderboards': ore_leaderboards
+    }]
+
+    retval = {
+        'server': server,
+        'servers': Server.query.all(),
+        'leaderboard_sections': leaderboard_sections
+    }
+
+    return render_template('leaderboards.html', **retval)
+
+
 def _face_last_modified(username, size=16):
     path = '%s/standardweb/faces/%s/%s.png' % (PROJECT_PATH, size, username)
 
@@ -135,7 +183,7 @@ def _face_last_modified(username, size=16):
 
 @app.route('/face/<username>.png')
 @app.route('/face/<int:size>/<username>.png')
-@cache.last_modified(_face_last_modified)
+@libcache.last_modified(_face_last_modified)
 def face(username, size=16):
     size = int(size)
 

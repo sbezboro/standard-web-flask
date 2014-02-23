@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Leaderboards - {{ server.address }} - Standard Survival Minecraft Server{% endblock %}
+
+{% block description %}A set of different leaderboards for various actions on the Minecraft server {{ server.address }}{% endblock %}
+
+{% block select_leaderboards %}selected{% endblock %}
+{% block content %}
+    <div class="nav-header">
+        <div class="inner">
+            <ul>
+                {% for s in servers %}
+                <li {% if server == s %}class="selected"{% endif %}>
+                    <a class="tooltip" href="/{{s.id}}/leaderboards" title="Address: {{ s.address }}">{{ s.name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div id="main">
+        <h2>Leaderboards</h2>
+        <div class="nav-pills">
+            <ul>
+                {% for section in leaderboard_sections %}
+                    {% if section.leaderboards %}
+                    <li>
+                        <a href="#{{ section.name|lower }}">{{ section.name }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% for section in leaderboard_sections %}
+            <div id="{{ section.name|lower }}" class="nav-section">
+                {% for leaderboard in section.leaderboards %}
+                    <div class="leaderboard-section {{ loop.cycle('left', 'right') }}">
+                        <h3>{{ leaderboard.title }}
+                            {% if leaderboard.subtitle %}
+                                <span class="subtitle">{{ leaderboard.subtitle }}</span>
+                            {% endif %}
+                        </h3>
+                        <table class="leaderboard-table">
+                            {% for count, player in leaderboard.list %}
+                            <tr>
+                                <td class="rank">
+                                    {{ loop.index }}
+                                </td>
+                                <td class="player">
+                                    <a href="/{{ server.id }}/player/{{ player.username }}">
+                                        {{ player.username|face_thumb }}
+                                        {{ player.displayname_html|safe }}
+                                    </a>
+                                </td>
+                                <td class="count">
+                                    {{ count }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
