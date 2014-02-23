@@ -1,6 +1,7 @@
 from datetime import datetime
 from datetime import timedelta
 
+from standardweb.lib import cache
 from standardweb.models import *
 
 from sqlalchemy.orm import joinedload
@@ -20,6 +21,7 @@ def extract_face(image, size):
     return image.crop((8, 8, 16, 16)).resize((size, size))
 
 
+@cache.CachedResult('player', time=30)
 def get_server_data(server, player):
     """
     Returns a dict of all the data for a particular player on

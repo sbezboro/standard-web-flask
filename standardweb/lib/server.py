@@ -1,4 +1,5 @@
 from standardweb.lib import api
+from standardweb.lib import cache
 from standardweb.lib import helpers as h
 from standardweb.models import *
 
@@ -8,6 +9,7 @@ from datetime import datetime
 from datetime import timedelta
 
 
+@cache.CachedResult('ranking')
 def get_ranking_data(server):
     retval = []
 
@@ -24,6 +26,7 @@ def get_ranking_data(server):
     return retval
 
 
+@cache.CachedResult('player-list', time=5)
 def get_player_list_data(server):
     server_status = api.get_server_status(server)
 

@@ -1,3 +1,4 @@
+from standardweb.lib import cache
 from standardweb.models import *
 
 from sqlalchemy.orm import joinedload
@@ -48,9 +49,25 @@ def _get_leaderboard_report(server, type, element, title, section, subtitle):
         section.append(leaderboard_data)
 
 
-def get_kill_leaderboards(server, element, title, section, subtitle=None):
+def _get_kill_leaderboards(server, element, title, section, subtitle=None):
     _get_leaderboard_report(server, 'kills', element, title, section, subtitle)
 
 
-def get_ore_leaderboards(server, element, title, section, subtitle=None):
+def _get_ore_leaderboards(server, element, title, section, subtitle=None):
     _get_leaderboard_report(server, 'ores', element, title, section, subtitle)
+
+
+@cache.CachedResult('leaderbaords', time=30)
+def get_leaderboard_data(server):
+    kill_leaderboards = []
+    ore_leaderboards = []
+
+    _get_kill_leaderboards(server, 'enderdragon', 'Ender Dragon Kills', kill_leaderboards)
+    _get_kill_leaderboards(server, 'wither', 'Wither Kills', kill_leaderboards)
+    _get_kill_leaderboards(server, 'creeper', 'Creeper Kills', kill_leaderboards)
+    _get_ore_leaderboards(server, 'DIAMOND_ORE', 'Diamond Ore Discoveries', ore_leaderboards, subtitle='Since (2013/11/20)')
+    _get_ore_leaderboards(server, 'EMERALD_ORE', 'Emerald Ore Discoveries', ore_leaderboards, subtitle='Since (2013/11/20)')
+    _get_ore_leaderboards(server, 'LAPIS_ORE', 'Lapis Ore Discoveries', ore_leaderboards, subtitle='Since (2013/11/20)')
+    _get_ore_leaderboards(server, 'REDSTONE_ORE', 'Redstone Ore Discoveries', ore_leaderboards, subtitle='Since (2013/12/4)')
+
+    return kill_leaderboards, ore_leaderboards

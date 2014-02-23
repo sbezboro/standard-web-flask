@@ -58,16 +58,17 @@ class User(db.Model, Base):
 
     def check_password(self, plaintext_password):
         algorithm, iterations, salt, hash_val = self.password.split('$', 3)
-        expected = self._make_password(plaintext_password, salt=salt, iterations=int(iterations))
+        expected = User._make_password(plaintext_password, salt=salt, iterations=int(iterations))
 
         return h.safe_str_cmp(self.password, expected)
 
     def set_password(self, plaintext_password, commit=True):
-        password = self._make_password(plaintext_password)
+        password = User._make_password(plaintext_password)
         self.password = password
         self.save(commit=commit)
 
-    def _make_password(self, password, salt=None, iterations=None):
+    @staticmethod
+    def _make_password(password, salt=None, iterations=None):
         if not salt:
             salt = binascii.b2a_hex(os.urandom(15))
 
