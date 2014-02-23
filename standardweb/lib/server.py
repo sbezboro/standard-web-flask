@@ -2,7 +2,6 @@ from standardweb.lib import api
 from standardweb.lib import helpers as h
 from standardweb.models import *
 
-from sqlalchemy.sql.expression import desc
 from sqlalchemy.orm import joinedload
 
 from datetime import datetime
@@ -13,7 +12,7 @@ def get_ranking_data(server):
     retval = []
 
     player_stats = PlayerStats.query.filter_by(server=server) \
-        .order_by(desc(PlayerStats.time_spent)) \
+        .order_by(PlayerStats.time_spent.desc()) \
         .limit(40) \
         .options(joinedload('player')) \
 
@@ -35,7 +34,7 @@ def get_player_list_data(server):
 
     player_info = []
     top10_player_ids = PlayerStats.query.filter_by(server=server) \
-                           .order_by(desc(PlayerStats.time_spent)) \
+                           .order_by(PlayerStats.time_spent.desc()) \
                            .limit(10) \
                            .options(joinedload('player'))
 

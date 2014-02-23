@@ -7,7 +7,8 @@ def _build_kill_leaderboard(server, type):
     kill_type = KillType.query.filter_by(type=type).first()
     kills = KillCount.query.filter_by(server=server, kill_type=kill_type) \
         .options(joinedload('killer')) \
-        .limit(100)
+        .order_by(KillCount.count.desc()) \
+        .limit(10)
     if kills:
         return sorted([(x.count, x.killer) for x in kills], key=lambda x: (-x[0], x[1].displayname.lower()))[:10]
 
@@ -17,7 +18,9 @@ def _build_kill_leaderboard(server, type):
 def _build_block_discovery_leaderboard(server, type):
     material_type = MaterialType.query.filter_by(type=type).first()
     discoveries = OreDiscoveryCount.query.filter_by(server=server, material_type=material_type) \
-        .options(joinedload('player'))
+        .options(joinedload('player')) \
+        .order_by(OreDiscoveryCount.count.desc()) \
+        .limit(10)
 
     if discoveries:
         return sorted([(x.count, x.player) for x in discoveries], key=lambda x: (-x[0], x[1].displayname.lower()))[:10]
