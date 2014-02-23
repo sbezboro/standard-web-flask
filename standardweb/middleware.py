@@ -3,8 +3,6 @@ from flask import g
 from flask import request
 from flask import session
 
-from jinja2.nodes import Markup
-
 from standardweb import app
 from standardweb.lib import csrf
 from standardweb.models import User
@@ -21,7 +19,7 @@ def csrf_protect():
     if request.method == "POST":
         func = app.view_functions.get(request.endpoint)
 
-        if func and func not in csrf.exempt_funcs:
+        if func and func not in csrf.exempt_funcs and 'debugtoolbar' not in request.endpoint:
             token = session.get('csrf_token')
 
             if not token or token != request.form.get('csrf_token'):

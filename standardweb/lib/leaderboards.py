@@ -6,7 +6,8 @@ from sqlalchemy.orm import joinedload
 def _build_kill_leaderboard(server, type):
     kill_type = KillType.query.filter_by(type=type).first()
     kills = KillCount.query.filter_by(server=server, kill_type=kill_type) \
-        .options(joinedload('killer'))
+        .options(joinedload('killer')) \
+        .limit(100)
     if kills:
         return sorted([(x.count, x.killer) for x in kills], key=lambda x: (-x[0], x[1].displayname.lower()))[:10]
 
