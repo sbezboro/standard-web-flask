@@ -795,6 +795,7 @@ a:hover {
 
 .search-form input[type=text] {
     width: 200px;
+    margin: 0 0 20px;
 }
 
 #refreshImage {

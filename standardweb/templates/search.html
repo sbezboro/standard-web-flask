@@ -15,9 +15,6 @@
             <input type="submit" value="Search" />
         </form>
 
-        <br />
-        <br />
-        
         {% for player in results %}
             <div class="search-row">
                 <a href="{{ url_for('player', username=player.username) }}">
