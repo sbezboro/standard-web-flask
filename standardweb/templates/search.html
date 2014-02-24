@@ -15,8 +15,9 @@
             <input type="submit" value="Search" />
         </form>
 
+        <ul class="search-list">
         {% for player in results %}
-            <div class="search-row">
+            <li>
                 <a href="{{ url_for('player', username=player.username) }}">
                     {{ player.username|face_thumb }}
                     {{ player.displayname_html|safe }}
@@ -24,10 +25,11 @@
                         ({{ player.username }})
                     {% endif %}
                 </a><br />
-            </div>
+            </li>
         {% else %}
             No results found
         {% endfor %}
+        </ul>
 
         <div class="search-pager">
         {% if page > 0 %}

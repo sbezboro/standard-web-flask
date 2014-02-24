@@ -282,11 +282,11 @@ a:hover {
     display: inline-block;
 }
 
-#player-list a, .ranking-table a, .player-stat-section a, .leaderboard-table a, .search-row a {
+#player-list a, .ranking-table a, .player-stat-section a, .leaderboard-table a, .search-list a {
     color: #545454;
 }
 
-#player-list a:hover, .ranking-table a:hover, .player-stat-section a:hover, .leaderboard-table a:hover, .search-row a:hover {
+#player-list a:hover, .ranking-table a:hover, .player-stat-section a:hover, .leaderboard-table a:hover, .search-list a:hover {
     color: #AAA;
 }
 
@@ -785,8 +785,14 @@ a:hover {
     cursor: default;
 }
 
-.search-row {
+.search-list {
+    margin: 0;
+    padding: 0;
+}
+
+.search-list li {
     font-size: 14pt;
+    list-style: none;
 }
 
 .search-pager {
