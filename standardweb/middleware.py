@@ -2,10 +2,13 @@ from flask import abort
 from flask import g
 from flask import request
 from flask import session
+from flask import url_for
 
 from standardweb import app
 from standardweb.lib import csrf
 from standardweb.models import User
+
+import os
 
 
 @app.before_request
@@ -30,3 +33,22 @@ def csrf_protect():
 @app.context_processor
 def inject_user():
     return dict(user=getattr(g, 'user', None))
+
+
+def _dated_url_for(endpoint, **values):
+    if endpoint == 'static':
+        filename = values.get('filename', None)
+
+        if filename:
+            file_path = os.path.join(app.root_path, endpoint, filename)
+            try:
+                values['t'] = int(os.stat(file_path).st_mtime)
+            except:
+                pass
+
+    return url_for(endpoint, **values)
+
+
+@app.context_processor
+def override_url_for():
+    return dict(url_for=_dated_url_for)

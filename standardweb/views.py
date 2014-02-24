@@ -1,5 +1,7 @@
 from flask import abort
 from flask import flash
+from flask import json
+from flask import jsonify
 from flask import redirect
 from flask import request
 from flask import render_template
@@ -40,16 +42,17 @@ def login():
     if form.validate_on_submit():
         username = request.form['username']
         password = request.form['password']
-        next = request.form.get('next')
+        next_path = request.form.get('next')
 
         user = User.query.filter_by(username=username).first()
 
         if user and user.check_password(password):
             session['user_id'] = user.id
+            session.permanent = True
 
             flash('Successfully logged in', 'success')
 
-            return redirect(next or url_for('index'))
+            return redirect(next_path or url_for('index'))
         else:
             flash('Invalid username/password combination', 'error')
 
@@ -69,6 +72,28 @@ def player_list():
     stats = libserver.get_player_list_data(server)
 
     return render_template('includes/playerlist.html', stats=stats)
+
+
+@app.route('/player_graph')
+@app.route('/<int:server_id>/player_graph')
+def player_graph(server_id=None):
+    server = Server.query.get(server_id or app.config['MAIN_SERVER_ID'])
+
+    week_index = request.args.get('weekIndex')
+
+    if week_index is None:
+        graph_data = libserver.get_player_graph_data(server)
+    else:
+        first_status = ServerStatus.query.filter_by(server=server).order_by('timestamp').first()
+
+        timestamp = first_status.timestamp + int(week_index) * timedelta(days=7)
+        start_date = timestamp
+        end_date = timestamp + timedelta(days=7)
+
+        graph_data = libserver.get_player_graph_data(server, start_date=start_date,
+                                                     end_date=end_date)
+
+    return jsonify(graph_data)
 
 
 @app.route('/player/<username>')

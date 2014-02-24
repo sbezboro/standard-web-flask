@@ -868,6 +868,16 @@ fieldset > .alert {
     text-decoration: underline;
 }
 
+.alert a.close {
+    float: right;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.alert.success a.close {
+    color: #468847;
+}
+
 .small {
     font-size: 0.5em;
     margin-left: 10px;

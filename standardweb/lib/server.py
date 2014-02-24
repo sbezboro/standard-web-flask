@@ -5,6 +5,7 @@ from standardweb.models import *
 
 from sqlalchemy.orm import joinedload
 
+import calendar
 from datetime import datetime
 from datetime import timedelta
 
@@ -65,4 +66,35 @@ def get_player_list_data(server):
         'num_players': server_status['numplayers'],
         'max_players': server_status['maxplayers'],
         'tps': server_status['tps']
+    }
+
+
+def get_player_graph_data(server, granularity=15, start_date=None, end_date=None):
+    end_date = end_date or datetime.utcnow()
+    start_date = start_date or end_date - timedelta(days=7)
+
+    statuses = ServerStatus.query.filter(ServerStatus.server == server,
+                                         ServerStatus.timestamp > start_date,
+                                         ServerStatus.timestamp < end_date) \
+        .order_by('timestamp')
+
+    index = 0
+    points = []
+    for status in statuses:
+        if index % granularity == 0:
+            data = {
+                'time': int(calendar.timegm(status.timestamp.timetuple()) * 1000),
+                'player_count': status.player_count
+            }
+
+            points.append(data)
+
+        index += 1
+
+    points.sort(key=lambda x: x['time'])
+
+    return {
+        'start_time': int(calendar.timegm(start_date.timetuple()) * 1000),
+        'end_time': int(calendar.timegm(end_date.timetuple()) * 1000),
+        'points': points
     }

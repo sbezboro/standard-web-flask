@@ -74,4 +74,8 @@ $(document).ready(function() {
       $section.addClass('hidden');
     }
   });
+
+  $(document).on('click', '.alert > .close', function() {
+    $(this).closest('.alert').remove();
+  });
 });

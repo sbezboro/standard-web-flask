@@ -3,6 +3,7 @@
     {% for category, message in messages %}
       <div class="alert {{ category }}">
         {{ message }}
+        <a class="close">&times;</a>
       </div>
     {% endfor %}
   {% endif %}

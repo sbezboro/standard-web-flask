@@ -5,6 +5,8 @@ from pbkdf2 import pbkdf2_bin
 
 from sqlalchemy.exc import IntegrityError
 
+from datetime import datetime
+
 import binascii
 import hashlib
 import os
@@ -83,7 +85,7 @@ class User(db.Model, Base):
 class Player(db.Model, Base):
     __tablename__ = 'standardweb_minecraftplayer'
 
-    id = db.Column(db.INTEGER, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30))
     nickname = db.Column(db.String(30))
     nickname_ansi = db.Column(db.String(256))
@@ -111,14 +113,14 @@ class Player(db.Model, Base):
 class PlayerStats(db.Model, Base):
     __tablename__ = 'standardweb_playerstats'
 
-    id = db.Column(db.INTEGER, primary_key=True)
-    player_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_minecraftplayer.id'))
-    server_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_server.id'))
-    time_spent = db.Column(db.INTEGER)
-    first_seen = db.Column(db.DATETIME)
-    last_seen = db.Column(db.DATETIME)
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, db.ForeignKey('standardweb_minecraftplayer.id'))
+    server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
+    time_spent = db.Column(db.Integer)
+    first_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     banned = db.Column(db.Boolean)
-    pvp_logs = db.Column(db.INTEGER)
+    pvp_logs = db.Column(db.Integer)
 
     server = db.relationship('Server', foreign_keys='PlayerStats.server_id')
     player = db.relationship('Player', foreign_keys='PlayerStats.player_id')
@@ -132,16 +134,42 @@ class PlayerStats(db.Model, Base):
 class Server(db.Model, Base):
     __tablename__ = 'standardweb_server'
 
-    id = db.Column(db.INTEGER, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
     address = db.Column(db.String(50))
     secret_key = db.Column(db.String(10))
 
 
+class ServerStatus(db.Model, Base):
+    __tablename__ = 'standardweb_serverstatus'
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
+    player_count = db.Column(db.Integer)
+    cpu_load = db.Column(db.Float)
+    tps = db.Column(db.Float)
+
+    server = db.relationship('Server', foreign_keys='ServerStatus.server_id')
+
+
+class MojangStatus(db.Model, Base):
+    __tablename__ = 'standardweb_mojangstatus'
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    website = db.Column(db.Boolean)
+    login = db.Column(db.Boolean)
+    session = db.Column(db.Boolean)
+    account = db.Column(db.Boolean)
+    auth = db.Column(db.Boolean)
+    skins = db.Column(db.Boolean)
+
+
 class DeathType(db.Model, Base):
     __tablename__ = 'standardweb_deathtype'
 
-    id = db.Column(db.INTEGER, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(100))
     displayname = db.Column(db.String(100))
 
@@ -149,7 +177,7 @@ class DeathType(db.Model, Base):
 class KillType(db.Model, Base):
     __tablename__ = 'standardweb_killtype'
 
-    id = db.Column(db.INTEGER, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(100))
     displayname = db.Column(db.String(100))
 
@@ -157,12 +185,12 @@ class KillType(db.Model, Base):
 class DeathCount(db.Model, Base):
     __tablename__ = 'standardweb_deathcount'
 
-    id = db.Column(db.INTEGER, primary_key=True)
-    server_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_server.id'))
-    death_type_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_deathtype.id'))
-    victim_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_minecraftplayer.id'))
-    killer_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_minecraftplayer.id'))
-    count = db.Column(db.INTEGER)
+    id = db.Column(db.Integer, primary_key=True)
+    server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
+    death_type_id = db.Column(db.Integer, db.ForeignKey('standardweb_deathtype.id'))
+    victim_id = db.Column(db.Integer, db.ForeignKey('standardweb_minecraftplayer.id'))
+    killer_id = db.Column(db.Integer, db.ForeignKey('standardweb_minecraftplayer.id'))
+    count = db.Column(db.Integer)
 
     server = db.relationship('Server', foreign_keys='DeathCount.server_id')
     death_type = db.relationship('DeathType', foreign_keys='DeathCount.death_type_id')
@@ -182,11 +210,11 @@ class DeathCount(db.Model, Base):
 class KillCount(db.Model, Base):
     __tablename__ = 'standardweb_killcount'
 
-    id = db.Column(db.INTEGER, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
     kill_type_id = db.Column(db.Integer, db.ForeignKey('standardweb_killtype.id'))
-    killer_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_minecraftplayer.id'))
-    count = db.Column(db.INTEGER)
+    killer_id = db.Column(db.Integer, db.ForeignKey('standardweb_minecraftplayer.id'))
+    count = db.Column(db.Integer)
 
     server = db.relationship('Server', foreign_keys='KillCount.server_id')
     kill_type = db.relationship('KillType', foreign_keys='KillCount.kill_type_id')
@@ -204,7 +232,7 @@ class KillCount(db.Model, Base):
 class MaterialType(db.Model, Base):
     __tablename__ = 'standardweb_materialtype'
 
-    id = db.Column(db.INTEGER, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(32), unique=True)
     displayname = db.Column(db.String(64))
 
@@ -212,14 +240,14 @@ class MaterialType(db.Model, Base):
 class OreDiscoveryEvent(db.Model, Base):
     __tablename__ = 'standardweb_orediscoveryevent'
 
-    id = db.Column(db.INTEGER, primary_key=True)
-    timestamp = db.Column(db.DATETIME)
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
-    player_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_minecraftplayer.id'))
-    material_type_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_materialtype.id'))
-    x = db.Column(db.INTEGER)
-    y = db.Column(db.INTEGER)
-    z = db.Column(db.INTEGER)
+    player_id = db.Column(db.Integer, db.ForeignKey('standardweb_minecraftplayer.id'))
+    material_type_id = db.Column(db.Integer, db.ForeignKey('standardweb_materialtype.id'))
+    x = db.Column(db.Integer)
+    y = db.Column(db.Integer)
+    z = db.Column(db.Integer)
 
     server = db.relationship('Server', foreign_keys='OreDiscoveryEvent.server_id')
     player = db.relationship('Player', foreign_keys='OreDiscoveryEvent.player_id')
@@ -229,11 +257,11 @@ class OreDiscoveryEvent(db.Model, Base):
 class OreDiscoveryCount(db.Model, Base):
     __tablename__ = 'standardweb_orediscoverycount'
 
-    id = db.Column(db.INTEGER, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
-    player_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_minecraftplayer.id'))
-    material_type_id = db.Column(db.INTEGER, db.ForeignKey('standardweb_materialtype.id'))
-    count = db.Column(db.INTEGER, default=0)
+    player_id = db.Column(db.Integer, db.ForeignKey('standardweb_minecraftplayer.id'))
+    material_type_id = db.Column(db.Integer, db.ForeignKey('standardweb_materialtype.id'))
+    count = db.Column(db.Integer, default=0)
 
     server = db.relationship('Server', foreign_keys='OreDiscoveryCount.server_id')
     player = db.relationship('Player', foreign_keys='OreDiscoveryCount.player_id')

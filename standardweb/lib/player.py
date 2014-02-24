@@ -13,7 +13,7 @@ def extract_face(image, size):
         for x in xrange(8, 16):
             for y in xrange(8, 16):
                 # apply head accessory for non-transparent pixels
-                if pix[x + 32, y][3] > 1:
+                if pix[x + 32, y][3] > 0:
                     pix[x, y] = pix[x + 32, y]
     except:
         pass
