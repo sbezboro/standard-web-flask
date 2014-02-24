@@ -789,6 +789,14 @@ a:hover {
     font-size: 14pt;
 }
 
+.search-pager {
+    margin: 10px 0;
+}
+
+.search-form input[type=text] {
+    width: 200px;
+}
+
 #refreshImage {
     margin-bottom: -2px;
 }

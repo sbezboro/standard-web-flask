@@ -51,7 +51,7 @@
                         <a href="#" onclick="alert('Log in to the Minecraft server (standardsurvival.com) and type /register to create an account!')">Sign up</a>
                         <a class="{% block select_login %}{% endblock %}" href="/login?next={{ request.path }}">Log in</a>
                     {% endif %}
-                    <form class="form-inline" method="GET" action="/search">
+                    <form class="form-inline" method="GET" action="{{ url_for('player_search') }}">
                         <input class="placeholder" type="text" name="q" placeholder="Player search" value="{{ query }}"/>
                     </form>
                 </div>

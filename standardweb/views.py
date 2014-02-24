@@ -18,6 +18,9 @@ from standardweb.lib import player as libplayer
 from standardweb.lib import server as libserver
 from standardweb.models import *
 
+from sqlalchemy import or_
+from sqlalchemy.sql.expression import func
+
 from datetime import datetime
 from datetime import timedelta
 
@@ -63,6 +66,34 @@ def login():
 def logout():
     session.pop('user_id', None)
     return redirect(url_for('index'))
+
+
+@app.route('/search')
+def player_search():
+    q = request.args.get('q')
+    p = request.args.get('p')
+
+    p = int(p) if p else 0
+
+    page_size = 20
+
+    results = Player.query.filter(or_(Player.username.ilike('%%%s%%' % q),
+                                      Player.nickname.ilike('%%%s%%' % q))) \
+        .order_by(func.ifnull(Player.nickname, Player.username)) \
+        .limit(page_size + 1) \
+        .offset(p * page_size)
+
+    results = list(results)
+
+    if len(results) > page_size:
+        show_next = True
+        results = results[:page_size]
+    else:
+        show_next = False
+
+    return render_template('search.html', results=results,
+                           query=q, page=p,
+                           show_next=show_next)
 
 
 @app.route('/player_list')
