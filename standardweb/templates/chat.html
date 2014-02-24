@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Live Server Chat - Standard Survival Minecraft Server{% endblock %}
+
+{% block select_chat %}selected{% endblock %}
+
+{% block content %}
+    <div class="nav-header">
+      <div class="inner">
+        <ul>
+          {% for s in servers %}
+          <li {% if server == s %}class="selected"{% endif %}>
+              <a class="tooltip" href="/{{s.id}}/chat" title="Address: {{ s.address }}">{{ s.name }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div id="main">
+      {% include 'includes/messages.html' %}
+
+      <h2>Live Server Chat</h2>
+      <div id="chat-container">
+        <div id="chat"></div>
+        <input id="chat-textbox" type="text" maxlength="80"/>
+      </div>
+      {% if not user %}
+        <br>
+        <div>
+          You must be <a href="{{ url_for('login') }}">logged in</a> to the website to be able to chat!
+        </div>
+      {% endif %}
+      <table class="players-table">
+      </table>
+      
+      <script type="text/javascript">
+          $(document).ready(function() {
+              var $chat = $('#chat');
+              var $chatTextbox = $('#chat-textbox');
+              var baseUrl = '{{ rts_address }}';
+              var serverId = {{ server.id }};
+              
+              $(document).on("click", ".message-player", function(event) {
+                  $chatTextbox.val("/msg " + $(this).attr("player") + " ");
+                  $chatTextbox.focus();
+                  return false;
+              });
+
+              var username;
+              var nickname;
+
+              {% if player %}
+                  username = '{{ player.username }}';
+                  {% if player.nickname %}
+                    nickname = '{{ player.nickname }}';
+                  {% endif %}
+              {% endif %}
+
+              var chatStream = new ChatStream({{ rts_auth_data|tojson|safe }}, baseUrl, $chat,
+                                              $chatTextbox, serverId, username, nickname);
+              chatStream.connect(function(error) {});
+              
+              soundManager.setup({
+                  url: '/static/flash/',
+                  flashVersion: 9,
+                  debugMode: false,
+                  preferFlash: false,
+                  onready: function() {
+                      var mentionSound = soundManager.createSound({
+                          id: 'mention',
+                          url: '/static/sound/mention.wav'
+                      });
+                      
+                      chatStream.setMentionSound(mentionSound);
+                  }
+              });
+          });
+      </script>
+    </div>
+{% endblock %}

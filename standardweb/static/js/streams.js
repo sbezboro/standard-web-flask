@@ -25,11 +25,11 @@ function Stream(authData, baseUrl, $outputArea, $textbox, serverId, source) {
     
     this.isAtBottom = function() {
         return $outputArea.get(0).scrollHeight - $outputArea.scrollTop() == $outputArea.outerHeight();
-    }
+    };
     
     this.scrollToBottom = function() {
         $outputArea.scrollTop($outputArea.get(0).scrollHeight);
-    }
+    };
     
     this.scrollToBottomIfAtBottom = function(callback) {
         if (this.isAtBottom()) {
@@ -39,11 +39,11 @@ function Stream(authData, baseUrl, $outputArea, $textbox, serverId, source) {
         } else {
             callback();
         }
-    }
+    };
     
     this.trimTopLines = function(num) {
         $('li:lt(' + num + ')', $outputArea).remove();
-    }
+    };
   
     this.addOutputLines = function(batch) {
         var shouldScroll = _this.isAtBottom();
@@ -66,11 +66,11 @@ function Stream(authData, baseUrl, $outputArea, $textbox, serverId, source) {
         if (shouldScroll) {
             _this.scrollToBottom();
         }
-    }
+    };
     
     this.addOutputLine = function(line) {
         this.addOutputLines([line]);
-    }
+    };
     
     this.postProcessLine = function(line) {
         var playSound = false;
@@ -97,42 +97,36 @@ function Stream(authData, baseUrl, $outputArea, $textbox, serverId, source) {
         }
         
         return line;
-    }
+    };
     
     this.addRegexMention = function(regex, style) {
         this.mentions.push({
             regex: regex,
             style: style
         });
-    }
+    };
     
     this.addChatMention = function(string, style) {
         var replacedPat = mentionPat.replace('MENTION_PART', string);
         var regex = new RegExp(replacedPat, 'gi');
         
         this.addRegexMention(regex, style);
-    }
+    };
     
     this.setMentionSound = function(mentionSound) {
         this.mentionSound = mentionSound;
-    }
+    };
     
-    this.messageEntered = function(input) {
+    this.messageEntered = function() {
         throw "Method should be implemented by inherited objects!";
-    }
+    };
     
     this.socketInitialized = function() {
         throw "Method should be implemented by inherited objects!";
-    }
+    };
     
     this.connect = function(callback) {
         this.addOutputLine("Connecting...");
-        
-        if (typeof io === 'undefined') {
-            var msg = "ERROR: Server not reachable!";
-            this.addOutputLine(msg);
-            return callback(new Error(msg));
-        }
         
         var socket = io.connect(this.baseUrl + '/' + this.source);
         this.socket = socket;
@@ -140,8 +134,13 @@ function Stream(authData, baseUrl, $outputArea, $textbox, serverId, source) {
         _this.socketInitialized();
 
         socket.on('connect_failed', function(reason) {
-            _rollbar.push({level: 'error', msg: 'Client could not connect to stream socket', reason: reason});
             _this.addOutputLine("ERROR: failed to connect!");
+            _rollbar.push({level: 'error', msg: 'Client could not connect to stream socket', reason: reason});
+        });
+
+        socket.on('error', function() {
+            _this.addOutputLine("ERROR: failed to connect!");
+            _rollbar.push({level: 'error', msg: 'Client could not connect to stream socket'});
         });
         
         socket.on('connect', function() {
@@ -155,8 +154,8 @@ function Stream(authData, baseUrl, $outputArea, $textbox, serverId, source) {
         });
         
         socket.on('disconnect', function() {
-            _rollbar.push({level: 'error', msg: 'Client disconnected from stream socket'});
             _this.addOutputLine("ERROR: socket connection lost!");
+            _rollbar.push({level: 'error', msg: 'Client disconnected from stream socket'});
         });
 
         socket.on('mc-connection-lost', function() {
@@ -251,7 +250,7 @@ function ConsoleStream(authToken, baseUrl, $outputArea, $textbox, serverId) {
     // A player messaging console
     this.addRegexMention('-&gt; me');
     
-    $textbox.keydown(function(e) {
+    $textbox.keydown(function() {
         if ($textbox.val().length >= 53) {
             $textbox.addClass('len-warn');
         } else {
@@ -264,7 +263,7 @@ function ConsoleStream(authToken, baseUrl, $outputArea, $textbox, serverId) {
         
         // This event is received when the session key is either invalid or doesn't
         // belong to a superuser
-        socket.on('unauthorized', function(data) {
+        socket.on('unauthorized', function() {
             _this.addOutputLine("ERROR: you are not authorized to access the admin panel!");
         });
         
@@ -303,7 +302,7 @@ function ConsoleStream(authToken, baseUrl, $outputArea, $textbox, serverId) {
                 var displayName = nicknameAnsi ? nicknameAnsi : username;
                 
                 var html = ['<a href="#"><div class="player" username="' + username + '">',
-                                '<img class="face-thumb" src="/faces/16/' + username + '.png"><span class="ansi-container">' + displayName + '</span>',
+                                '<img class="face-thumb" src="/face/16/' + username + '.png"><span class="ansi-container">' + displayName + '</span>',
                                 '<span class="rank">#' + players[i].rank + '</span>',
                             '</div></a>'].join('');
                 
@@ -337,7 +336,7 @@ function ConsoleStream(authToken, baseUrl, $outputArea, $textbox, serverId) {
                 } else if (username) {
                     html += ['<div class="user">',
                                 '<a href="/player/' + username + '">',
-                                    '<span><img class="face-thumb" src="/faces/16/' + username + '.png">' + username + '</span>',
+                                    '<span><img class="face-thumb" src="/face/16/' + username + '.png">' + username + '</span>',
                                     active ? '<img src="/static/images/online.png">': '',
                                 '</a>',
                             '</div>'].join('');
@@ -351,7 +350,7 @@ function ConsoleStream(authToken, baseUrl, $outputArea, $textbox, serverId) {
             
             $('.users').html(html);
         });
-    }
+    };
     
     this.messageEntered = function(input) {
         var data = {};
@@ -368,7 +367,7 @@ function ConsoleStream(authToken, baseUrl, $outputArea, $textbox, serverId) {
         
         socket.emit('console-input', data);
         $textbox.removeClass('len-warn');
-    }
+    };
     
     this.setDonator = function(username) {
         socket.emit('set-donator', {
@@ -390,6 +389,35 @@ function ChatStream(authData, baseUrl, $outputArea, $textbox, serverId, username
     if (nickname) {
         this.addChatMention(nickname, 'background:#00ACC4');
     }
+
+    this.renderPlayerTable = function(players, maxPlayers) {
+        var tableHtml = "<tr>";
+
+        for (var i = 0; i < maxPlayers; ++i) {
+            if (players.length <= i) {
+                tableHtml += '<td>&nbsp;</td>';
+            } else {
+                var username = players[i].username;
+                var nickname = players[i].nickname;
+
+                var displayName = (nickname ? nickname : username);
+
+                tableHtml += ['<td>',
+                                '<a href="/player/' + username + '" target="_blank">',
+                                  '<span><img class="face-thumb" src="/face/16/' + username + '.png">' + displayName + '</span>',
+                                '</a>',
+                              '</td>'].join('');
+            }
+
+            // Three columns per row, same as ingame
+            if ((i + 1) % 3 == 0) {
+                tableHtml += '</tr><tr>';
+            }
+        }
+        tableHtml += "</tr>";
+
+        $('.players-table').html(tableHtml);
+    };
     
     this.socketInitialized = function() {
         socket = _this.socket;
@@ -420,7 +448,6 @@ function ChatStream(authData, baseUrl, $outputArea, $textbox, serverId, username
         // Renders a table almost identical looking to the tab player table ingame
         socket.on('server-status', function(data) {
             var players = data.players;
-            var numPlayers = data.numPlayers;
             var maxPlayers = data.maxPlayers;
             
             players = players.sort(function(a, b) {
@@ -431,40 +458,18 @@ function ChatStream(authData, baseUrl, $outputArea, $textbox, serverId, username
                 if (a.toLowerCase() > b.toLowerCase()) return 1;
                 return 0;
             });
-            
-            var tableHtml = "<tr>";
-            for (var i = 0; i < maxPlayers; ++i) {
-                if (players.length <= i) {
-                    tableHtml += '<td>&nbsp;</td>';
-                } else {
-                    var username = players[i].username;
-                    var nickname = players[i].nickname;
-                    
-                    var displayName = (nickname ? nickname : username);
-                    
-                    tableHtml += ['<td>',
-                                    '<a href="/player/' + username + '" target="_blank">',
-                                      '<span><img class="face-thumb" src="/faces/16/' + username + '.png">' + displayName + '</span>',
-                                    '</a>',
-                                  '</td>'].join('');
-                }
-                
-                // Three columns per row, same as ingame
-                if ((i + 1) % 3 == 0) {
-                    tableHtml += '</tr><tr>'
-                }
-            }
-            tableHtml += "</tr>";
-            
-            $('.players-table').html(tableHtml);
+
+            _this.renderPlayerTable(players, maxPlayers);
         });
-    }
+    };
     
     this.messageEntered = function(input) {
         socket.emit('chat-input', {
             message: input
         });
-    }
+    };
+
+    _this.renderPlayerTable([], 90);
 }
 
 ChatStream.prototype = Object.create(Stream.prototype);

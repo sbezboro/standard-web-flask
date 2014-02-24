@@ -1,6 +1,6 @@
 from flask import abort
 from flask import flash
-from flask import json
+from flask import g
 from flask import jsonify
 from flask import redirect
 from flask import request
@@ -280,3 +280,24 @@ def face(username, size=16):
     tmp.seek(0)
 
     return send_file(tmp, mimetype="image/png")
+
+@app.route('/chat')
+@app.route('/<int:server_id>/chat')
+def chat(server_id=None):
+    if not server_id:
+        return redirect(url_for('chat', server_id=app.config['MAIN_SERVER_ID']))
+
+    server = Server.query.get(server_id)
+
+    if g.user:
+        player = Player.query.filter_by(username=g.user.username)
+    else:
+        player = None
+
+    retval = {
+        'server': server,
+        'servers': Server.query.all(),
+        'player': player
+    }
+
+    return render_template('chat.html', **retval)

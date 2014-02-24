@@ -8,6 +8,7 @@ from standardweb import app
 from standardweb.lib import csrf
 from standardweb.models import User
 
+import hashlib
 import os
 
 
@@ -52,3 +53,29 @@ def _dated_url_for(endpoint, **values):
 @app.context_processor
 def override_url_for():
     return dict(url_for=_dated_url_for)
+
+
+@app.context_processor
+def rts_auth_data():
+    data = {}
+
+    if g.user:
+        user_id = g.user.id
+        username = g.user.username
+        is_superuser = g.user.is_superuser
+
+        content = '-'.join([str(user_id), username, str(int(is_superuser))])
+
+        token = hashlib.sha256(content + app.config['RTS_SECRET']).hexdigest()
+
+        data = {
+            'user_id': user_id,
+            'username': username,
+            'is_superuser': int(is_superuser),
+            'token': token
+        }
+
+    return {
+        'rts_address': app.config['RTS_ADDRESS'],
+        'rts_auth_data': data
+    }
