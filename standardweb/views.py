@@ -20,6 +20,7 @@ from standardweb.models import *
 
 from sqlalchemy import or_
 from sqlalchemy.sql.expression import func
+from sqlalchemy.orm import joinedload
 
 from datetime import datetime
 from datetime import timedelta
@@ -280,6 +281,19 @@ def face(username, size=16):
     tmp.seek(0)
 
     return send_file(tmp, mimetype="image/png")
+
+
+@app.route('/forums')
+def forums():
+    categories = ForumCategory.query.options(joinedload(ForumCategory.forums)) \
+        .order_by(ForumCategory.position).all()
+
+    retval = {
+        'categories': categories
+    }
+
+    return render_template('forums/index.html', **retval)
+
 
 @app.route('/chat')
 @app.route('/<int:server_id>/chat')

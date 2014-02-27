@@ -804,6 +804,57 @@ a:hover {
     margin: 0 0 20px;
 }
 
+.forum.category {
+    margin: 0 0 10px;
+}
+
+.forum.category h4 {
+    border-top: 1px solid #aaa;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    background: #3c3c3c;
+    padding: 7px 10px;
+    color: #fff;
+    margin: 0;
+}
+
+.forum.row {
+    border: 1px solid #aaa;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.forum.row tr {
+    border: 1px solid #aaa;
+    padding: 0;
+    margin: 0;
+}
+
+.forum.row td:nth-child(1) {
+    width: 60%;
+}
+
+.forum.row td:nth-child(2) {
+    width: 10%;
+}
+
+.forum.row td:nth-child(3) {
+    width: 10%;
+}
+
+.forum.row th {
+    border: 1px solid #aaa;
+    background: #e7e7e7;
+    font-weight: normal;
+    padding: 4px;
+    margin: 0;
+    font-size: 14px;
+}
+
+.forum.row td {
+    border: 1px solid #aaa;
+}
+
 #refreshImage {
     margin-bottom: -2px;
 }

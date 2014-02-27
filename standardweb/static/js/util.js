@@ -78,4 +78,12 @@ $(document).ready(function() {
   $(document).on('click', '.alert > .close', function() {
     $(this).closest('.alert').remove();
   });
+
+  $("abbr.timeago").timeago();
+  $(".placeholder").placeholder();
+  $(".tooltip").tipsy();
+});
+
+$.ajaxSetup ({
+  cache: false
 });

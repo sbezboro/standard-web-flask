@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+
+{% block title %}Forums - Standard Survival Minecraft Server{% endblock %}
+
+{% block select_forum %}selected{% endblock %}
+
+{% block content %}
+    <div id="main">
+        <h2>Standard Survival Forums</h2>
+        {% for category in categories %}
+            <div class="forum category">
+                <h4>{{ category.name }}</h4>
+                <table class="forum row">
+                    <tr>
+                        <th>
+                            Forum
+                        </th>
+                        <th>
+                            Topics
+                        </th>
+                        <th>
+                            Posts
+                        </th>
+                        <th>
+                            Last post
+                        </th>
+                    </tr>
+                    {% for forum in category.forums %}
+                        <tr>
+                            <td>
+                                <a href="">{{ forum.name }}</a>
+                                {{ forum.description }}
+                            </td>
+                            <td>
+                                {{ forum.topic_count }}
+                            </td>
+                            <td>
+                                {{ forum.post_count }}
+                            </td>
+                            <td>
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

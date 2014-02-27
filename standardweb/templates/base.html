@@ -35,21 +35,20 @@
         <div id="inner">
             <div class="desktop">
                 <a href="/" class="strong {% block select_index %}{% endblock %}">Standard Survival</a>
-                <a class="{% block select_ranking %}{% endblock %}" href="/{% if server %}{{ server.id }}{% else %}2{% endif %}/ranking">Ranking</a>
-                <a class="{% block select_leaderboards %}{% endblock %}" href="/{% if server %}{{ server.id }}{% else %}2{% endif %}/leaderboards">Leaderboards</a>
-                <a class="{% block select_forum %}{% endblock %}" href="/forum/">Forum</a>
-                <a class="{% block select_chat %}{% endblock %}" href="/chat">Live Chat</a>
-                {% if user and user.is_superuser %}<a href="/analytics">Analytics</a>{% endif %}
-                {% if user and user.is_superuser %}<a href="/server-admin">Server Admin</a>{% endif %}
+                <a class="{% block select_ranking %}{% endblock %}" href="{{ url_for('ranking', server_id=server.id if server else None) }}">Ranking</a>
+                <a class="{% block select_leaderboards %}{% endblock %}" href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a>
+                <a class="{% block select_forum %}{% endblock %}" href="{{ url_for('forums') }}">Forums</a>
+                <a class="{% block select_chat %}{% endblock %}" href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a>
+                {% if user and user.is_superuser %}<a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a>{% endif %}
                 <div id="right">
                     {% if user %}
                         {% if not user.is_superuser %}
-                            <a class="{% block select_player %}{% endblock %}" href="/player/{{ user.username }}">{{ user.username|face_thumb }}{{ user.username }}</a>
+                            <a class="{% block select_player %}{% endblock %}" href="{{ url_for('player', username=user.username) }}">{{ user.username|face_thumb }}{{ user.username }}</a>
                         {% endif %}
                         <a href="/logout">Log out</a>
                     {% else %}
                         <a href="#" onclick="alert('Log in to the Minecraft server (standardsurvival.com) and type /register to create an account!')">Sign up</a>
-                        <a class="{% block select_login %}{% endblock %}" href="/login?next={{ request.path }}">Log in</a>
+                        <a class="{% block select_login %}{% endblock %}" href="{{ url_for('login', next=request.path) }}">Log in</a>
                     {% endif %}
                     <form class="form-inline" method="GET" action="{{ url_for('player_search') }}">
                         <input class="placeholder" type="text" name="q" placeholder="Player search" value="{{ query }}"/>
@@ -88,17 +87,5 @@
     <div id="container">
         {% block content %}{% endblock %}
     </div>
-    
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $("abbr.timeago").timeago();
-            $(".placeholder").placeholder();
-            $(".tooltip").tipsy();
-        });
-        
-        $.ajaxSetup ({
-            cache: false
-        });
-    </script>
 </body>
 </html>

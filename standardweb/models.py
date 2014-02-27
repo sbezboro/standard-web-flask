@@ -274,3 +274,62 @@ class OreDiscoveryCount(db.Model, Base):
                                          player=player)
         ore_count.count += 1
         ore_count.save()
+
+
+class ForumCategory(db.Model, Base):
+    __tablename__ = 'djangobb_forum_category'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80))
+    position = db.Column(db.Integer, default=0)
+
+    forums = db.relationship('Forum')
+
+
+class Forum(db.Model, Base):
+    __tablename__ = 'djangobb_forum_forum'
+
+    id = db.Column(db.Integer, primary_key=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('djangobb_forum_category.id'))
+    name = db.Column(db.String(80))
+    position = db.Column(db.Integer, default=0)
+    description = db.Column(db.Text())
+    updated = db.Column(db.DateTime, default=datetime.utcnow)
+    post_count = db.Column(db.Integer, default=0)
+    topic_count = db.Column(db.Integer, default=0)
+    last_post_id = db.Column(db.Integer, db.ForeignKey('djangobb_forum_post.id'))
+    locked = db.Column(db.Boolean)
+
+    category = db.relationship('ForumCategory', foreign_keys='Forum.category_id')
+
+
+class ForumTopic(db.Model, Base):
+    __tablename__ = 'djangobb_forum_topic'
+
+    id = db.Column(db.Integer, primary_key=True)
+    forum_id = db.Column(db.Integer, db.ForeignKey('djangobb_forum_forum.id'))
+    name = db.Column(db.String(255))
+    created = db.Column(db.DateTime, default=datetime.utcnow)
+    updated = db.Column(db.DateTime, default=None)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    views = db.Column(db.Integer, default=0)
+    sticky = db.Column(db.Boolean)
+    closed = db.Column(db.Boolean)
+    post_count = db.Column(db.Integer)
+    last_post_id = db.Column(db.Integer, db.ForeignKey('djangobb_forum_post.id'))
+    locked = db.Column(db.Boolean)
+
+
+class ForumPost(db.Model, Base):
+    __tablename__ = 'djangobb_forum_post'
+
+    id = db.Column(db.Integer, primary_key=True)
+    topic_id =  db.Column(db.Integer, db.ForeignKey('djangobb_forum_topic.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    created = db.Column(db.DateTime, default=datetime.utcnow)
+    updated = db.Column(db.DateTime, default=None)
+    updated_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    body = db.Column(db.Text())
+    body_html = db.Column(db.Text())
+    user_ip = db.Column(db.String(15))
+    locked = db.Column(db.Boolean)
