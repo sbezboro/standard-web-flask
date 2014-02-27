@@ -59,7 +59,7 @@ def override_url_for():
 def rts_auth_data():
     data = {}
 
-    if g.user:
+    if hasattr(g, 'user'):
         user_id = g.user.id
         username = g.user.username
         is_superuser = g.user.is_superuser

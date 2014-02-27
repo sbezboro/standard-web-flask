@@ -301,3 +301,22 @@ def chat(server_id=None):
     }
 
     return render_template('chat.html', **retval)
+
+
+@app.route('/admin')
+@app.route('/<int:server_id>/admin')
+def admin(server_id=None):
+    if not g.user.is_superuser:
+        abort(403)
+
+    if not server_id:
+        return redirect(url_for('admin', server_id=app.config['MAIN_SERVER_ID']))
+
+    server = Server.query.get(server_id)
+
+    retval = {
+        'server': server,
+        'servers': Server.query.all()
+    }
+
+    return render_template('admin.html', **retval)
