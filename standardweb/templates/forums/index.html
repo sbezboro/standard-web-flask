@@ -9,37 +9,45 @@
     <div id="main">
         <h2>Standard Survival Forums</h2>
         {% for category in categories %}
-            <div class="forum category">
+            <div class="forum-category">
                 <h4>{{ category.name }}</h4>
-                <table class="forum row">
-                    <tr>
-                        <th>
-                            Forum
-                        </th>
-                        <th>
-                            Topics
-                        </th>
-                        <th>
-                            Posts
-                        </th>
-                        <th>
-                            Last post
-                        </th>
-                    </tr>
+                <table class="forum-table">
                     {% for forum in category.forums %}
                         <tr>
-                            <td>
-                                <a href="">{{ forum.name }}</a>
-                                {{ forum.description }}
+                            <td class="forum-cell">
+                                <img class="acitivity-icon" src="{{ url_for('static', filename='images/forums/active_topic.png') }}">
+                                <div class="forum-info">
+                                    <a class="name" href="">{{ forum.name }}</a>
+                                    <div class="description">
+                                        {{ forum.description }}
+                                    </div>
+                                </div>
                             </td>
                             <td>
-                                {{ forum.topic_count }}
-                            </td>
-                            <td>
-                                {{ forum.post_count }}
-                            </td>
-                            <td>
+                                <div class="count">
+                                    <b>{{ forum.topic_count }}</b> topics
+                                </div>
+                                <div class="count">
+                                    <b>{{ forum.post_count }}</b> posts
+                                </div>
 
+                            </td>
+                            <td class="last-post-cell">
+                                {% with last_post = forum.last_post %}
+                                {% with last_topic = last_post.topic %}
+                                {% with last_post_user = last_post.user %}
+                                <div>
+                                    <b>Topic:</b> <a href="{{ last_topic.url }}">{{ last_topic.name | truncate(30) }}</a>
+                                </div>
+                                <div>
+                                    <b>Last post:</b> <a href="{{ last_post.url }}"><abbr class="timeago" title="{{ last_post.created | iso_date }}">{{ last_post.created }}</abbr></a>
+                                </div>
+                                <div>
+                                    <b>By:</b> <a href="{{ url_for('player', username=user.username) }}">{{ last_post_user.username }}</a>
+                                </div>
+                                {% endwith %}
+                                {% endwith %}
+                                {% endwith %}
                             </td>
                         </tr>
                     {% endfor %}

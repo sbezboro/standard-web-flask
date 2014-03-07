@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+
+{% block title %}Forums - Standard Survival Minecraft Server{% endblock %}
+
+{% block select_forum %}selected{% endblock %}
+
+{% block content %}
+    <div id="main">
+        <h2>Standard Survival Forums</h2>
+            <div class="forum-topic">
+                {% for post in topic.posts %}
+                    <div class="forum-post">
+                        <h4><abbr class="timeago" title="{{ post.created | iso_date }}">{{ post.created }}</abbr></h4>
+                        <div class="post-author">
+                            <a href="{{ url_for('player', username=post.user.username) }}">
+                                {{ post.user.username | face_large }}
+                            </a>
+                            <div class="post-author-name">
+                                <a href="{{ url_for('player', username=post.user.username) }}">
+                                    {{ post.user.username }}
+                                </a>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            {{ post.body_html | safe }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+    </div>
+{% endblock %}

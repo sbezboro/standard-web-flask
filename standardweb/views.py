@@ -285,14 +285,43 @@ def face(username, size=16):
 
 @app.route('/forums')
 def forums():
-    categories = ForumCategory.query.options(joinedload(ForumCategory.forums)) \
-        .order_by(ForumCategory.position).all()
+    categories = ForumCategory.query.options(
+        joinedload(ForumCategory.forums)
+        .joinedload(Forum.last_post)
+        .joinedload(ForumPost.topic)
+        .joinedload(ForumTopic.user)
+    ).options(
+        joinedload(ForumCategory.forums)
+        .joinedload(Forum.last_post)
+        .joinedload(ForumPost.user)
+    ).order_by(ForumCategory.position).all()
 
     retval = {
         'categories': categories
     }
 
     return render_template('forums/index.html', **retval)
+
+
+@app.route('/topic/<int:topic_id>')
+def forum_topic(topic_id):
+    topic = ForumTopic.query.options(
+        joinedload(ForumTopic.posts)
+        .joinedload(ForumPost.user)
+    ).get(topic_id)
+
+    retval = {
+        'topic': topic
+    }
+
+    return render_template('forums/topic.html', **retval)
+
+
+@app.route('/post/<int:post_id>')
+def forum_post(post_id):
+    post = ForumPost.query.get(post_id)
+
+    return redirect(url_for('forum_topic', topic_id=post.topic_id, _anchor=post.id))
 
 
 @app.route('/chat')

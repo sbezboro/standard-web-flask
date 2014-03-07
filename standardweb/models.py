@@ -1,3 +1,5 @@
+from flask import url_for
+
 from standardweb import db
 from standardweb.lib import helpers as h
 
@@ -301,6 +303,7 @@ class Forum(db.Model, Base):
     locked = db.Column(db.Boolean)
 
     category = db.relationship('ForumCategory', foreign_keys='Forum.category_id')
+    last_post = db.relationship('ForumPost', foreign_keys='Forum.last_post_id')
 
 
 class ForumTopic(db.Model, Base):
@@ -311,13 +314,19 @@ class ForumTopic(db.Model, Base):
     name = db.Column(db.String(255))
     created = db.Column(db.DateTime, default=datetime.utcnow)
     updated = db.Column(db.DateTime, default=None)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('auth_user.id'))
     views = db.Column(db.Integer, default=0)
     sticky = db.Column(db.Boolean)
     closed = db.Column(db.Boolean)
     post_count = db.Column(db.Integer)
     last_post_id = db.Column(db.Integer, db.ForeignKey('djangobb_forum_post.id'))
-    locked = db.Column(db.Boolean)
+
+    user = db.relationship('User', foreign_keys='ForumTopic.user_id')
+    posts = db.relationship('ForumPost', foreign_keys='ForumPost.topic_id')
+
+    @property
+    def url(self):
+        return url_for('forum_topic', topic_id=self.id)
 
 
 class ForumPost(db.Model, Base):
@@ -325,11 +334,17 @@ class ForumPost(db.Model, Base):
 
     id = db.Column(db.Integer, primary_key=True)
     topic_id =  db.Column(db.Integer, db.ForeignKey('djangobb_forum_topic.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('auth_user.id'))
     created = db.Column(db.DateTime, default=datetime.utcnow)
     updated = db.Column(db.DateTime, default=None)
-    updated_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    updated_by_id = db.Column(db.Integer, db.ForeignKey('auth_user.id'))
     body = db.Column(db.Text())
     body_html = db.Column(db.Text())
     user_ip = db.Column(db.String(15))
-    locked = db.Column(db.Boolean)
+
+    topic = db.relationship('ForumTopic', foreign_keys='ForumPost.topic_id')
+    user = db.relationship('User', foreign_keys='ForumPost.user_id')
+
+    @property
+    def url(self):
+        return url_for('forum_post', post_id=self.id)

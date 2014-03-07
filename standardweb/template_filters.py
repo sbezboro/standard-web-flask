@@ -1,6 +1,9 @@
 from jinja2.nodes import Markup
 
 from standardweb import app
+from standardweb.lib import helpers as h
+
+from datetime import datetime
 
 
 def _face_image(username, size):
@@ -17,3 +20,9 @@ def face_thumb(username):
 @app.template_filter('face_large')
 def face_large(username):
     return Markup(_face_image(username, 64))
+
+
+@app.template_filter('iso_date')
+def iso_date(date):
+    #date = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+    return h.iso_date(date)

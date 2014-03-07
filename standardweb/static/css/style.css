@@ -804,55 +804,98 @@ a:hover {
     margin: 0 0 20px;
 }
 
-.forum.category {
-    margin: 0 0 10px;
-}
-
-.forum.category h4 {
-    border-top: 1px solid #aaa;
-    border-left: 1px solid #aaa;
-    border-right: 1px solid #aaa;
+.forum-category h4 {
     background: #3c3c3c;
-    padding: 7px 10px;
+    padding: 6px 10px;
     color: #fff;
     margin: 0;
 }
 
-.forum.row {
-    border: 1px solid #aaa;
+.forum-table {
+    background: #fff;
+    border: 1px solid #ddd;
     border-collapse: collapse;
     width: 100%;
 }
 
-.forum.row tr {
-    border: 1px solid #aaa;
+.forum-table tr {
     padding: 0;
     margin: 0;
+    border-top: 1px solid #e0e0e0;
 }
 
-.forum.row td:nth-child(1) {
+.forum-table tr:hover {
+    background: #f9f9f9;
+}
+
+.forum-table td:nth-child(1) {
     width: 60%;
 }
 
-.forum.row td:nth-child(2) {
+.forum-table td:nth-child(2) {
     width: 10%;
 }
 
-.forum.row td:nth-child(3) {
-    width: 10%;
+.forum-cell {
+    padding: 10px;
 }
 
-.forum.row th {
-    border: 1px solid #aaa;
-    background: #e7e7e7;
-    font-weight: normal;
-    padding: 4px;
+.forum-cell .acitivity-icon {
+    margin: 0 10px 5px 3px;
+}
+
+.forum-info {
+    display: inline-block;
+}
+
+.forum-info .description {
+    font-size: 12px;
+    color: #686868;
+}
+
+.forum-table .count {
+    font-size: 13px;
+    text-align: right;
+}
+
+.last-post-cell {
+    padding-left: 40px;
+    font-size: 12px;
+}
+
+.forum-post {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+.forum-post h4 {
+    background: #3c3c3c;
+    padding: 6px 6px;
+    color: #fff;
     margin: 0;
-    font-size: 14px;
 }
 
-.forum.row td {
-    border: 1px solid #aaa;
+.forum-post .post-author {
+    background: #eaeaea;
+    padding: 20px;
+}
+
+.forum-post .post-author .post-author-name {
+    display: inline-block;
+    vertical-align: top;
+    margin: 5px 0 0;
+}
+
+.forum-post .post-content {
+    background: #fff;
+    padding: 10px;
+}
+
+.forum-post .post-content blockquote {
+    background: #f5f5f5;
+    padding: 10px;
+    border: 1px solid #c7c7c7;
+    margin: 4px 4px 10px;
 }
 
 #refreshImage {
