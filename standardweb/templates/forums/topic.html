@@ -10,8 +10,13 @@
         <h2>Standard Survival Forums</h2>
             <div class="forum-topic">
                 {% for post in topic.posts %}
+                    <a class="anchor-nav" id="{{ post.id }}"></a>
                     <div class="forum-post">
-                        <h4><abbr class="timeago" title="{{ post.created | iso_date }}">{{ post.created }}</abbr></h4>
+                        <h4>
+                            <a href="{{ url_for('forum_post', post_id=post.id) }}">
+                                <abbr class="timeago" title="{{ post.created | iso_date }}">{{ post.created }}</abbr>
+                            </a>
+                        </h4>
                         <div class="post-author">
                             <a href="{{ url_for('player', username=post.user.username) }}">
                                 {{ post.user.username | face_large }}

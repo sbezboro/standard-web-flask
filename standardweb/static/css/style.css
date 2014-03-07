@@ -875,6 +875,10 @@ a:hover {
     margin: 0;
 }
 
+.forum-post h4 a {
+    color: #fff;
+}
+
 .forum-post .post-author {
     background: #eaeaea;
     padding: 20px;
@@ -896,6 +900,10 @@ a:hover {
     padding: 10px;
     border: 1px solid #c7c7c7;
     margin: 4px 4px 10px;
+}
+
+.forum-post .post-content img {
+    max-width: 100%;
 }
 
 #refreshImage {
@@ -1008,6 +1016,11 @@ fieldset > .alert {
 
 .right {
     float: right;
+}
+
+.anchor-nav {
+    font-size: 1px;
+    line-height: 1px;
 }
 
 @font-face {
