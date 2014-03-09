@@ -303,7 +303,12 @@ class Forum(db.Model, Base):
     locked = db.Column(db.Boolean)
 
     category = db.relationship('ForumCategory', foreign_keys='Forum.category_id')
+    topics = db.relationship('ForumTopic')
     last_post = db.relationship('ForumPost', foreign_keys='Forum.last_post_id')
+
+    @property
+    def url(self):
+        return url_for('forum', forum_id=self.id)
 
 
 class ForumTopic(db.Model, Base):
@@ -321,8 +326,10 @@ class ForumTopic(db.Model, Base):
     post_count = db.Column(db.Integer)
     last_post_id = db.Column(db.Integer, db.ForeignKey('djangobb_forum_post.id'))
 
+    forum = db.relationship('Forum', foreign_keys='ForumTopic.forum_id')
     user = db.relationship('User', foreign_keys='ForumTopic.user_id')
     posts = db.relationship('ForumPost', foreign_keys='ForumPost.topic_id')
+    last_post = db.relationship('ForumPost', foreign_keys='ForumTopic.last_post_id')
 
     @property
     def url(self):
@@ -348,3 +355,15 @@ class ForumPost(db.Model, Base):
     @property
     def url(self):
         return url_for('forum_post', post_id=self.id)
+
+
+class ForumPostTracking(db.Model, Base):
+    __tablename__ = 'djangobb_forum_posttracking'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('auth_user.id'))
+    topics =  db.Column(db.Text())
+    last_read = db.Column(db.DateTime, default=None)
+
+    user = db.relationship('User', foreign_keys='ForumPostTracking.user_id',
+                           backref=db.backref('posttracking', lazy='joined'))

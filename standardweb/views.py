@@ -71,10 +71,10 @@ def logout():
 
 @app.route('/search')
 def player_search():
-    q = request.args.get('q')
-    p = request.args.get('p')
+    query = request.args.get('q')
+    page = request.args.get('p')
 
-    p = int(p) if p else 0
+    page = int(page) if page else 0
 
     page_size = 20
 
@@ -93,7 +93,7 @@ def player_search():
         show_next = False
 
     return render_template('search.html', results=results,
-                           query=q, page=p,
+                           query=query, page=page,
                            show_next=show_next)
 
 
@@ -303,15 +303,70 @@ def forums():
     return render_template('forums/index.html', **retval)
 
 
+@app.route('/forum/<int:forum_id>')
+def forum(forum_id):
+    forum = Forum.query.get(forum_id)
+
+    if not forum:
+        abort(404)
+
+    page_size = 40
+
+    page = request.args.get('p')
+    page = int(page) if page else 1
+
+    if page < 1 or page > forum.topic_count / page_size + 1:
+        return redirect(url_for('forum', forum_id=forum_id))
+
+    topics = ForumTopic.query.options(
+        joinedload(ForumTopic.user)
+    ).options(
+        joinedload(ForumTopic.last_post)
+        .joinedload(ForumPost.user)
+    ).filter_by(forum_id=forum_id) \
+    .order_by(ForumTopic.sticky.desc(), ForumTopic.created.desc()) \
+    .limit(page_size) \
+    .offset((page - 1) * page_size)
+
+    retval = {
+        'forum': forum,
+        'topics': topics,
+        'page_size': page_size,
+        'page': page
+    }
+
+    return render_template('forums/forum.html', **retval)
+
+
 @app.route('/topic/<int:topic_id>')
 def forum_topic(topic_id):
     topic = ForumTopic.query.options(
-        joinedload(ForumTopic.posts)
-        .joinedload(ForumPost.user)
+        joinedload(ForumTopic.forum)
     ).get(topic_id)
 
+    if not topic:
+        abort(404)
+
+    page_size = 20
+
+    page = request.args.get('p')
+    page = int(page) if page else 1
+
+    if page < 1 or page > topic.post_count / page_size + 1:
+        return redirect(url_for('forum_topic', topic_id=topic_id))
+
+    posts = ForumPost.query.options(
+        joinedload(ForumPost.user)
+    ).filter_by(topic_id=topic_id) \
+    .order_by(ForumPost.created) \
+    .limit(page_size) \
+    .offset((page - 1) * page_size)
+
     retval = {
-        'topic': topic
+        'topic': topic,
+        'posts': posts,
+        'page_size': page_size,
+        'page': page
     }
 
     return render_template('forums/topic.html', **retval)
@@ -320,6 +375,9 @@ def forum_topic(topic_id):
 @app.route('/post/<int:post_id>')
 def forum_post(post_id):
     post = ForumPost.query.get(post_id)
+
+    if not post:
+        abort(404)
 
     return redirect(url_for('forum_topic', topic_id=post.topic_id, _anchor=post.id))
 

@@ -24,5 +24,4 @@ def face_large(username):
 
 @app.template_filter('iso_date')
 def iso_date(date):
-    #date = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
     return h.iso_date(date)

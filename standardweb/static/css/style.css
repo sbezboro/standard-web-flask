@@ -804,36 +804,49 @@ a:hover {
     margin: 0 0 20px;
 }
 
-.forum-category h4 {
+.forum-category h4, .forum h4, .forum-topic h4 {
     background: #3c3c3c;
     padding: 6px 10px;
     color: #fff;
     margin: 0;
 }
 
-.forum-table {
+.forum-table, .forum-topic-table {
     background: #fff;
     border: 1px solid #ddd;
     border-collapse: collapse;
     width: 100%;
 }
 
-.forum-table tr {
+.forum-table tr, .forum-topic-table tr {
     padding: 0;
     margin: 0;
     border-top: 1px solid #e0e0e0;
 }
 
-.forum-table tr:hover {
+.forum-table tr:hover, .forum-topic-table tr:hover {
     background: #f9f9f9;
 }
 
-.forum-table td:nth-child(1) {
+.forum-table td:nth-child(1), .forum-topic-table td:nth-child(1) {
     width: 60%;
 }
 
-.forum-table td:nth-child(2) {
+.forum-table td:nth-child(2), .forum-topic-table td:nth-child(2) {
     width: 10%;
+}
+
+.forum-table .count, .forum-topic-table .count {
+    font-size: 13px;
+    text-align: right;
+}
+
+.forum-topic-table tr.sticky {
+    background: #e0ffe6;
+}
+
+.forum-topic-table tr.sticky:hover {
+    background: #ceffd2;
 }
 
 .forum-cell {
@@ -853,9 +866,25 @@ a:hover {
     color: #686868;
 }
 
-.forum-table .count {
-    font-size: 13px;
-    text-align: right;
+.forum .pages, .forum-topic .pages {
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.forum .pages span, .forum-topic .pages span {
+    padding: 2px 5px;
+}
+
+.forum .pages a, .forum-topic .pages a {
+    background: #fff;
+    color: #9d9d9d;
+    border: 1px solid #ddd;
+    padding: 2px 4px;
+}
+
+.forum .breadcrumbs, .forum-topic .breadcrumbs {
+    margin-bottom: 10px;
+    font-size: 18px;
 }
 
 .last-post-cell {

@@ -1,37 +1,53 @@
-{% extends "base.html" %}
+{% extends 'forums/base.html' %}
 
-
-{% block title %}Forums - Standard Survival Minecraft Server{% endblock %}
-
-{% block select_forum %}selected{% endblock %}
-
-{% block content %}
-    <div id="main">
-        <h2>Standard Survival Forums</h2>
-            <div class="forum-topic">
-                {% for post in topic.posts %}
-                    <a class="anchor-nav" id="{{ post.id }}"></a>
-                    <div class="forum-post">
-                        <h4>
-                            <a href="{{ url_for('forum_post', post_id=post.id) }}">
-                                <abbr class="timeago" title="{{ post.created | iso_date }}">{{ post.created }}</abbr>
-                            </a>
-                        </h4>
-                        <div class="post-author">
-                            <a href="{{ url_for('player', username=post.user.username) }}">
-                                {{ post.user.username | face_large }}
-                            </a>
-                            <div class="post-author-name">
-                                <a href="{{ url_for('player', username=post.user.username) }}">
-                                    {{ post.user.username }}
-                                </a>
-                            </div>
-                        </div>
-                        <div class="post-content">
-                            {{ post.body_html | safe }}
-                        </div>
+{% block forum_content %}
+    <div class="forum-topic">
+        <div class="breadcrumbs">
+            <a href="{{ url_for('forums') }}">Forums</a> &rarr;
+            <a href="{{ url_for('forum', forum_id=topic.forum_id) }}">{{ topic.forum.name }}</a> &rarr;
+            {{ topic.name }}
+        </div>
+        {{ pages() }}
+        {% for post in posts %}
+            <a class="anchor-nav" id="{{ post.id }}"></a>
+            <div class="forum-post">
+                <h4>
+                    <a href="{{ url_for('forum_post', post_id=post.id) }}">
+                        <abbr class="timeago" title="{{ post.created | iso_date }}">{{ post.created }}</abbr>
+                    </a>
+                </h4>
+                <div class="post-author">
+                    <a href="{{ url_for('player', username=post.user.username) }}">
+                        {{ post.user.username | face_large }}
+                    </a>
+                    <div class="post-author-name">
+                        <a href="{{ url_for('player', username=post.user.username) }}">
+                            {{ post.user.username }}
+                        </a>
                     </div>
-                {% endfor %}
+                </div>
+                <div class="post-content">
+                    {{ post.body_html | safe }}
+                </div>
             </div>
+        {% endfor %}
+        {{ pages() }}
     </div>
 {% endblock %}
+
+{% macro pages() %}
+    <div class="pages">
+        {% if topic.post_count > page_size %}
+            <b>Pages:</b>
+            {% for p in range(1, (topic.post_count // page_size) + 2) %}
+                {% if p == page %}
+                    <span>{{ p }}</span>
+                {% elif p != 1 %}
+                    <a href="{{ url_for('forum_topic', topic_id=topic.id, p=p) }}">{{ p }}</a>
+                {% else %}
+                    <a href="{{ url_for('forum_topic', topic_id=topic.id) }}">{{ p }}</a>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+{%- endmacro %}
