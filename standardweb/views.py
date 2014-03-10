@@ -301,12 +301,14 @@ def forums():
     if hasattr(g, 'user'):
         user = g.user
         read_topics = user.posttracking.get_topics()
+        last_read = user.posttracking.last_read
 
         if read_topics:
             topics = ForumTopic.query.filter(ForumTopic.id.in_(read_topics.keys()))
             for topic in topics:
-                if topic.last_post_id > read_topics.get(topic.id):
-                    active_forum_ids.add(topic.forum_id)
+                if not last_read or topic.updated > last_read:
+                    if topic.last_post_id > read_topics.get(str(topic.id)):
+                        active_forum_ids.add(topic.forum_id)
 
     retval = {
         'categories': categories,
