@@ -3,8 +3,6 @@ from jinja2.nodes import Markup
 from standardweb import app
 from standardweb.lib import helpers as h
 
-from datetime import datetime
-
 
 def _face_image(username, size):
     cls = 'face-thumb' if size == 16 else 'face-large'

@@ -1,3 +1,4 @@
+from flask import json
 from flask import url_for
 
 from standardweb import db
@@ -323,6 +324,7 @@ class ForumTopic(db.Model, Base):
     views = db.Column(db.Integer, default=0)
     sticky = db.Column(db.Boolean)
     closed = db.Column(db.Boolean)
+    deleted = db.Column(db.Boolean)
     post_count = db.Column(db.Integer)
     last_post_id = db.Column(db.Integer, db.ForeignKey('djangobb_forum_post.id'))
 
@@ -334,6 +336,28 @@ class ForumTopic(db.Model, Base):
     @property
     def url(self):
         return url_for('forum_topic', topic_id=self.id)
+
+    def update_read(self, user, commit=True):
+        tracking = user.posttracking
+
+        if tracking.last_read and (tracking.last_read > self.last_post.created):
+            return
+
+        topics = tracking.get_topics()
+
+        if topics:
+            if len(topics) > 5120:
+                tracking.set_topics({})
+                tracking.last_read = datetime.now()
+                tracking.save(commit=commit)
+
+            if self.last_post_id > topics.get(str(self.id), 0):
+                topics[str(self.id)] = self.last_post_id
+                tracking.set_topics(topics)
+                tracking.save(commit=commit)
+        else:
+            tracking.set_topics({self.id: self.last_post_id})
+            tracking.save(commit=commit)
 
 
 class ForumPost(db.Model, Base):
@@ -348,6 +372,7 @@ class ForumPost(db.Model, Base):
     body = db.Column(db.Text())
     body_html = db.Column(db.Text())
     user_ip = db.Column(db.String(15))
+    deleted = db.Column(db.Boolean)
 
     topic = db.relationship('ForumTopic', foreign_keys='ForumPost.topic_id')
     user = db.relationship('User', foreign_keys='ForumPost.user_id')
@@ -366,4 +391,10 @@ class ForumPostTracking(db.Model, Base):
     last_read = db.Column(db.DateTime, default=None)
 
     user = db.relationship('User', foreign_keys='ForumPostTracking.user_id',
-                           backref=db.backref('posttracking', lazy='joined'))
+                           backref=db.backref('posttracking', uselist=False))
+
+    def get_topics(self):
+        return json.loads(self.topics) if self.topics else None
+
+    def set_topics(self, topics):
+        self.topics = json.dumps(topics)

@@ -7,10 +7,8 @@ from flask import request
 from flask import render_template
 from flask import send_file
 from flask import session
-from flask import url_for
 
 from standardweb import app
-from standardweb import cache
 from standardweb.forms import LoginForm
 from standardweb.lib import cache as libcache
 from standardweb.lib import leaderboards as libleaderboards
@@ -33,6 +31,8 @@ import requests
 
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
+TOPICS_PER_PAGE = 40
+POSTS_PER_PAGE = 20
 
 @app.route('/')
 def index():
@@ -296,8 +296,21 @@ def forums():
         .joinedload(ForumPost.user)
     ).order_by(ForumCategory.position).all()
 
+    active_forum_ids = set()
+
+    if hasattr(g, 'user'):
+        user = g.user
+        read_topics = user.posttracking.get_topics()
+
+        if read_topics:
+            topics = ForumTopic.query.filter(ForumTopic.id.in_(read_topics.keys()))
+            for topic in topics:
+                if topic.last_post_id > read_topics.get(topic.id):
+                    active_forum_ids.add(topic.forum_id)
+
     retval = {
-        'categories': categories
+        'categories': categories,
+        'active_forum_ids': active_forum_ids
     }
 
     return render_template('forums/index.html', **retval)
@@ -310,7 +323,7 @@ def forum(forum_id):
     if not forum:
         abort(404)
 
-    page_size = 40
+    page_size = TOPICS_PER_PAGE
 
     page = request.args.get('p')
     page = int(page) if page else 1
@@ -323,14 +336,30 @@ def forum(forum_id):
     ).options(
         joinedload(ForumTopic.last_post)
         .joinedload(ForumPost.user)
-    ).filter_by(forum_id=forum_id) \
-    .order_by(ForumTopic.sticky.desc(), ForumTopic.created.desc()) \
+    ).filter_by(forum_id=forum_id, deleted=False) \
+    .order_by(ForumTopic.sticky.desc(), ForumTopic.updated.desc()) \
     .limit(page_size) \
     .offset((page - 1) * page_size)
+
+    topics = list(topics)
+
+    active_topic_ids = set()
+
+    if hasattr(g, 'user'):
+        user = g.user
+        read_topics = user.posttracking.get_topics()
+        last_read = user.posttracking.last_read
+
+        if read_topics:
+            for topic in topics:
+                if topic.last_post_id > read_topics.get(str(topic.id), 0) \
+                        and (not last_read or last_read < topic.updated):
+                    active_topic_ids.add(topic.id)
 
     retval = {
         'forum': forum,
         'topics': topics,
+        'active_topic_ids': active_topic_ids,
         'page_size': page_size,
         'page': page
     }
@@ -338,7 +367,7 @@ def forum(forum_id):
     return render_template('forums/forum.html', **retval)
 
 
-@app.route('/topic/<int:topic_id>')
+@app.route('/forums/topic/<int:topic_id>')
 def forum_topic(topic_id):
     topic = ForumTopic.query.options(
         joinedload(ForumTopic.forum)
@@ -347,7 +376,7 @@ def forum_topic(topic_id):
     if not topic:
         abort(404)
 
-    page_size = 20
+    page_size = POSTS_PER_PAGE
 
     page = request.args.get('p')
     page = int(page) if page else 1
@@ -362,6 +391,11 @@ def forum_topic(topic_id):
     .limit(page_size) \
     .offset((page - 1) * page_size)
 
+    posts = list(posts)
+
+    if hasattr(g, 'user'):
+        topic.update_read(g.user)
+
     retval = {
         'topic': topic,
         'posts': posts,
@@ -372,12 +406,17 @@ def forum_topic(topic_id):
     return render_template('forums/topic.html', **retval)
 
 
-@app.route('/post/<int:post_id>')
+@app.route('/forums/post/<int:post_id>')
 def forum_post(post_id):
     post = ForumPost.query.get(post_id)
 
     if not post:
         abort(404)
+
+    topic = post.topic
+    if topic.post_count > POSTS_PER_PAGE:
+        last_page = int(topic.post_count / POSTS_PER_PAGE) + 1
+        return redirect(url_for('forum_topic', topic_id=post.topic_id, p=last_page,_anchor=post.id))
 
     return redirect(url_for('forum_topic', topic_id=post.topic_id, _anchor=post.id))
 

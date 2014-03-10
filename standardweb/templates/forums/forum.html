@@ -10,28 +10,35 @@
         <h4>{{ forum.name }}</h4>
         <table class="forum-topic-table">
             {% for topic in topics %}
+                {% with active = topic.id in active_topic_ids %}
                 <tr class="{% if topic.sticky %}sticky{% endif %}">
-                    <td class="forum-cell">
-                        <img class="acitivity-icon" src="{{ url_for('static', filename='images/forums/active_topic.png') }}">
-                        <div class="forum-info">
-                            {% if topic.sticky %}Sticky:{% endif %}
-                            <a class="name" href="{{ topic.url }}">{{ topic.name }}</a>
-                            <div class="description">
-                                <a href="{{ url_for('player', username=topic.user.username) }}">
-                                    {{ topic.user.username|face_thumb }} {{ topic.user.username }}
-                                </a> -
-                                <abbr class="timeago" title="{{ topic.created | iso_date }}">{{ topic.created }}</abbr>
-                                {% if topic.post_count > 20 %}
-                                    -
-                                    {% for page in range(1, (topic.post_count // 20) + 2) %}
-                                        {% if page > 1 %}
-                                            <a href="{{ url_for('forum_topic', topic_id=topic.id, p=page) }}">{{ page }}</a>
-                                        {% else %}
-                                            <a href="{{ url_for('forum_topic', topic_id=topic.id) }}">{{ page }}</a>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
+                    <td>
+                        {% if active %}
+                            <img src="{{ url_for('static', filename='images/forums/active_topic.png') }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/forums/inactive_topic.png') }}">
+                        {% endif %}
+                    </td>
+                    <td class="topic-cell">
+                        {% if topic.sticky %}Sticky:{% endif %}
+                        <a class="name {% if active %}active{% endif %}" href="{{ topic.url }}">{{ topic.name }}</a>
+                        <div class="description">
+                            <a href="{{ url_for('player', username=topic.user.username) }}">
+                                {{ topic.user.username|face_thumb }} {{ topic.user.username }}
+                            </a> -
+                            <abbr class="timeago" title="{{ topic.created | iso_date }}">{{ topic.created }}</abbr>
+                            {% if topic.post_count > 20 %}
+                                -
+                                <span class="pages">
+                                {% for page in range(1, (topic.post_count // 20) + 2) %}
+                                    {% if page > 1 %}
+                                        <a href="{{ url_for('forum_topic', topic_id=topic.id, p=page) }}">{{ page }}</a>
+                                    {% else %}
+                                        <a href="{{ url_for('forum_topic', topic_id=topic.id) }}">{{ page }}</a>
+                                    {% endif %}
+                                {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                     </td>
                     <td>
@@ -53,6 +60,7 @@
                         {% endwith %}
                     </td>
                 </tr>
+            {% endwith %}
             {% endfor %}
         </table>
         {{ pages() }}
@@ -63,7 +71,14 @@
     <div class="pages">
         {% if forum.topic_count > page_size %}
             <b>Pages:</b>
-            {% for p in range(1, (forum.topic_count // page_size) + 2) %}
+            {% with end_page = (forum.topic_count // page_size) + 1 %}
+            {% for p in range(1, end_page + 1) %}
+                {% if (p - page)|abs >= 3 and not p == end_page and not p == 1 %}
+                    {% if (p - page)|abs == 3 %}
+                        ...
+                    {% endif %}
+                    {% continue %}
+                {% endif %}
 
                 {% if p == page %}
                     <span>{{ p }}</span>
@@ -73,6 +88,7 @@
                     <a href="{{ url_for('forum', forum_id=forum.id) }}">{{ p }}</a>
                 {% endif %}
             {% endfor %}
+            {% endwith %}
         {% endif %}
     </div>
 {%- endmacro %}

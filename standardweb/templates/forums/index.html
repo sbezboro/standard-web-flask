@@ -6,9 +6,16 @@
         <h4>{{ category.name }}</h4>
         <table class="forum-table">
             {% for forum in category.forums %}
+                {% with active = forum.id in active_forum_ids %}
                 <tr>
+                    <td>
+                        {% if active %}
+                            <img src="{{ url_for('static', filename='images/forums/active_topic.png') }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/forums/inactive_topic.png') }}">
+                        {% endif %}
+                    </td>
                     <td class="forum-cell">
-                        <img class="acitivity-icon" src="{{ url_for('static', filename='images/forums/active_topic.png') }}">
                         <div class="forum-info">
                             <a class="name" href="{{ forum.url }}">{{ forum.name }}</a>
                             <div class="description">
@@ -38,6 +45,7 @@
                         {% endwith %}
                     </td>
                 </tr>
+            {% endwith %}
             {% endfor %}
         </table>
     </div>

@@ -828,11 +828,20 @@ a:hover {
     background: #f9f9f9;
 }
 
+.forum-table td, .forum-topic-table td {
+}
+
 .forum-table td:nth-child(1), .forum-topic-table td:nth-child(1) {
-    width: 60%;
+    width: 4%;
+    text-align: center;
 }
 
 .forum-table td:nth-child(2), .forum-topic-table td:nth-child(2) {
+    padding: 10px 0;
+    width: 60%;
+}
+
+.forum-table td:nth-child(3), .forum-topic-table td:nth-child(3) {
     width: 10%;
 }
 
@@ -853,14 +862,6 @@ a:hover {
     padding: 10px;
 }
 
-.forum-cell .acitivity-icon {
-    margin: 0 10px 5px 3px;
-}
-
-.forum-info {
-    display: inline-block;
-}
-
 .forum-info .description {
     font-size: 12px;
     color: #686868;
@@ -877,9 +878,14 @@ a:hover {
 
 .forum .pages a, .forum-topic .pages a {
     background: #fff;
-    color: #9d9d9d;
+    color: #696969;
     border: 1px solid #ddd;
     padding: 2px 4px;
+}
+
+.topic-cell .pages a {
+    font-size: 10px;
+    padding: 1px 2px;
 }
 
 .forum .breadcrumbs, .forum-topic .breadcrumbs {
@@ -887,9 +893,22 @@ a:hover {
     font-size: 18px;
 }
 
-.last-post-cell {
-    padding-left: 40px;
+.topic-cell {
+    font-size: 14px;
+}
+
+.topic-cell .name.active {
+    font-weight: bold;
+}
+
+.topic-cell .description {
     font-size: 12px;
+    color: #686868;
+}
+
+.last-post-cell {
+    font-size: 12px;
+    padding: 10px;
 }
 
 .forum-post {
