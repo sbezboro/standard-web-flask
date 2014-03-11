@@ -6,7 +6,14 @@
             <a href="{{ url_for('forums') }}">Forums</a> &rarr;
             {{ forum.name }}
         </div>
-        {{ pages() }}
+        <div class="button-area">
+            {{ pages() }}
+            <div class="controls">
+                <a href="">Mark all threads as read</a>
+                <a href="{{ url_for('forum_topic', topic_id=1) }}" class="btn">New Topic</a>
+            </div>
+        </div>
+        <div class="clear"></div>
         <h4>{{ forum.name }}</h4>
         <table class="forum-topic-table">
             {% for topic in topics %}
@@ -63,7 +70,12 @@
             {% endwith %}
             {% endfor %}
         </table>
-        {{ pages() }}
+        <div class="button-area">
+            {{ pages() }}
+            <div class="controls">
+                <a href="{{ url_for('forum_topic', topic_id=1) }}" class="btn">New Topic</a>
+            </div>
+        </div>
     </div>
 {% endblock %}
 

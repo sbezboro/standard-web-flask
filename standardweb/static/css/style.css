@@ -240,6 +240,7 @@ a:hover {
     border: 1px solid #b9b9b9;
     border-radius: 4px;
     padding: 6px 14px;
+    display: inline-block;
     background-color: #f5f5f5;
     background: linear-gradient(to top,#e1e1e1 0%,#fff 100%);
     background: -webkit-linear-gradient(bottom,#e1e1e1 0%,#fff 100%);
@@ -867,9 +868,29 @@ a:hover {
     color: #686868;
 }
 
+.forum .btn {
+    font-size: 12px;
+    padding: 5px 8px;
+}
+
+.forum .button-area, .forum-topic .button-area {
+    margin: 12px 0;
+}
+
+.forum .controls, .forum-topic .controls {
+    float: right;
+    position: relative;
+    bottom: 4px;
+}
+
+.forum .controls a, .forum-topic .controls a {
+    font-size: 12px;
+    margin: 0 0 0 10px;
+}
+
 .forum .pages, .forum-topic .pages {
-    margin: 10px 0;
     font-size: 14px;
+    display: inline-block;
 }
 
 .forum .pages span, .forum-topic .pages span {
