@@ -1,13 +1,15 @@
 {% extends 'forums/base.html' %}
 
 {% block forum_content %}
-    <div class="forum-topic">
-        <div class="breadcrumbs">
-            <a href="{{ url_for('forums') }}">Forums</a> &rarr;
-            <a href="{{ url_for('forum', forum_id=topic.forum_id) }}">{{ topic.forum.name }}</a> &rarr;
-            {{ topic.name }}
-        </div>
+    <div class="breadcrumbs">
+        <a href="{{ url_for('forums') }}">Forums</a> &rarr;
+        <a href="{{ url_for('forum', forum_id=topic.forum_id) }}">{{ topic.forum.name }}</a> &rarr;
+        {{ topic.name }}
+    </div>
+    <div class="button-area">
         {{ pages() }}
+    </div>
+    <div class="forum-topic">
         {% for post in posts %}
             <a class="anchor-nav" id="{{ post.id }}"></a>
             <div class="forum-post">
@@ -31,7 +33,12 @@
                 </div>
             </div>
         {% endfor %}
-        {{ pages() }}
+        <div class="button-area">
+            {{ pages() }}
+            <div class="controls">
+                <a href="{{ url_for('forum_topic', topic_id=1) }}" class="btn">Reply</a>
+            </div>
+        </div>
     </div>
 {% endblock %}
 

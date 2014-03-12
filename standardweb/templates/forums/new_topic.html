@@ -1,0 +1,37 @@
+{% extends 'forums/base.html' %}
+
+{% block forum_content %}
+    <div class="breadcrumbs">
+        <a href="{{ url_for('forums') }}">Forums</a> &rarr;
+        <a href="{{ url_for('forum', forum_id=forum.id) }}">{{ forum.name }}</a> &rarr;
+        New Topic
+    </div>
+    <div class="new-topic">
+        <h4>
+            New Topic
+        </h4>
+        <div>
+            <form id="login-form" action="/login" method="post">
+                {{ form.hidden_tag() }}
+                <fieldset>
+                    {% include 'includes/messages.html' %}
+                    <div class="control-group">
+                        <label class="control-label">{{ form.title.label }}</label>
+                        <div class="control">{{ form.title() }}</div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">{{ form.body.label }}</label>
+                        <div class="control">{{ form.body() }}</div>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control">
+                            <input class="btn" type="submit" value="Post">
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+{% endblock %}

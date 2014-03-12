@@ -1,19 +1,18 @@
 {% extends 'forums/base.html' %}
 
 {% block forum_content %}
+    <div class="breadcrumbs">
+        <a href="{{ url_for('forums') }}">Forums</a> &rarr;
+        {{ forum.name }}
+    </div>
+    <div class="button-area">
+        {{ pages() }}
+        <div class="controls">
+            <a href="">Mark all topics as read</a>
+            <a href="{{ url_for('new_topic', forum_id=forum.id) }}" class="btn">New Topic</a>
+        </div>
+    </div>
     <div class="forum">
-        <div class="breadcrumbs">
-            <a href="{{ url_for('forums') }}">Forums</a> &rarr;
-            {{ forum.name }}
-        </div>
-        <div class="button-area">
-            {{ pages() }}
-            <div class="controls">
-                <a href="">Mark all threads as read</a>
-                <a href="{{ url_for('forum_topic', topic_id=1) }}" class="btn">New Topic</a>
-            </div>
-        </div>
-        <div class="clear"></div>
         <h4>{{ forum.name }}</h4>
         <table class="forum-topic-table">
             {% for topic in topics %}
@@ -70,11 +69,12 @@
             {% endwith %}
             {% endfor %}
         </table>
-        <div class="button-area">
-            {{ pages() }}
-            <div class="controls">
-                <a href="{{ url_for('forum_topic', topic_id=1) }}" class="btn">New Topic</a>
-            </div>
+    </div>
+    <div class="button-area">
+        {{ pages() }}
+        <div class="controls">
+            <a href="">Mark all topics as read</a>
+            <a href="{{ url_for('new_topic', forum_id=forum.id) }}" class="btn">New Topic</a>
         </div>
     </div>
 {% endblock %}

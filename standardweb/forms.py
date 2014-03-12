@@ -3,7 +3,7 @@ from standardweb.lib import csrf
 from flask import request
 
 from flask_wtf import Form
-from wtforms import HiddenField, PasswordField, TextField
+from wtforms import HiddenField, PasswordField, TextField, TextAreaField
 from wtforms.validators import DataRequired
 
 from urlparse import urljoin
@@ -53,3 +53,8 @@ class RedirectForm(BaseForm):
 class LoginForm(RedirectForm):
     username = TextField('Minecraft Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
+
+
+class NewTopicForm(BaseForm):
+    title = TextField('Title', validators=[DataRequired()])
+    body = TextAreaField('Body', validators=[DataRequired()])

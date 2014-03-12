@@ -233,6 +233,10 @@ a:hover {
     color: #104b73;
 }
 
+fieldset {
+    border: none;
+}
+
 .btn {
     color: #111 !important;
     font-size: 0.9em;
@@ -805,16 +809,8 @@ a:hover {
     margin: 0 0 20px;
 }
 
-.forum-category h4, .forum h4, .forum-topic h4 {
-    background: #3c3c3c;
-    padding: 6px 10px;
-    color: #fff;
-    margin: 0;
-}
-
 .forum-table, .forum-topic-table {
     background: #fff;
-    border: 1px solid #ddd;
     border-collapse: collapse;
     width: 100%;
 }
@@ -827,9 +823,6 @@ a:hover {
 
 .forum-table tr:hover, .forum-topic-table tr:hover {
     background: #f9f9f9;
-}
-
-.forum-table td, .forum-topic-table td {
 }
 
 .forum-table td:nth-child(1), .forum-topic-table td:nth-child(1) {
@@ -868,50 +861,61 @@ a:hover {
     color: #686868;
 }
 
-.forum .btn {
+.forum-content h4 {
+    background: #3c3c3c;
+    padding: 6px 8px;
+    color: #fff;
+    margin: 0;
+}
+
+.forum-content h4 a {
+    color: #fff;
+}
+
+.forum-content .btn {
     font-size: 12px;
     padding: 5px 8px;
 }
 
-.forum .button-area, .forum-topic .button-area {
+.forum-content .button-area {
     margin: 12px 0;
 }
 
-.forum .controls, .forum-topic .controls {
+.forum-content .controls {
     float: right;
     position: relative;
     bottom: 4px;
 }
 
-.forum .controls a, .forum-topic .controls a {
+.forum-content .controls a {
     font-size: 12px;
     margin: 0 0 0 10px;
 }
 
-.forum .pages, .forum-topic .pages {
+.forum-content .pages {
     font-size: 14px;
     display: inline-block;
 }
 
-.forum .pages span, .forum-topic .pages span {
+.forum-content .pages span {
     padding: 2px 5px;
 }
 
-.forum .pages a, .forum-topic .pages a {
+.forum-content .pages a {
     background: #fff;
     color: #696969;
     border: 1px solid #ddd;
     padding: 2px 4px;
 }
 
+.forum-content .breadcrumbs {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
 .topic-cell .pages a {
     font-size: 10px;
     padding: 1px 2px;
-}
-
-.forum .breadcrumbs, .forum-topic .breadcrumbs {
-    margin-bottom: 10px;
-    font-size: 18px;
 }
 
 .topic-cell {
@@ -933,20 +937,13 @@ a:hover {
     padding: 10px;
 }
 
-.forum-post {
-    margin-bottom: 20px;
+.forum {
     border: 1px solid #ddd;
 }
 
-.forum-post h4 {
-    background: #3c3c3c;
-    padding: 6px 6px;
-    color: #fff;
-    margin: 0;
-}
-
-.forum-post h4 a {
-    color: #fff;
+.forum-post {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
 }
 
 .forum-post .post-author {
@@ -974,6 +971,19 @@ a:hover {
 
 .forum-post .post-content img {
     max-width: 100%;
+}
+
+.new-topic {
+    background: #fff;
+    border: 1px solid #ddd;
+}
+
+.new-topic .control-label {
+    width: 100px;
+}
+
+.new-topic .control {
+    margin-left: 120px;
 }
 
 #refreshImage {

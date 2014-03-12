@@ -9,7 +9,7 @@ from flask import send_file
 from flask import session
 
 from standardweb import app
-from standardweb.forms import LoginForm
+from standardweb.forms import LoginForm, NewTopicForm
 from standardweb.lib import cache as libcache
 from standardweb.lib import leaderboards as libleaderboards
 from standardweb.lib import player as libplayer
@@ -421,6 +421,28 @@ def forum_post(post_id):
         return redirect(url_for('forum_topic', topic_id=post.topic_id, p=last_page,_anchor=post.id))
 
     return redirect(url_for('forum_topic', topic_id=post.topic_id, _anchor=post.id))
+
+
+@app.route('/forum/<int:forum_id>/new_topic', methods=['GET', 'POST'])
+def new_topic(forum_id):
+    forum = Forum.query.get(forum_id)
+
+    if not forum:
+        abort(404)
+
+    form = NewTopicForm()
+
+    if form.validate_on_submit():
+        name = request.form['name']
+        body = request.form['body']
+
+
+    retval = {
+        'forum': forum,
+        'form': form
+    }
+
+    return render_template('forums/new_topic.html', **retval)
 
 
 @app.route('/chat')
