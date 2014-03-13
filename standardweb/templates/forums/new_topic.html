@@ -17,12 +17,12 @@
                     {% include 'includes/messages.html' %}
                     <div class="control-group">
                         <label class="control-label">{{ form.title.label }}</label>
-                        <div class="control">{{ form.title() }}</div>
+                        <div class="control">{{ form.title(style='width: 400px') }}</div>
                     </div>
 
                     <div class="control-group">
                         <label class="control-label">{{ form.body.label }}</label>
-                        <div class="control">{{ form.body() }}</div>
+                        <div class="control">{{ form.body(style='width: 100%') }}</div>
                     </div>
 
                     <div class="control-group">
