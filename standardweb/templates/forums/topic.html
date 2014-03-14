@@ -43,8 +43,8 @@
 {% endblock %}
 
 {% macro pages() %}
-    <div class="pages">
-        {% if topic.post_count > page_size %}
+    {% if topic.post_count > page_size %}
+        <div class="pages">
             <b>Pages:</b>
             {% with end_page = (topic.post_count // page_size) + 1 %}
             {% for p in range(1, end_page + 1) %}
@@ -64,6 +64,6 @@
                 {% endif %}
             {% endfor %}
             {% endwith %}
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
 {%- endmacro %}

@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
-db = SQLAlchemy(app)
+db = SQLAlchemy(app, session_options=dict(autocommit=False, autoflush=False))
 
 cache = MemcachedCache(['127.0.0.1:11211'])
 

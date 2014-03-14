@@ -884,7 +884,7 @@ fieldset {
 }
 
 .forum-content .button-area {
-    margin: 12px 0;
+    margin: 10px 0;
 }
 
 .forum-content .controls {
@@ -1000,7 +1000,18 @@ fieldset {
 }
 
 .new-topic .control {
+    margin-top: 4px;
     margin-left: 0;
+}
+
+.new-topic input[type='text'] {
+    width: 50%;
+}
+
+.new-topic textarea {
+    width: 100%;
+    height: 250px;
+    resize: vertical;
 }
 
 #refreshImage {

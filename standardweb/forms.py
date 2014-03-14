@@ -58,3 +58,7 @@ class LoginForm(RedirectForm):
 class NewTopicForm(BaseForm):
     title = TextField('Title', validators=[DataRequired()])
     body = TextAreaField('Body', validators=[DataRequired()])
+
+
+class NewPostForm(BaseForm):
+    body = TextAreaField('Body', validators=[DataRequired()])

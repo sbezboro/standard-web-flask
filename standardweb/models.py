@@ -42,6 +42,7 @@ def _get_or_create(cls, commit=True, **kwargs):
 class Base(object):
     def save(self, commit=True):
         db.session.add(self)
+
         if commit:
             db.session.commit()
 
@@ -319,13 +320,13 @@ class ForumTopic(db.Model, Base):
     forum_id = db.Column(db.Integer, db.ForeignKey('djangobb_forum_forum.id'))
     name = db.Column(db.String(255))
     created = db.Column(db.DateTime, default=datetime.utcnow)
-    updated = db.Column(db.DateTime, default=None)
+    updated = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('auth_user.id'))
     views = db.Column(db.Integer, default=0)
-    sticky = db.Column(db.Boolean)
-    closed = db.Column(db.Boolean)
-    deleted = db.Column(db.Boolean)
-    post_count = db.Column(db.Integer)
+    sticky = db.Column(db.Boolean, default=False)
+    closed = db.Column(db.Boolean, default=False)
+    deleted = db.Column(db.Boolean, default=False)
+    post_count = db.Column(db.Integer, default=1)
     last_post_id = db.Column(db.Integer, db.ForeignKey('djangobb_forum_post.id'))
 
     forum = db.relationship('Forum', foreign_keys='ForumTopic.forum_id')
@@ -367,12 +368,12 @@ class ForumPost(db.Model, Base):
     topic_id =  db.Column(db.Integer, db.ForeignKey('djangobb_forum_topic.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('auth_user.id'))
     created = db.Column(db.DateTime, default=datetime.utcnow)
-    updated = db.Column(db.DateTime, default=None)
+    updated = db.Column(db.DateTime, default=datetime.utcnow)
     updated_by_id = db.Column(db.Integer, db.ForeignKey('auth_user.id'))
     body = db.Column(db.Text())
     body_html = db.Column(db.Text())
     user_ip = db.Column(db.String(15))
-    deleted = db.Column(db.Boolean)
+    deleted = db.Column(db.Boolean, default=False)
 
     topic = db.relationship('ForumTopic', foreign_keys='ForumPost.topic_id')
     user = db.relationship('User', foreign_keys='ForumPost.user_id')
@@ -380,6 +381,11 @@ class ForumPost(db.Model, Base):
     @property
     def url(self):
         return url_for('forum_post', post_id=self.id)
+
+    def save(self, commit=True):
+        from standardweb.lib import forums
+        self.body_html = forums.convert_bbcode(self.body)
+        return super(ForumPost, self).save(commit)
 
 
 class ForumPostTracking(db.Model, Base):

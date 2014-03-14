@@ -6,7 +6,7 @@
 {% block content %}
   <div id="main">
     <div class="center-section">
-      <form id="login-form" action="/login" method="post">
+      <form id="login-form" action="{{ url_for('login') }}" method="post">
         {{ form.hidden_tag() }}
         <h2>Log in</h2>
         <fieldset>

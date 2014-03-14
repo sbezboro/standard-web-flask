@@ -1,6 +1,7 @@
 {% extends 'forums/base.html' %}
 
 {% block forum_content %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bbcode.css') }}">
     <div class="breadcrumbs">
         <a href="{{ url_for('forums') }}">Forums</a> &rarr;
         <a href="{{ url_for('forum', forum_id=forum.id) }}">{{ forum.name }}</a> &rarr;
@@ -11,18 +12,18 @@
             New Topic
         </h4>
         <div>
-            <form id="login-form" action="/login" method="post">
+            <form id="login-form" action="{{ url_for('new_topic', forum_id=forum.id) }}" method="post">
                 {{ form.hidden_tag() }}
                 <fieldset>
                     {% include 'includes/messages.html' %}
                     <div class="control-group">
                         <label class="control-label">{{ form.title.label }}</label>
-                        <div class="control">{{ form.title(style='width: 400px') }}</div>
+                        <div class="control">{{ form.title() }}</div>
                     </div>
 
                     <div class="control-group">
                         <label class="control-label">{{ form.body.label }}</label>
-                        <div class="control">{{ form.body(style='width: 100%') }}</div>
+                        <div class="control">{{ form.body() }}</div>
                     </div>
 
                     <div class="control-group">
@@ -34,4 +35,51 @@
             </form>
         </div>
     </div>
+    <script>
+        $(document).ready(function() {
+            $("textarea").sceditor({
+                plugins: "bbcode",
+                toolbar: 'bold,italic,underline,strike|size,color,removeformat|code,quote|image,link,youtube|emoticon|source',
+                resizeWidth: false,
+                emoticonsRoot: "/static/images/forums/emoticons/",
+                emoticons: {
+                    dropdown: {
+                        ':)': 'smile.png',
+                        ':D': 'grin.png',
+                        ':(': 'sad.png',
+                        ":'(": 'cwy.png',
+                        '8-)': 'cool.png',
+                        '<3': 'heart.png',
+                        ':O': 'shocked.png',
+                        ':P': 'tongue.png',
+                        ';)': 'wink.png',
+                    },
+                    more: {
+                        ':angel:': 'angel.png',
+                        ':angry:': 'angry.png',
+                        ':ermm:': 'ermm.png',
+                        ':alien:': 'alien.png',
+                        ':blink:': 'blink.png',
+                        ':blush:': 'blush.png',
+                        ':cheerful:': 'cheerful.png',
+                        ':devil:': 'devil.png',
+                        ':dizzy:': 'dizzy.png',
+                        ':getlost:': 'getlost.png',
+                        ':happy:': 'happy.png',
+                        ':kissing:': 'kissing.png',
+                        ':ninja:': 'ninja.png',
+                        ':pinch:': 'pinch.png',
+                        ':pouty:': 'pouty.png',
+                        ':sick:': 'sick.png',
+                        ':sideways:': 'sideways.png',
+                        ':silly:': 'silly.png',
+                        ':sleeping:': 'sleeping.png',
+                        ':unsure:': 'unsure.png',
+                        ':woot:': 'w00t.png',
+                        ':wassat:': 'wassat.png'
+                    }
+                }
+           });
+        });
+    </script>
 {% endblock %}

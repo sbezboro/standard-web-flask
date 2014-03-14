@@ -430,12 +430,25 @@ def new_topic(forum_id):
     if not forum:
         abort(404)
 
+    if not hasattr(g, 'user'):
+        return redirect(url_for('login'))
+
+    user = g.user
+
     form = NewTopicForm()
 
     if form.validate_on_submit():
-        name = request.form['name']
+        title = request.form['title']
         body = request.form['body']
 
+        topic = ForumTopic(forum=forum, user=user, name=title)
+        topic.save(commit=True)
+
+        post = ForumPost(topic_id=topic.id, user=user, body=body, user_ip=request.remote_addr)
+        topic.last_post = post
+        post.save(commit=True)
+
+        return redirect(url_for('forum_topic', topic_id=topic.id))
 
     retval = {
         'forum': forum,
