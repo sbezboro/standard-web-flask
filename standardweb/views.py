@@ -9,7 +9,7 @@ from flask import send_file
 from flask import session
 
 from standardweb import app
-from standardweb.forms import LoginForm, NewTopicForm
+from standardweb.forms import LoginForm, NewPostForm, NewTopicForm
 from standardweb.lib import cache as libcache
 from standardweb.lib import leaderboards as libleaderboards
 from standardweb.lib import player as libplayer
@@ -398,11 +398,14 @@ def forum_topic(topic_id):
     if hasattr(g, 'user'):
         topic.update_read(g.user)
 
+    form = NewPostForm()
+
     retval = {
         'topic': topic,
         'posts': posts,
         'page_size': page_size,
-        'page': page
+        'page': page,
+        'form': form
     }
 
     return render_template('forums/topic.html', **retval)
@@ -456,6 +459,30 @@ def new_topic(forum_id):
     }
 
     return render_template('forums/new_topic.html', **retval)
+
+
+@app.route('/forum/<int:topic_id>/new_post', methods=['POST'])
+def new_post(topic_id):
+    topic = ForumTopic.query.get(topic_id)
+
+    if not forum:
+        abort(404)
+
+    if not hasattr(g, 'user'):
+        return redirect(url_for('login'))
+
+    user = g.user
+
+    form = NewPostForm()
+
+    if form.validate_on_submit():
+        body = request.form['body']
+
+        post = ForumPost(topic_id=topic.id, user=user, body=body, user_ip=request.remote_addr)
+        topic.last_post = post
+        post.save(commit=True)
+
+        return redirect(url_for('forum_post', post_id=post.id))
 
 
 @app.route('/chat')

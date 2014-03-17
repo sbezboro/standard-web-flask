@@ -346,18 +346,6 @@ fieldset {
     margin: 20px 0 20px;
 }
 
-.control-group .errorlist {
-    background-color: #fff;
-    display: inline;
-    margin: 0;
-    font-size: 0.8em;
-    border: 0;
-}
-
-.control-group .errorlist li {
-    display: inline;
-}
-
 .control-label {
     display: inline;
     text-align: right;
@@ -365,6 +353,11 @@ fieldset {
     width: 210px;
     font-size: smaller;
     padding-top: 4px;
+}
+
+.control-errors {
+    color: rgb(202, 0, 0);
+    font-size: smaller;
 }
 
 .control {
@@ -979,36 +972,36 @@ fieldset {
     max-width: 100%;
 }
 
-.new-topic {
+.new-topic, .new-post {
     background: #fff;
     border: 1px solid #ddd;
 }
 
-.new-topic fieldset {
+.new-topic fieldset, .new-post fieldset {
     padding: 26px 30px;
 }
 
-.new-topic .control-group {
+.new-topic .control-group, .new-post .control-group {
     margin: 0 0 14px;
 }
 
-.new-topic .control-label {
+.new-topic .control-label, .new-post .control-label {
     font-size: 14px;
     font-weight: bold;
     width: 100px;
     float: none;
 }
 
-.new-topic .control {
+.new-topic .control, .new-post .control {
     margin-top: 4px;
     margin-left: 0;
 }
 
-.new-topic input[type='text'] {
+.new-topic input[type='text'], .new-post input[type='text'] {
     width: 50%;
 }
 
-.new-topic textarea {
+.new-topic textarea, .new-post textarea {
     width: 100%;
     height: 250px;
     resize: vertical;
@@ -1097,10 +1090,8 @@ fieldset > .alert {
     float: right;
     text-decoration: none;
     cursor: pointer;
-}
-
-.alert.success a.close {
-    color: #468847;
+    color: #aaa;
+    opacity: 0.7;
 }
 
 .small {
