@@ -178,6 +178,15 @@ code {
     background-color: #fff;
 }
 
+.nav-header li a.disabled {
+    color: #aaa;
+}
+
+.nav-header li a.disabled:hover {
+    background: #e0e0e0;
+    cursor: default;
+}
+
 .sub-header {
     height: 30px;
     text-align: left;

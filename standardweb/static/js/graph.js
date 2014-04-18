@@ -1,7 +1,7 @@
 function loadPlayerGraph($elem, serverId, maxPlayers) {
     var offset = new Date().getTimezoneOffset() * 1000 * 60;
-    serverId = serverId || 2;
-    maxPlayers = maxPlayers || 90;
+    serverId = serverId || 4;
+    maxPlayers = maxPlayers || 120;
     
     var data = {};
     
@@ -53,7 +53,7 @@ function loadPlayerGraph($elem, serverId, maxPlayers) {
                 colors: ["#7E9BFF", "#F00"],
                 series: {lines: { fill: true }},
                 xaxes: [{mode: "time", minTickSize: [1, "day"], timeformat: "%b %d"}],
-                yaxes: [{min: 0, max: maxPlayers, tickSize: 13, position: "right"}, {min: 0, max: 40}] });
+                yaxes: [{min: 0, max: maxPlayers, tickSize: 20, position: "right"}, {min: 0, max: 40}] });
         },
         error: function(data) {
         }

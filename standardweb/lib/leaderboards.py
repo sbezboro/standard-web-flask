@@ -62,9 +62,10 @@ def get_leaderboard_data(server):
     kill_leaderboards = []
     ore_leaderboards = []
 
+    _get_kill_leaderboards(server, 'creeper', 'Creeper Kills', kill_leaderboards)
+    _get_kill_leaderboards(server, 'witch', 'Witch Kills', kill_leaderboards)
     _get_kill_leaderboards(server, 'enderdragon', 'Ender Dragon Kills', kill_leaderboards)
     _get_kill_leaderboards(server, 'wither', 'Wither Kills', kill_leaderboards)
-    _get_kill_leaderboards(server, 'creeper', 'Creeper Kills', kill_leaderboards)
     _get_ore_leaderboards(server, 'DIAMOND_ORE', 'Diamond Ore Discoveries', ore_leaderboards, subtitle='Since (2013/11/20)')
     _get_ore_leaderboards(server, 'EMERALD_ORE', 'Emerald Ore Discoveries', ore_leaderboards, subtitle='Since (2013/11/20)')
     _get_ore_leaderboards(server, 'LAPIS_ORE', 'Lapis Ore Discoveries', ore_leaderboards, subtitle='Since (2013/11/20)')
