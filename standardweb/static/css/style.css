@@ -959,6 +959,10 @@ fieldset {
     padding: 20px;
 }
 
+.forum-post .post-author.admin {
+    background: #c7e7f3;
+}
+
 .forum-post .post-author .post-author-name {
     display: inline-block;
     vertical-align: top;

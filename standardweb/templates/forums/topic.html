@@ -18,21 +18,28 @@
                         <abbr class="timeago" title="{{ post.created | iso_date }}">{{ post.created }}</abbr>
                     </a>
                 </h4>
-                <div class="post-author">
-                    <a href="{{ url_for('player', username=post.user.player.username) }}">
-                        {{ post.user.player.username | face_large }}
-                    </a>
-                    <div class="post-author-name">
+                <div class="post-author {% if post.user.admin %}admin{% endif %}">
+                    {% if post.user.player %}
                         <a href="{{ url_for('player', username=post.user.player.username) }}">
-                            {{ post.user.player.displayname_html|safe }}
+                            {{ post.user.player.username | face_large }}
                         </a>
-                        {% if post.user.player.nickname %}
-                            ({{ post.user.player.username }})
-                        {% endif %}
-                    </div>
+                        <div class="post-author-name">
+                            <a href="{{ url_for('player', username=post.user.player.username) }}">
+                                {{ post.user.player.displayname_html|safe }}
+                            </a>
+                            {% if post.user.player.nickname %}
+                                ({{ post.user.player.username }})
+                            {% endif %}
+                            <br/>
+                        </div>
+                    {% else %}
+                        <div class="post-author-name">
+                            {{ post.user.username }}
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="post-content">
-                    {{ post.body_html | safe }}
+                    {{ post.body_html|replace('djangobb_forum/img/smilies', 'images/forums/emoticons')|safe }}
                 </div>
             </div>
         {% endfor %}
