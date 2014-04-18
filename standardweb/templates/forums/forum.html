@@ -29,9 +29,13 @@
                         {% if topic.sticky %}Sticky:{% endif %}
                         <a class="name {% if active %}active{% endif %}" href="{{ topic.url }}">{{ topic.name }}</a>
                         <div class="description">
-                            <a href="{{ url_for('player', username=topic.user.username) }}">
-                                {{ topic.user.username|face_thumb }} {{ topic.user.username }}
-                            </a> -
+                            {% if topic.user.player %}
+                                <a href="{{ url_for('player', username=topic.user.player.username) }}">
+                                    {{ topic.user.player.username|face_thumb }} {{ topic.user.player.displayname_html|safe }}
+                                </a>
+                            {% else %}
+                                {{ topic.user.username }}
+                            {% endif %} -
                             <abbr class="timeago" title="{{ topic.created | iso_date }}">{{ topic.created }}</abbr>
                             {% if topic.post_count > 20 %}
                                 -
@@ -61,7 +65,13 @@
                             <b>Last post:</b> <a href="{{ last_post.url }}"><abbr class="timeago" title="{{ last_post.created | iso_date }}">{{ last_post.created }}</abbr></a>
                         </div>
                         <div>
-                            {{ last_post_user.username|face_thumb }} <a href="{{ url_for('player', username=last_post_user.username) }}">{{ last_post_user.username }}</a>
+                            {% if last_post_user.player %}
+                                <a href="{{ url_for('player', username=last_post_user.player.username) }}">
+                                    {{ last_post_user.player.username|face_thumb }} {{ last_post_user.player.displayname_html|safe }}
+                                </a>
+                            {% else %}
+                                {{ last_post_user.username }}
+                            {% endif %}
                         </div>
                         {% endwith %}
                     </td>

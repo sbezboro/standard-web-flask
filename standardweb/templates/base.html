@@ -39,11 +39,11 @@
                 <a class="{% block select_leaderboards %}{% endblock %}" href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a>
                 <a class="{% block select_forum %}{% endblock %}" href="{{ url_for('forums') }}">Forums</a>
                 <a class="{% block select_chat %}{% endblock %}" href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a>
-                {% if user and user.is_superuser %}<a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a>{% endif %}
+                {% if user and user.admin %}<a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a>{% endif %}
                 <div id="right">
                     {% if user %}
-                        {% if not user.is_superuser %}
-                            <a class="{% block select_player %}{% endblock %}" href="{{ url_for('player', username=user.username) }}">{{ user.username|face_thumb }}{{ user.username }}</a>
+                        {% if not user.admin %}
+                            <a class="{% block select_player %}{% endblock %}" href="{{ url_for('player', username=user.player.username) }}">{{ user.player.username|face_thumb }}{{ user.player.username }}</a>
                         {% endif %}
                         <a href="/logout">Log out</a>
                     {% else %}
@@ -65,12 +65,12 @@
                     <li><a href="/leaderboards">Leaderboards</a></li>
                     <li><a href="/forum">Forum</a></li>
                     <li><a href="/chat">Live Chat</a></li>
-                    {% if user and user.is_superuser %}<li><a href="/analytics">Analytics</a></li>{% endif %}
-                    {% if user and user.is_superuser %}<li><a href="/server-admin">Server Admin</a></li>{% endif %}
+                    {% if user and user.admin %}<li><a href="/analytics">Analytics</a></li>{% endif %}
+                    {% if user and user.admin %}<li><a href="/server-admin">Server Admin</a></li>{% endif %}
                         <li>&nbsp;</li>
                     {% if user %}
-                        {% if not user.is_superuser %}
-                            <li><a href="/player/{{ user.username }}">{{ user.username|face_thumb }} {{ user.username }}</a></li>
+                        {% if not user.admin %}
+                            <li><a href="{{ url_for('player', username=user.player.username) }}">{{ user.player.username|face_thumb }}{{ user.player.username }}</a></li>
                         {% endif %}
                         <li><a href="/logout">Log out</a></li>
                     {% else %}

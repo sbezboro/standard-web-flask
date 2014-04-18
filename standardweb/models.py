@@ -54,13 +54,17 @@ class Base(object):
 
 
 class User(db.Model, Base):
-    __tablename__ = 'auth_user'
+    __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30))
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    uuid = db.Column(db.String(36))
     email = db.Column(db.String(75))
     password = db.Column(db.String(128))
-    is_superuser = db.Column(db.Boolean)
+    admin = db.Column(db.Boolean)
+
+    player = db.relationship('Player')
 
     def check_password(self, plaintext_password):
         algorithm, iterations, salt, hash_val = self.password.split('$', 3)
@@ -116,11 +120,11 @@ class Player(db.Model, Base):
 
 
 class PlayerStats(db.Model, Base):
-    __tablename__ = 'standardweb_playerstats'
+    __tablename__ = 'playerstats'
 
     id = db.Column(db.Integer, primary_key=True)
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
-    server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
+    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
     time_spent = db.Column(db.Integer)
     first_seen = db.Column(db.DateTime, default=datetime.utcnow)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
@@ -137,20 +141,21 @@ class PlayerStats(db.Model, Base):
 
 
 class Server(db.Model, Base):
-    __tablename__ = 'standardweb_server'
+    __tablename__ = 'server'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
     address = db.Column(db.String(50))
+    online = db.Column(db.Boolean())
     secret_key = db.Column(db.String(10))
 
 
 class ServerStatus(db.Model, Base):
-    __tablename__ = 'standardweb_serverstatus'
+    __tablename__ = 'serverstatus'
 
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
+    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
     player_count = db.Column(db.Integer)
     cpu_load = db.Column(db.Float)
     tps = db.Column(db.Float)
@@ -159,7 +164,7 @@ class ServerStatus(db.Model, Base):
 
 
 class MojangStatus(db.Model, Base):
-    __tablename__ = 'standardweb_mojangstatus'
+    __tablename__ = 'mojangstatus'
 
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
@@ -172,7 +177,7 @@ class MojangStatus(db.Model, Base):
 
 
 class DeathType(db.Model, Base):
-    __tablename__ = 'standardweb_deathtype'
+    __tablename__ = 'deathtype'
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(100))
@@ -180,7 +185,7 @@ class DeathType(db.Model, Base):
 
 
 class KillType(db.Model, Base):
-    __tablename__ = 'standardweb_killtype'
+    __tablename__ = 'killtype'
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(100))
@@ -188,11 +193,11 @@ class KillType(db.Model, Base):
 
 
 class DeathCount(db.Model, Base):
-    __tablename__ = 'standardweb_deathcount'
+    __tablename__ = 'deathcount'
 
     id = db.Column(db.Integer, primary_key=True)
-    server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
-    death_type_id = db.Column(db.Integer, db.ForeignKey('standardweb_deathtype.id'))
+    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
+    death_type_id = db.Column(db.Integer, db.ForeignKey('deathtype.id'))
     victim_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     killer_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     count = db.Column(db.Integer)
@@ -213,11 +218,11 @@ class DeathCount(db.Model, Base):
 
 
 class KillCount(db.Model, Base):
-    __tablename__ = 'standardweb_killcount'
+    __tablename__ = 'killcount'
 
     id = db.Column(db.Integer, primary_key=True)
-    server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
-    kill_type_id = db.Column(db.Integer, db.ForeignKey('standardweb_killtype.id'))
+    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
+    kill_type_id = db.Column(db.Integer, db.ForeignKey('killtype.id'))
     killer_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     count = db.Column(db.Integer)
 
@@ -235,7 +240,7 @@ class KillCount(db.Model, Base):
 
 
 class MaterialType(db.Model, Base):
-    __tablename__ = 'standardweb_materialtype'
+    __tablename__ = 'materialtype'
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(32), unique=True)
@@ -243,13 +248,13 @@ class MaterialType(db.Model, Base):
 
 
 class OreDiscoveryEvent(db.Model, Base):
-    __tablename__ = 'standardweb_orediscoveryevent'
+    __tablename__ = 'orediscoveryevent'
 
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
+    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
-    material_type_id = db.Column(db.Integer, db.ForeignKey('standardweb_materialtype.id'))
+    material_type_id = db.Column(db.Integer, db.ForeignKey('materialtype.id'))
     x = db.Column(db.Integer)
     y = db.Column(db.Integer)
     z = db.Column(db.Integer)
@@ -260,12 +265,12 @@ class OreDiscoveryEvent(db.Model, Base):
 
 
 class OreDiscoveryCount(db.Model, Base):
-    __tablename__ = 'standardweb_orediscoverycount'
+    __tablename__ = 'orediscoverycount'
 
     id = db.Column(db.Integer, primary_key=True)
-    server_id = db.Column(db.Integer, db.ForeignKey('standardweb_server.id'))
+    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
-    material_type_id = db.Column(db.Integer, db.ForeignKey('standardweb_materialtype.id'))
+    material_type_id = db.Column(db.Integer, db.ForeignKey('materialtype.id'))
     count = db.Column(db.Integer, default=0)
 
     server = db.relationship('Server', foreign_keys='OreDiscoveryCount.server_id')
@@ -282,7 +287,7 @@ class OreDiscoveryCount(db.Model, Base):
 
 
 class ForumCategory(db.Model, Base):
-    __tablename__ = 'djangobb_forum_category'
+    __tablename__ = 'forum_category'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
@@ -292,17 +297,17 @@ class ForumCategory(db.Model, Base):
 
 
 class Forum(db.Model, Base):
-    __tablename__ = 'djangobb_forum_forum'
+    __tablename__ = 'forum'
 
     id = db.Column(db.Integer, primary_key=True)
-    category_id = db.Column(db.Integer, db.ForeignKey('djangobb_forum_category.id'))
+    category_id = db.Column(db.Integer, db.ForeignKey('forum_category.id'))
     name = db.Column(db.String(80))
     position = db.Column(db.Integer, default=0)
     description = db.Column(db.Text())
     updated = db.Column(db.DateTime, default=datetime.utcnow)
     post_count = db.Column(db.Integer, default=0)
     topic_count = db.Column(db.Integer, default=0)
-    last_post_id = db.Column(db.Integer, db.ForeignKey('djangobb_forum_post.id'))
+    last_post_id = db.Column(db.Integer, db.ForeignKey('forum_post.id'))
     locked = db.Column(db.Boolean)
 
     category = db.relationship('ForumCategory', foreign_keys='Forum.category_id')
@@ -315,20 +320,20 @@ class Forum(db.Model, Base):
 
 
 class ForumTopic(db.Model, Base):
-    __tablename__ = 'djangobb_forum_topic'
+    __tablename__ = 'forum_topic'
 
     id = db.Column(db.Integer, primary_key=True)
-    forum_id = db.Column(db.Integer, db.ForeignKey('djangobb_forum_forum.id'))
+    forum_id = db.Column(db.Integer, db.ForeignKey('forum.id'))
     name = db.Column(db.String(255))
     created = db.Column(db.DateTime, default=datetime.utcnow)
     updated = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('auth_user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     views = db.Column(db.Integer, default=0)
     sticky = db.Column(db.Boolean, default=False)
     closed = db.Column(db.Boolean, default=False)
     deleted = db.Column(db.Boolean, default=False)
     post_count = db.Column(db.Integer, default=1)
-    last_post_id = db.Column(db.Integer, db.ForeignKey('djangobb_forum_post.id'))
+    last_post_id = db.Column(db.Integer, db.ForeignKey('forum_post.id'))
 
     forum = db.relationship('Forum', foreign_keys='ForumTopic.forum_id')
     user = db.relationship('User', foreign_keys='ForumTopic.user_id')
@@ -363,14 +368,14 @@ class ForumTopic(db.Model, Base):
 
 
 class ForumPost(db.Model, Base):
-    __tablename__ = 'djangobb_forum_post'
+    __tablename__ = 'forum_post'
 
     id = db.Column(db.Integer, primary_key=True)
-    topic_id =  db.Column(db.Integer, db.ForeignKey('djangobb_forum_topic.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('auth_user.id'))
+    topic_id =  db.Column(db.Integer, db.ForeignKey('forum_topic.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     created = db.Column(db.DateTime, default=datetime.utcnow)
     updated = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_by_id = db.Column(db.Integer, db.ForeignKey('auth_user.id'))
+    updated_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     body = db.Column(db.Text())
     body_html = db.Column(db.Text())
     user_ip = db.Column(db.String(15))
@@ -390,10 +395,10 @@ class ForumPost(db.Model, Base):
 
 
 class ForumPostTracking(db.Model, Base):
-    __tablename__ = 'djangobb_forum_posttracking'
+    __tablename__ = 'forum_posttracking'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('auth_user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     topics =  db.Column(db.Text())
     last_read = db.Column(db.DateTime, default=None)
 

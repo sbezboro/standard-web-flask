@@ -40,7 +40,13 @@
                             <b>Last post:</b> <a href="{{ last_post.url }}"><abbr class="timeago" title="{{ last_post.created | iso_date }}">{{ last_post.created }}</abbr></a>
                         </div>
                         <div>
-                            <b>By:</b> <a href="{{ url_for('player', username=last_post_user.username) }}">{{ last_post_user.username }}</a>
+                            {% if last_post_user.player %}
+                                <a href="{{ url_for('player', username=last_post_user.player.username) }}">
+                                    {{ last_post_user.player.username|face_thumb }} {{ last_post_user.player.displayname_html|safe }}
+                                </a>
+                            {% else %}
+                                {{ last_post_user.username }}
+                            {% endif %}
                         </div>
                         {% endwith %}
                     </td>

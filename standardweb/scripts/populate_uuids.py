@@ -1,8 +1,4 @@
-import json
-import os
 import sys
-
-import requests
 
 from standardweb import app
 from standardweb.lib import minecraft_uuid

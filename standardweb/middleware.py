@@ -7,6 +7,7 @@ from flask import url_for
 from standardweb import app
 from standardweb.lib import csrf
 from standardweb.models import User
+from sqlalchemy.orm import joinedload
 
 import hashlib
 import os
@@ -15,7 +16,7 @@ import os
 @app.before_request
 def user_session():
     if request.endpoint and 'static' not in request.endpoint and session.get('user_id'):
-        g.user = User.query.get(session['user_id'])
+        g.user = User.query.options(joinedload('player')).get(session['user_id'])
 
 
 @app.before_request
@@ -61,17 +62,17 @@ def rts_auth_data():
 
     if hasattr(g, 'user'):
         user_id = g.user.id
-        username = g.user.username
-        is_superuser = g.user.is_superuser
+        username = g.user.player.username if g.user.player else g.user.username
+        admin = g.user.admin
 
-        content = '-'.join([str(user_id), username, str(int(is_superuser))])
+        content = '-'.join([str(user_id), username, str(int(admin))])
 
         token = hashlib.sha256(content + app.config['RTS_SECRET']).hexdigest()
 
         data = {
             'user_id': user_id,
             'username': username,
-            'is_superuser': int(is_superuser),
+            'is_superuser': int(admin),
             'token': token
         }
 

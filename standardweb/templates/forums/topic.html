@@ -19,13 +19,16 @@
                     </a>
                 </h4>
                 <div class="post-author">
-                    <a href="{{ url_for('player', username=post.user.username) }}">
-                        {{ post.user.username | face_large }}
+                    <a href="{{ url_for('player', username=post.user.player.username) }}">
+                        {{ post.user.player.username | face_large }}
                     </a>
                     <div class="post-author-name">
-                        <a href="{{ url_for('player', username=post.user.username) }}">
-                            {{ post.user.username }}
+                        <a href="{{ url_for('player', username=post.user.player.username) }}">
+                            {{ post.user.player.displayname_html|safe }}
                         </a>
+                        {% if post.user.player.nickname %}
+                            ({{ post.user.player.username }})
+                        {% endif %}
                     </div>
                 </div>
                 <div class="post-content">

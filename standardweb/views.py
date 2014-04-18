@@ -290,10 +290,12 @@ def forums():
         .joinedload(Forum.last_post)
         .joinedload(ForumPost.topic)
         .joinedload(ForumTopic.user)
+        .joinedload(User.player)
     ).options(
         joinedload(ForumCategory.forums)
         .joinedload(Forum.last_post)
         .joinedload(ForumPost.user)
+        .joinedload(User.player)
     ).order_by(ForumCategory.position).all()
 
     active_forum_ids = set()
@@ -335,9 +337,11 @@ def forum(forum_id):
 
     topics = ForumTopic.query.options(
         joinedload(ForumTopic.user)
+        .joinedload(User.player)
     ).options(
         joinedload(ForumTopic.last_post)
         .joinedload(ForumPost.user)
+        .joinedload(User.player)
     ).filter_by(forum_id=forum_id, deleted=False) \
     .order_by(ForumTopic.sticky.desc(), ForumTopic.updated.desc()) \
     .limit(page_size) \
@@ -388,6 +392,7 @@ def forum_topic(topic_id):
 
     posts = ForumPost.query.options(
         joinedload(ForumPost.user)
+        .joinedload(User.player)
     ).filter_by(topic_id=topic_id) \
     .order_by(ForumPost.created) \
     .limit(page_size) \
@@ -510,7 +515,7 @@ def chat(server_id=None):
 @app.route('/admin')
 @app.route('/<int:server_id>/admin')
 def admin(server_id=None):
-    if not g.user.is_superuser:
+    if not g.user.admin:
         abort(403)
 
     if not server_id:
