@@ -860,6 +860,14 @@ fieldset {
     background: #ceffd2;
 }
 
+.forum-topic-table tr.admin {
+    background: #e2f2ff;
+}
+
+.forum-topic-table tr.admin:hover {
+    background: #daeaff;
+}
+
 .forum-cell {
     padding: 10px;
 }

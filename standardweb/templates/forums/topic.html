@@ -40,6 +40,20 @@
                 </div>
                 <div class="post-content">
                     {{ post.body_html|replace('djangobb_forum/img/smilies', 'images/forums/emoticons')|safe }}
+
+                    {% if post.attachments %}
+                        {% for attachment in post.attachments %}
+                            {{ attachment|attachment_link }}
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if post.user.forum_profile.signature_html %}
+                        <div class="signature">
+                            <br /><br />
+                            <hr>
+                            {{ post.user.forum_profile.signature_html|safe }}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}

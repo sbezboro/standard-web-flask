@@ -23,3 +23,11 @@ def face_large(username):
 @app.template_filter('iso_date')
 def iso_date(date):
     return h.iso_date(date)
+
+
+@app.template_filter('attachment_link')
+def attachment_link(attach):
+    if attach.content_type in set(['image/png', 'image/gif', 'image/jpeg', 'image/x-png']):
+        return Markup('<img src="%s"/>' % attach.url)
+
+    return Markup('%s <a href="%s">%s</a>' % (attach.name, attach.url, attach.name))

@@ -335,6 +335,11 @@ def forum(forum_id):
     if page < 1 or page > forum.topic_count / page_size + 1:
         return redirect(url_for('forum', forum_id=forum_id))
 
+    if forum.locked:
+        order = ForumTopic.sticky.desc(), ForumTopic.created.desc()
+    else:
+        order = ForumTopic.sticky.desc(), ForumTopic.updated.desc()
+
     topics = ForumTopic.query.options(
         joinedload(ForumTopic.user)
         .joinedload(User.player)
@@ -343,7 +348,7 @@ def forum(forum_id):
         .joinedload(ForumPost.user)
         .joinedload(User.player)
     ).filter_by(forum_id=forum_id, deleted=False) \
-    .order_by(ForumTopic.sticky.desc(), ForumTopic.updated.desc()) \
+    .order_by(*order) \
     .limit(page_size) \
     .offset((page - 1) * page_size)
 
@@ -443,6 +448,9 @@ def new_topic(forum_id):
 
     user = g.user
 
+    if forum.locked and not g.admin:
+        abort(403)
+
     form = NewTopicForm()
 
     if form.validate_on_submit():
@@ -498,6 +506,9 @@ def chat(server_id=None):
 
     server = Server.query.get(server_id)
 
+    if not server:
+        abort(404)
+
     if g.user:
         player = Player.query.filter_by(username=g.user.username)
     else:
@@ -523,9 +534,20 @@ def admin(server_id=None):
 
     server = Server.query.get(server_id)
 
+    if not server:
+        abort(404)
+
     retval = {
         'server': server,
         'servers': Server.query.all()
     }
 
     return render_template('admin.html', **retval)
+
+
+@app.route('/attachment/<hash>')
+def forum_attachment(hash):
+    attachment = ForumAttachment.query.filter_by(hash=hash).first()
+    f = file(attachment.file_path, 'rb')
+
+    return send_file(f, mimetype=attachment.content_type, as_attachment=True)

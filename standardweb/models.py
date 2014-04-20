@@ -1,6 +1,7 @@
 from flask import json
 from flask import url_for
 
+from standardweb import app
 from standardweb import db
 from standardweb.lib import helpers as h
 
@@ -13,6 +14,7 @@ from datetime import datetime
 import binascii
 import hashlib
 import os
+
 
 
 def _get_or_create(cls, commit=True, **kwargs):
@@ -131,8 +133,8 @@ class PlayerStats(db.Model, Base):
     banned = db.Column(db.Boolean)
     pvp_logs = db.Column(db.Integer)
 
-    server = db.relationship('Server', foreign_keys='PlayerStats.server_id')
-    player = db.relationship('Player', foreign_keys='PlayerStats.player_id')
+    server = db.relationship('Server')
+    player = db.relationship('Player')
 
     def get_rank(self):
         return PlayerStats.query.filter(PlayerStats.server_id == self.server_id,
@@ -160,7 +162,7 @@ class ServerStatus(db.Model, Base):
     cpu_load = db.Column(db.Float)
     tps = db.Column(db.Float)
 
-    server = db.relationship('Server', foreign_keys='ServerStatus.server_id')
+    server = db.relationship('Server')
 
 
 class MojangStatus(db.Model, Base):
@@ -202,8 +204,8 @@ class DeathCount(db.Model, Base):
     killer_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     count = db.Column(db.Integer)
 
-    server = db.relationship('Server', foreign_keys='DeathCount.server_id')
-    death_type = db.relationship('DeathType', foreign_keys='DeathCount.death_type_id')
+    server = db.relationship('Server')
+    death_type = db.relationship('DeathType')
     killer = db.relationship('Player', foreign_keys='DeathCount.killer_id')
     victim = db.relationship('Player', foreign_keys='DeathCount.victim_id')
 
@@ -226,9 +228,9 @@ class KillCount(db.Model, Base):
     killer_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     count = db.Column(db.Integer)
 
-    server = db.relationship('Server', foreign_keys='KillCount.server_id')
-    kill_type = db.relationship('KillType', foreign_keys='KillCount.kill_type_id')
-    killer = db.relationship('Player', foreign_keys='KillCount.killer_id')
+    server = db.relationship('Server')
+    kill_type = db.relationship('KillType')
+    killer = db.relationship('Player')
 
     @classmethod
     def increment(cls, server, kill_type, killer):
@@ -259,9 +261,9 @@ class OreDiscoveryEvent(db.Model, Base):
     y = db.Column(db.Integer)
     z = db.Column(db.Integer)
 
-    server = db.relationship('Server', foreign_keys='OreDiscoveryEvent.server_id')
-    player = db.relationship('Player', foreign_keys='OreDiscoveryEvent.player_id')
-    material_type = db.relationship('MaterialType', foreign_keys='OreDiscoveryEvent.material_type_id')
+    server = db.relationship('Server')
+    player = db.relationship('Player')
+    material_type = db.relationship('MaterialType')
 
 
 class OreDiscoveryCount(db.Model, Base):
@@ -273,9 +275,9 @@ class OreDiscoveryCount(db.Model, Base):
     material_type_id = db.Column(db.Integer, db.ForeignKey('materialtype.id'))
     count = db.Column(db.Integer, default=0)
 
-    server = db.relationship('Server', foreign_keys='OreDiscoveryCount.server_id')
-    player = db.relationship('Player', foreign_keys='OreDiscoveryCount.player_id')
-    material_type = db.relationship('MaterialType', foreign_keys='OreDiscoveryCount.material_type_id')
+    server = db.relationship('Server')
+    player = db.relationship('Player')
+    material_type = db.relationship('MaterialType')
 
     @classmethod
     def increment(cls, server, material_type, player):
@@ -284,6 +286,17 @@ class OreDiscoveryCount(db.Model, Base):
                                          player=player)
         ore_count.count += 1
         ore_count.save()
+
+
+class ForumProfile(db.Model, Base):
+    __tablename__ = 'forum_profile'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    signature = db.Column(db.Text())
+    signature_html = db.Column(db.Text())
+
+    user = db.relationship('User', backref=db.backref('forum_profile', uselist=False))
 
 
 class ForumCategory(db.Model, Base):
@@ -310,9 +323,9 @@ class Forum(db.Model, Base):
     last_post_id = db.Column(db.Integer, db.ForeignKey('forum_post.id'))
     locked = db.Column(db.Boolean)
 
-    category = db.relationship('ForumCategory', foreign_keys='Forum.category_id')
+    category = db.relationship('ForumCategory')
     topics = db.relationship('ForumTopic')
-    last_post = db.relationship('ForumPost', foreign_keys='Forum.last_post_id')
+    last_post = db.relationship('ForumPost')
 
     @property
     def url(self):
@@ -335,8 +348,8 @@ class ForumTopic(db.Model, Base):
     post_count = db.Column(db.Integer, default=1)
     last_post_id = db.Column(db.Integer, db.ForeignKey('forum_post.id'))
 
-    forum = db.relationship('Forum', foreign_keys='ForumTopic.forum_id')
-    user = db.relationship('User', foreign_keys='ForumTopic.user_id')
+    forum = db.relationship('Forum')
+    user = db.relationship('User')
     posts = db.relationship('ForumPost', foreign_keys='ForumPost.topic_id')
     last_post = db.relationship('ForumPost', foreign_keys='ForumTopic.last_post_id')
 
@@ -402,11 +415,32 @@ class ForumPostTracking(db.Model, Base):
     topics =  db.Column(db.Text())
     last_read = db.Column(db.DateTime, default=None)
 
-    user = db.relationship('User', foreign_keys='ForumPostTracking.user_id',
-                           backref=db.backref('posttracking', uselist=False))
+    user = db.relationship('User', backref=db.backref('posttracking', uselist=False))
 
     def get_topics(self):
         return json.loads(self.topics) if self.topics else None
 
     def set_topics(self, topics):
         self.topics = json.dumps(topics)
+
+
+class ForumAttachment(db.Model, Base):
+    __tablename__ = 'forum_attachment'
+
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('forum_post.id'))
+    size =  db.Column(db.Integer())
+    content_type = db.Column(db.String(255))
+    path = db.Column(db.String(255))
+    name = db.Column(db.Text())
+    hash = db.Column(db.String(40))
+
+    post = db.relationship('ForumPost', backref=db.backref('attachments'))
+
+    @property
+    def url(self):
+        return url_for('forum_attachment', hash=self.hash)
+
+    @property
+    def file_path(self):
+        return os.path.join(app.root_path, 'attachments', self.path)

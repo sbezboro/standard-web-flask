@@ -9,15 +9,18 @@
         {{ pages() }}
         <div class="controls">
             <a href="">Mark all topics as read</a>
-            <a href="{{ url_for('new_topic', forum_id=forum.id) }}" class="btn">New Topic</a>
+            {% if not forum.locked or not user or user.admin %}
+                <a href="{{ url_for('new_topic', forum_id=forum.id) }}" class="btn">New Topic</a>
+            {% endif %}
         </div>
     </div>
+    <div class="clear"></div>
     <div class="forum">
         <h4>{{ forum.name }}</h4>
         <table class="forum-topic-table">
             {% for topic in topics %}
                 {% with active = topic.id in active_topic_ids %}
-                <tr class="{% if topic.sticky %}sticky{% endif %}">
+                <tr class="{% if topic.sticky %}sticky{% else %}{% if topic.user.admin %}admin{% endif %}{% endif %}">
                     <td>
                         {% if active %}
                             <img src="{{ url_for('static', filename='images/forums/active_topic.png') }}">
@@ -84,7 +87,9 @@
         {{ pages() }}
         <div class="controls">
             <a href="">Mark all topics as read</a>
-            <a href="{{ url_for('new_topic', forum_id=forum.id) }}" class="btn">New Topic</a>
+            {% if not forum.locked or not user or user.admin %}
+                <a href="{{ url_for('new_topic', forum_id=forum.id) }}" class="btn">New Topic</a>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
