@@ -1,10 +1,18 @@
 {% extends "base.html" %}
 
 {% block title %}
-    {{ player.displayname }} {% if player.nickname %}({{ player.username }}){% endif %} - {{ server.address }} - Standard Survival Minecraft Server
+    {% if player %}
+        {{ player.displayname }} {% if player.nickname %}({{ player.username }}){% endif %} - {{ server.address }} - Standard Survival Minecraft Server
+    {% else %}
+        {{ username or 'Player' }} - {{ server.address }} - Standard Survival Minecraft Server
+    {% endif %}
 {% endblock %}
 
-{% block description %}{{ player.displayname }}'s rank info, kills, deaths and playtime info on {{ server.address }}{% endblock %}
+{% block description %}
+    {% if player %}
+        {{ player.displayname }}'s rank info, kills, deaths and playtime info on {{ server.address }}
+    {% endif %}
+{% endblock %}
 
 {% block select_player %}{% if user.username == username %}selected{% endif %}{% endblock %}
 {% block content %}
@@ -145,7 +153,7 @@
             {% endif %}
             <div class="clear"></div>
         {% else %}
-            <h2>No record of {{ username }} on any server</h2>
+            <h2>No record of {{ username or 'that player'}} having played on any server</h2>
         {% endif %}
     </div>
 {% endblock %}

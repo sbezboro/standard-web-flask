@@ -146,11 +146,18 @@ def player(username, server_id=None):
     template = 'player.html'
     retval = {
         'server': server,
-        'servers': Server.query.all(),
-        'username': username
+        'servers': Server.query.all()
     }
 
-    player = Player.query.filter_by(username=username).first()
+    if len(username) == 32:
+        player = Player.query.filter_by(uuid=username).first()
+        if player:
+            return redirect(url_for('player', username=player.username,
+                                    server_id=app.config['MAIN_SERVER_ID']))
+    else:
+        retval['username'] = username
+        player = Player.query.filter_by(username=username).first()
+
     if not player:
         # the username doesn't belong to any player seen on any server
         return render_template(template, **retval), 404

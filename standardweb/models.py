@@ -96,7 +96,7 @@ class Player(db.Model, Base):
     __tablename__ = 'player'
 
     id = db.Column(db.Integer, primary_key=True)
-    uuid = db.Column(db.String(36))
+    uuid = db.Column(db.String(32))
     username = db.Column(db.String(30))
     nickname = db.Column(db.String(30))
     nickname_ansi = db.Column(db.String(256))
