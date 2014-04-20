@@ -66,7 +66,7 @@ class User(db.Model, Base):
     password = db.Column(db.String(128))
     admin = db.Column(db.Boolean)
 
-    player = db.relationship('Player')
+    player = db.relationship('Player', backref=db.backref('user', uselist=False))
 
     def check_password(self, plaintext_password):
         algorithm, iterations, salt, hash_val = self.password.split('$', 3)

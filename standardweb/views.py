@@ -8,7 +8,6 @@ from flask import render_template
 from flask import send_file
 from flask import session
 
-from standardweb import app
 from standardweb.forms import LoginForm, NewPostForm, NewTopicForm
 from standardweb.lib import cache as libcache
 from standardweb.lib import leaderboards as libleaderboards
@@ -48,7 +47,11 @@ def login():
         password = request.form['password']
         next_path = request.form.get('next')
 
-        user = User.query.filter_by(username=username).first()
+        player = Player.query.filter_by(username=username).first()
+        if player:
+            user = player.user
+        else:
+            user = User.query.filter_by(username=username).first()
 
         if user and user.check_password(password):
             session['user_id'] = user.id
@@ -78,11 +81,11 @@ def player_search():
 
     page_size = 20
 
-    results = Player.query.filter(or_(Player.username.ilike('%%%s%%' % q),
-                                      Player.nickname.ilike('%%%s%%' % q))) \
+    results = Player.query.filter(or_(Player.username.ilike('%%%s%%' % query),
+                                      Player.nickname.ilike('%%%s%%' % query))) \
         .order_by(func.ifnull(Player.nickname, Player.username)) \
         .limit(page_size + 1) \
-        .offset(p * page_size)
+        .offset(page * page_size)
 
     results = list(results)
 
@@ -384,7 +387,7 @@ def forum_topic(topic_id):
         joinedload(ForumTopic.forum)
     ).get(topic_id)
 
-    if not topic:
+    if not topic or topic.deleted:
         abort(404)
 
     page_size = POSTS_PER_PAGE
@@ -398,7 +401,7 @@ def forum_topic(topic_id):
     posts = ForumPost.query.options(
         joinedload(ForumPost.user)
         .joinedload(User.player)
-    ).filter_by(topic_id=topic_id) \
+    ).filter_by(topic_id=topic_id, deleted=False) \
     .order_by(ForumPost.created) \
     .limit(page_size) \
     .offset((page - 1) * page_size)
@@ -482,6 +485,7 @@ def new_post(topic_id):
         abort(404)
 
     if not hasattr(g, 'user'):
+        flash('You must log in before you can do that', 'warning')
         return redirect(url_for('login'))
 
     user = g.user
