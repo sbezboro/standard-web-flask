@@ -3,7 +3,6 @@ from flask import url_for
 
 from standardweb import app
 from standardweb import db
-from standardweb.lib import cache
 from standardweb.lib import helpers as h
 
 from pbkdf2 import pbkdf2_bin
