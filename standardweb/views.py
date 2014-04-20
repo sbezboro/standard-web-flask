@@ -332,7 +332,9 @@ def forums():
 
 @app.route('/forum/<int:forum_id>')
 def forum(forum_id):
-    forum = Forum.query.get(forum_id)
+    forum = Forum.query.options(
+        joinedload(Forum.moderators)
+    ).get(forum_id)
 
     if not forum:
         abort(404)
@@ -392,6 +394,7 @@ def forum(forum_id):
 def forum_topic(topic_id):
     topic = ForumTopic.query.options(
         joinedload(ForumTopic.forum)
+        .joinedload(Forum.moderators)
     ).get(topic_id)
 
     if not topic or topic.deleted:
@@ -408,6 +411,11 @@ def forum_topic(topic_id):
     posts = ForumPost.query.options(
         joinedload(ForumPost.user)
         .joinedload(User.player)
+    ).options(
+        joinedload(ForumPost.attachments)
+    ).options(
+        joinedload(ForumPost.user)
+        .joinedload(User.forum_profile)
     ).filter_by(topic_id=topic_id, deleted=False) \
     .order_by(ForumPost.created) \
     .limit(page_size) \
@@ -446,7 +454,7 @@ def forum_post(post_id):
     return redirect(url_for('forum_topic', topic_id=post.topic_id, _anchor=post.id))
 
 
-@app.route('/forum/<int:forum_id>/new_topic', methods=['GET', 'POST'])
+@app.route('/forum/topic/<int:forum_id>/new_topic', methods=['GET', 'POST'])
 def new_topic(forum_id):
     forum = Forum.query.get(forum_id)
 
@@ -484,11 +492,11 @@ def new_topic(forum_id):
     return render_template('forums/new_topic.html', **retval)
 
 
-@app.route('/forum/<int:topic_id>/new_post', methods=['POST'])
+@app.route('/forum/topic/<int:topic_id>/new_post', methods=['POST'])
 def new_post(topic_id):
     topic = ForumTopic.query.get(topic_id)
 
-    if not forum:
+    if not topic:
         abort(404)
 
     if not hasattr(g, 'user'):
@@ -504,9 +512,91 @@ def new_post(topic_id):
 
         post = ForumPost(topic_id=topic.id, user=user, body=body, user_ip=request.remote_addr)
         topic.last_post = post
+        topic.post_count += 1
         post.save(commit=True)
 
         return redirect(url_for('forum_post', post_id=post.id))
+
+
+@app.route('/forum/topic/<int:topic_id>/status')
+def forum_topic_status(topic_id):
+    topic = ForumTopic.query.options(
+        joinedload(ForumTopic.forum)
+        .joinedload(Forum.moderators)
+    ).get(topic_id)
+
+    if not topic:
+        abort(404)
+
+    if not hasattr(g, 'user'):
+        flash('You must log in before you can do that', 'warning')
+        return redirect(url_for('login'))
+
+    user = g.user
+
+    if not user.admin or user not in topic.forum.moderators:
+        abort(403)
+
+    status = request.args.get('status')
+
+    message = None
+
+    if status == 'close':
+        message = 'Topic closed'
+        topic.closed = True
+    elif status == 'open':
+        message = 'Topic opened'
+        topic.closed = False
+    elif status == 'sticky':
+        message = 'Topic stickied'
+        topic.sticky = True
+    elif status == 'unsticky':
+        message = 'Topic unstickied'
+        topic.sticky = False
+
+    if message:
+        topic.save(commit=True)
+
+        flash(message, 'success')
+
+    return redirect(topic.url)
+
+
+@app.route('/forum/post/<int:post_id>/delete')
+def forum_post_delete(post_id):
+    post = ForumPost.query.options(
+        joinedload(ForumPost.topic)
+        .joinedload(ForumTopic.forum)
+        .joinedload(Forum.moderators)
+    ).get(post_id)
+
+    if not post:
+        abort(404)
+
+    if not hasattr(g, 'user'):
+        flash('You must log in before you can do that', 'warning')
+        return redirect(url_for('login'))
+
+    user = g.user
+
+    if not user.admin and user not in post.topic.forum.moderators:
+        abort(403)
+
+    post.deleted = True
+    post.save(commit=False)
+
+    post.topic.post_count -= 1
+
+    if post.id == post.topic.last_post_id:
+        for other_post in reversed(post.topic.posts):
+            if not other_post.deleted:
+                post.topic.last_post_id = other_post.id
+                post.topic.save(commit=True)
+                break
+
+    flash('Post deleted', 'success')
+
+    return redirect(post.topic.url)
 
 
 @app.route('/chat')

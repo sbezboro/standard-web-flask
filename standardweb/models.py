@@ -3,6 +3,7 @@ from flask import url_for
 
 from standardweb import app
 from standardweb import db
+from standardweb.lib import cache
 from standardweb.lib import helpers as h
 
 from pbkdf2 import pbkdf2_bin
@@ -309,6 +310,11 @@ class ForumCategory(db.Model, Base):
     forums = db.relationship('Forum')
 
 
+forum_moderators = db.Table('forum_moderators',
+    db.Column('forum_id', db.Integer, db.ForeignKey('forum.id')),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')))
+
+
 class Forum(db.Model, Base):
     __tablename__ = 'forum'
 
@@ -326,6 +332,7 @@ class Forum(db.Model, Base):
     category = db.relationship('ForumCategory')
     topics = db.relationship('ForumTopic')
     last_post = db.relationship('ForumPost')
+    moderators = db.relationship('User', secondary=forum_moderators)
 
     @property
     def url(self):

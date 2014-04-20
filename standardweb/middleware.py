@@ -16,7 +16,11 @@ import os
 @app.before_request
 def user_session():
     if request.endpoint and 'static' not in request.endpoint and session.get('user_id'):
-        g.user = User.query.options(joinedload('player')).get(session['user_id'])
+        g.user = User.query.options(
+            joinedload(User.player)
+        ).options(
+            joinedload(User.posttracking)
+        ).get(session['user_id'])
 
 
 @app.before_request

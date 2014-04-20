@@ -43,7 +43,9 @@
 
                     {% if post.attachments %}
                         {% for attachment in post.attachments %}
-                            {{ attachment|attachment_link }}
+                            <div class="attachment">
+                                {{ attachment|attachment_link }}
+                            </div>
                         {% endfor %}
                     {% endif %}
 
@@ -55,6 +57,17 @@
                         </div>
                     {% endif %}
                 </div>
+                <div class="post-details">
+                    {% if user %}
+                        {% if user.admin or user in topic.forum.moderators %}
+                            <a href="{{ url_for('forum_post_delete', post_id=post.id) }}">Delete</a> |
+                        {% endif %}
+                        {% if user == topic.user or user.admin or user in topic.forum.moderators %}
+                            <a href="#">Edit</a> |
+                        {% endif %}
+                        <a href="#">Reply</a>
+                    {% endif %}
+                </div>
             </div>
         {% endfor %}
         <div class="button-area">
@@ -62,30 +75,49 @@
         </div>
     </div>
     {% if user %}
-        <div class="new-post">
-            <h4>
-                Quick Reply
-            </h4>
-            <div>
-                <form class="post-form" action="{{ url_for('new_post', topic_id=topic.id) }}" method="post">
-                    {{ form.hidden_tag() }}
-                    <fieldset>
-                        {% include 'includes/messages.html' %}
-                        <div class="control-group">
-                            <label class="control-label">{{ form.body.label }}</label>
-                            <span class="control-errors">{% if form.body.errors %}{{ form.body.errors[0] }}{% endif %}</span>
-                            <div class="control">{{ form.body() }}</div>
-                        </div>
-
-                        <div class="control-group">
-                            <div class="control">
-                                <input class="btn" type="submit" value="Post">
+        {% if not topic.closed or user.admin %}
+            <div class="new-post">
+                <h4>
+                    Quick Reply
+                </h4>
+                <div>
+                    <form class="post-form" action="{{ url_for('new_post', topic_id=topic.id) }}" method="post">
+                        {{ form.hidden_tag() }}
+                        <fieldset>
+                            <div class="control-group">
+                                <label class="control-label">{{ form.body.label }}</label>
+                                <span class="control-errors">{% if form.body.errors %}{{ form.body.errors[0] }}{% endif %}</span>
+                                <div class="control">{{ form.body() }}</div>
                             </div>
-                        </div>
-                    </fieldset>
-                </form>
+
+                            <div class="control-group">
+                                <div class="control">
+                                    <input class="btn" type="submit" value="Post">
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
             </div>
-        </div>
+        {% endif %}
+        {% if user.admin or user in topic.forum.moderators %}
+            <div class="moderation-area">
+                <b>Moderate:</b>
+                {% if topic.closed %}
+                    <a href="{{ url_for('forum_topic_status', topic_id=topic.id, status='open') }}">Open</a>
+                {% else %}
+                    <a href="{{ url_for('forum_topic_status', topic_id=topic.id, status='close') }}">Close</a>
+                {% endif %}
+                |
+                {% if topic.sticky %}
+                    <a href="{{ url_for('forum_topic_status', topic_id=topic.id, status='unsticky') }}">Unsticky</a>
+                {% else %}
+                    <a href="{{ url_for('forum_topic_status', topic_id=topic.id, status='sticky') }}">Sticky</a>
+                {% endif %}
+                |
+                <a href="#">Move</a>
+            </div>
+        {% endif %}
     {% else %}
         You must <a href="{{ url_for('login') }}">login</a> before you can post a reply
     {% endif %}

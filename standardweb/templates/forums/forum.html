@@ -20,9 +20,11 @@
         <table class="forum-topic-table">
             {% for topic in topics %}
                 {% with active = topic.id in active_topic_ids %}
-                <tr class="{% if topic.sticky %}sticky{% else %}{% if topic.user.admin %}admin{% endif %}{% endif %}">
+                <tr class="{% if topic.sticky %}sticky{% else %}{% if topic.user.admin %}admin{% endif %} {% if topic.closed %}closed{% endif %}{% endif %}">
                     <td>
-                        {% if active %}
+                        {% if topic.closed %}
+                            <img src="{{ url_for('static', filename='images/forums/closed_topic.png') }}">
+                        {% elif active %}
                             <img src="{{ url_for('static', filename='images/forums/active_topic.png') }}">
                         {% else %}
                             <img src="{{ url_for('static', filename='images/forums/inactive_topic.png') }}">
