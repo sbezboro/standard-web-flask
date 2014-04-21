@@ -79,6 +79,10 @@ $(document).ready(function() {
     $(this).closest('.alert').remove();
   });
 
+  $(document).on('click', 'a.confirm', function() {
+    return confirm($(this).attr('data-confirm-message') || 'Are you sure?');
+  });
+
   $("abbr.timeago").timeago();
   $(".placeholder").placeholder();
   $(".tooltip").tipsy();

@@ -12,7 +12,7 @@
     <div class="forum-topic">
         {% for post in posts %}
             <a class="anchor-nav" id="{{ post.id }}"></a>
-            <div class="forum-post">
+            <div class="forum-post {% if post.user.forum_ban %}banned{% endif %}">
                 <h4>
                     <a href="{{ url_for('forum_post', post_id=post.id) }}">
                         <abbr class="timeago" title="{{ post.created | iso_date }}">{{ post.created }}</abbr>
@@ -20,21 +20,36 @@
                 </h4>
                 <div class="post-author {% if post.user.admin %}admin{% endif %}">
                     {% if post.user.player %}
-                        <a href="{{ url_for('player', username=post.user.player.username) }}">
-                            {{ post.user.player.username | face_large }}
-                        </a>
-                        <div class="post-author-name">
+                        {% with stats, rank = player_stats[post.user.player] or (None, None) %}
                             <a href="{{ url_for('player', username=post.user.player.username) }}">
-                                {{ post.user.player.displayname_html|safe }}
+                                {{ post.user.player.username | face_large }}
                             </a>
-                            {% if post.user.player.nickname %}
-                                ({{ post.user.player.username }})
-                            {% endif %}
-                            <br/>
-                        </div>
+                            <div class="post-author-name">
+                                <a href="{{ url_for('player', username=post.user.player.username) }}">
+                                    {{ post.user.player.displayname_html|safe }}
+                                </a>
+                                {% if post.user.player.nickname %}
+                                    ({{ post.user.player.username }})
+                                {% endif %}
+                                <br/>
+                                {% if stats %}
+                                    <b>Time played:</b> {{ h.elapsed_time_string(stats.time_spent) }}
+                                    <br/>
+                                    <b>Rank:</b> {{ rank }}
+                                {% endif %}
+                            </div>
+                        {% endwith %}
                     {% else %}
                         <div class="post-author-name">
                             {{ post.user.username }}
+                        </div>
+                    {% endif %}
+
+                    {% if user.admin or user in topic.forum.moderators and not post.user.admin %}
+                        <div class="post-author-admin">
+                            {% if not post.user.forum_ban %}
+                                <a class="confirm" href="{{ url_for('forum_ban', user_id=post.user_id) }}">Ban from forums</a>
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>
@@ -60,7 +75,7 @@
                 <div class="post-details">
                     {% if user %}
                         {% if user.admin or user in topic.forum.moderators %}
-                            <a href="{{ url_for('forum_post_delete', post_id=post.id) }}">Delete</a> |
+                            <a class="confirm" href="{{ url_for('forum_post_delete', post_id=post.id) }}">Delete</a> |
                         {% endif %}
                         {% if user == topic.user or user.admin or user in topic.forum.moderators %}
                             <a href="#">Edit</a> |

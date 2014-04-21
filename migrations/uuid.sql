@@ -89,3 +89,10 @@ insert into user (id, username, player_id, uuid, full_name, email, password, adm
     select u.id, IF(ISNULL(p.id), u.username, NULL), p.id, uuid, CONCAT(first_name, ' ', last_name), email, password, is_superuser, last_login, date_joined
     from auth_user u
     left join player p on u.username = p.username;
+
+alter table forum_ban
+	modify column reason text default null,
+    add column by_user_id int(11) default null after user_id,
+    drop key user_id,
+    add foreign key (by_user_id) references user (id)
+    add foreign key (user_id) references user (id);

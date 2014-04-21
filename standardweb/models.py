@@ -116,10 +116,6 @@ class Player(db.Model, Base):
     def displayname_html(self):
         return self.nickname_html if self.nickname else self.username
 
-    @property
-    def last_seen(self):
-        return PlayerStats.objects.get(player=self, server=2).last_seen
-
 
 class PlayerStats(db.Model, Base):
     __tablename__ = 'playerstats'
@@ -293,6 +289,7 @@ class ForumProfile(db.Model, Base):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    post_count = db.Column(db.Integer)
     signature = db.Column(db.Text())
     signature_html = db.Column(db.Text())
 
@@ -331,7 +328,8 @@ class Forum(db.Model, Base):
     category = db.relationship('ForumCategory')
     topics = db.relationship('ForumTopic')
     last_post = db.relationship('ForumPost')
-    moderators = db.relationship('User', secondary=forum_moderators)
+    moderators = db.relationship('User', secondary=forum_moderators,
+                                 backref=db.backref('moderated_forums'))
 
     @property
     def url(self):
@@ -450,3 +448,15 @@ class ForumAttachment(db.Model, Base):
     @property
     def file_path(self):
         return os.path.join(app.root_path, 'attachments', self.path)
+
+
+class ForumBan(db.Model, Base):
+    __tablename__ = 'forum_ban'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    reason = db.Column(db.Text())
+    by_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    user = db.relationship('User', foreign_keys='ForumBan.user_id', backref=db.backref('forum_ban', uselist=False))
+    by_user = db.relationship('User', foreign_keys='ForumBan.by_user_id')

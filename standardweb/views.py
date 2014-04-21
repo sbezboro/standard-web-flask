@@ -412,16 +412,29 @@ def forum_topic(topic_id):
         joinedload(ForumPost.user)
         .joinedload(User.player)
     ).options(
-        joinedload(ForumPost.attachments)
-    ).options(
         joinedload(ForumPost.user)
         .joinedload(User.forum_profile)
+    ).options(
+        joinedload(ForumPost.user)
+        .joinedload(User.forum_ban)
+    ).options(
+        joinedload(ForumPost.attachments)
     ).filter_by(topic_id=topic_id, deleted=False) \
     .order_by(ForumPost.created) \
     .limit(page_size) \
     .offset((page - 1) * page_size)
 
     posts = list(posts)
+
+    player_ids = set([post.user.player_id for post in posts])
+
+    player_stats = PlayerStats.query.filter(PlayerStats.server_id == app.config['MAIN_SERVER_ID'],
+                                            PlayerStats.player_id.in_(player_ids))
+
+    player_stats = {
+        stats.player: (stats, stats.get_rank())
+        for stats in player_stats
+    }
 
     if hasattr(g, 'user'):
         topic.update_read(g.user)
@@ -431,6 +444,7 @@ def forum_topic(topic_id):
     retval = {
         'topic': topic,
         'posts': posts,
+        'player_stats': player_stats,
         'page_size': page_size,
         'page': page,
         'form': form
@@ -479,8 +493,19 @@ def new_topic(forum_id):
         topic.save(commit=True)
 
         post = ForumPost(topic_id=topic.id, user=user, body=body, user_ip=request.remote_addr)
+        post.save(commit=False)
+
+        user.forum_profile.post_count += 1
+        user.forum_profile.save(commit=False)
+
+        forum.last_post = post
+        forum.post_count += 1
+        forum.topic_count += 1
+        forum.save(commit=False)
+
         topic.last_post = post
-        post.save(commit=True)
+        topic.post_count += 1
+        topic.save(commit=True)
 
         return redirect(url_for('forum_topic', topic_id=topic.id))
 
@@ -494,7 +519,9 @@ def new_topic(forum_id):
 
 @app.route('/forum/topic/<int:topic_id>/new_post', methods=['POST'])
 def new_post(topic_id):
-    topic = ForumTopic.query.get(topic_id)
+    topic = ForumTopic.query.options(
+        joinedload(ForumTopic.forum)
+    ).get(topic_id)
 
     if not topic:
         abort(404)
@@ -511,6 +538,14 @@ def new_post(topic_id):
         body = request.form['body']
 
         post = ForumPost(topic_id=topic.id, user=user, body=body, user_ip=request.remote_addr)
+
+        user.forum_profile.post_count += 1
+        user.forum_profile.save(commit=False)
+
+        topic.forum.last_post = post
+        topic.forum.post_count += 1
+        topic.forum.save(commit=False)
+
         topic.last_post = post
         topic.post_count += 1
         post.save(commit=True)
@@ -534,7 +569,7 @@ def forum_topic_status(topic_id):
 
     user = g.user
 
-    if not user.admin or user not in topic.forum.moderators:
+    if not user.admin and user not in topic.forum.moderators:
         abort(403)
 
     status = request.args.get('status')
@@ -568,6 +603,9 @@ def forum_post_delete(post_id):
         joinedload(ForumPost.topic)
         .joinedload(ForumTopic.forum)
         .joinedload(Forum.moderators)
+    ).options(
+        joinedload(ForumPost.user)
+        .joinedload(User.forum_profile)
     ).get(post_id)
 
     if not post:
@@ -583,20 +621,58 @@ def forum_post_delete(post_id):
         abort(403)
 
     post.deleted = True
-    post.save(commit=False)
-
-    post.topic.post_count -= 1
+    post.save(commit=True)
 
     if post.id == post.topic.last_post_id:
-        for other_post in reversed(post.topic.posts):
-            if not other_post.deleted:
-                post.topic.last_post_id = other_post.id
-                post.topic.save(commit=True)
-                break
+        new_last_post = ForumPost.query.join(ForumPost.topic) \
+            .filter(ForumPost.deleted == False, ForumTopic.id == post.topic_id) \
+            .order_by(ForumPost.created.desc()).first()
+
+        post.topic.last_post = new_last_post
+        post.topic.save(commit=False)
+
+    if post.id == post.topic.forum.last_post_id:
+        new_last_post = ForumPost.query.join(ForumPost.topic).join(ForumTopic.forum) \
+            .filter(ForumPost.deleted == False, Forum.id == post.topic.forum_id) \
+            .order_by(ForumPost.created.desc()).first()
+
+        post.topic.forum.last_post = new_last_post
+        post.topic.forum_last_topic = new_last_post.topic
+        post.topic.forum.save(commit=False)
+
+    post.user.forum_profile.post_count -= 1
+    post.user.forum_profile.save(commit=False)
+
+    post.topic.forum.post_count -= 1
+    post.topic.forum.save(commit=False)
+
+    post.topic.post_count -= 1
+    post.topic.save(commit=True)
 
     flash('Post deleted', 'success')
 
     return redirect(post.topic.url)
+
+
+@app.route('/forum/ban')
+def forum_ban():
+    if not hasattr(g, 'user'):
+        flash('You must log in before you can do that', 'warning')
+        return redirect(url_for('login'))
+
+    user = g.user
+
+    if not user.admin and not user.moderated_forums:
+        abort(403)
+
+    user_id = request.args['user_id']
+
+    ban = ForumBan(user_id=user_id, by_user_id=user.id)
+    ban.save(commit=True)
+
+    flash('User banned from forums', 'success')
+
+    return redirect(request.referrer)
 
 
 @app.route('/chat')

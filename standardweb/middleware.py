@@ -6,6 +6,7 @@ from flask import url_for
 
 from standardweb import app
 from standardweb.lib import csrf
+from standardweb.lib import helpers as h
 from standardweb.models import User
 from sqlalchemy.orm import joinedload
 
@@ -39,6 +40,11 @@ def csrf_protect():
 @app.context_processor
 def inject_user():
     return dict(user=getattr(g, 'user', None))
+
+
+@app.context_processor
+def inject_h():
+    return dict(h=h)
 
 
 def _dated_url_for(endpoint, **values):
