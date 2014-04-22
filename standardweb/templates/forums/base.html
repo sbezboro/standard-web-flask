@@ -17,7 +17,7 @@
 
     <script>
         $(document).ready(function() {
-            $(".post-form textarea").sceditor({
+            window.sceditor = $(".post-form textarea").sceditor({
                 plugins: "bbcode",
                 toolbar: 'bold,italic,underline,strike|size,color,removeformat|code,quote|image,link,youtube|emoticon|source',
                 resizeWidth: false,
@@ -60,7 +60,7 @@
                         ':wassat:': 'wassat.png'
                     }
                 }
-           });
+           }).sceditor('instance');
         });
     </script>
 {% endblock %}

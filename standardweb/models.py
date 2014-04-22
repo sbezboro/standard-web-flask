@@ -391,8 +391,9 @@ class ForumPost(db.Model, Base):
     topic_id =  db.Column(db.Integer, db.ForeignKey('forum_topic.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     created = db.Column(db.DateTime, default=datetime.utcnow)
-    updated = db.Column(db.DateTime, default=datetime.utcnow)
+    updated = db.Column(db.DateTime, default=None)
     updated_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    markup = db.Column(db.String(15), default='bbcode')
     body = db.Column(db.Text())
     body_html = db.Column(db.Text())
     user_ip = db.Column(db.String(15))
@@ -400,6 +401,7 @@ class ForumPost(db.Model, Base):
 
     topic = db.relationship('ForumTopic', foreign_keys='ForumPost.topic_id')
     user = db.relationship('User', foreign_keys='ForumPost.user_id')
+    updated_by = db.relationship('User', foreign_keys='ForumPost.updated_by_id')
 
     @property
     def url(self):

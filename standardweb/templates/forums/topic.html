@@ -24,15 +24,18 @@
                             <a href="{{ url_for('player', username=post.user.player.username) }}">
                                 {{ post.user.player.username | face_large }}
                             </a>
-                            <div class="post-author-name">
-                                <a href="{{ url_for('player', username=post.user.player.username) }}">
-                                    {{ post.user.player.displayname_html|safe }}
-                                </a>
-                                {% if post.user.player.nickname %}
-                                    ({{ post.user.player.username }})
-                                {% endif %}
-                                <br/>
+                            <div class="post-author-details">
+                                <h5>
+                                    <a href="{{ url_for('player', username=post.user.player.username) }}">
+                                        {{ post.user.player.displayname_html|safe }}
+                                    </a>
+                                    {% if post.user.player.nickname %}
+                                        ({{ post.user.player.username }})
+                                    {% endif %}
+                                </h5>
+                                <b>Posts:</b> {{ post.user.forum_profile.post_count }}
                                 {% if stats %}
+                                    <br/>
                                     <b>Time played:</b> {{ h.elapsed_time_string(stats.time_spent) }}
                                     <br/>
                                     <b>Rank:</b> {{ rank }}
@@ -40,8 +43,11 @@
                             </div>
                         {% endwith %}
                     {% else %}
-                        <div class="post-author-name">
-                            {{ post.user.username }}
+                        <div class="post-author-details">
+                            <h5>
+                                {{ post.user.username }}
+                            </h5>
+                            <b>Posts:</b> {{ post.user.forum_profile.post_count }}
                         </div>
                     {% endif %}
 
@@ -52,10 +58,13 @@
                             {% endif %}
                         </div>
                     {% endif %}
-                </div>
-                <div class="post-content">
-                    {{ post.body_html|replace('djangobb_forum/img/smilies', 'images/forums/emoticons')|safe }}
 
+                    <div class="clear"></div>
+                </div>
+                <div class="post-content" data-bbcode="{{ post.body }}">
+                    {{ post.body_html|replace('djangobb_forum/img/smilies', 'images/forums/emoticons')|safe }}
+                </div>
+                <div class="post-extras">
                     {% if post.attachments %}
                         {% for attachment in post.attachments %}
                             <div class="attachment">
@@ -73,14 +82,27 @@
                     {% endif %}
                 </div>
                 <div class="post-details">
+                    {% if post.updated %}
+                        <span class="updated">
+                            Edited by
+                            {% if post.updated_by.player %}
+                                <b>{{ post.updated_by.player.displayname_html|safe }}</b>
+                            {% else %}
+                                <b>{{ post.updated_by.username }}</b>
+                            {% endif %}
+                            <abbr class="timeago" title="{{ post.updated | iso_date }}">{{ post.updated }}</abbr>
+                        </span>
+                    {% endif %}
                     {% if user %}
                         {% if user.admin or user in topic.forum.moderators %}
                             <a class="confirm" href="{{ url_for('forum_post_delete', post_id=post.id) }}">Delete</a> |
                         {% endif %}
-                        {% if user == topic.user or user.admin or user in topic.forum.moderators %}
-                            <a href="#">Edit</a> |
+                        {% if not topic.closed %}
+                            {% if user == topic.user or user.admin or user in topic.forum.moderators %}
+                                <a href="#">Edit</a> |
+                            {% endif %}
+                            <a class="reply" href="#">Reply</a>
                         {% endif %}
-                        <a href="#">Reply</a>
                     {% endif %}
                 </div>
             </div>
@@ -136,6 +158,23 @@
     {% else %}
         You must <a href="{{ url_for('login') }}">login</a> before you can post a reply
     {% endif %}
+
+    <script type="application/javascript">
+        $('.reply').on('click', function(e) {
+            var content = $(this).closest('.post-details').siblings('.post-content').attr('data-bbcode');
+
+            var username = 'test';
+
+            content = '[quote=Posted by ' + username + ']\n' + content + '[/quote]';
+
+            window.sceditor.val(window.sceditor.val() + content);
+            window.sceditor.focus();
+
+            $(document).scrollTop($(document).height());
+
+            return false;
+        });
+    </script>
 {% endblock %}
 
 {% macro pages() %}

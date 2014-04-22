@@ -32,7 +32,8 @@ def safe_str_cmp(a, b):
 
 def ansi_to_html(ansi):
     html = ansi_converter.convert(ansi, full=False)
-    return '<span class="ansi-container">' + html + ('</span>' * html.count('<span')) + '</span>'
+    count = html.count('<span') - html.count('</span')
+    return '<span class="ansi-container">' + html + ('</span>' * count) + '</span>'
 
 
 def strip_ansi(text):
