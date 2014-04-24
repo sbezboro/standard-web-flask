@@ -20,7 +20,7 @@
                 </h4>
                 <div class="post-author {% if post.user.admin %}admin{% endif %}">
                     {% if post.user.player %}
-                        {% with stats, rank = player_stats[post.user.player] or (None, None) %}
+                        {% with stats, rank = player_stats.get(post.user.player, (None, None)) %}
                             <a href="{{ url_for('player', username=post.user.player.username) }}">
                                 {{ post.user.player.username | face_large }}
                             </a>
@@ -99,7 +99,7 @@
                         {% endif %}
                         {% if not topic.closed %}
                             {% if user == topic.user or user.admin or user in topic.forum.moderators %}
-                                <a href="#">Edit</a> |
+                                {# <a href="#">Edit</a> | #}
                             {% endif %}
                             <a class="reply" href="#">Reply</a>
                         {% endif %}

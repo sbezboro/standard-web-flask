@@ -87,7 +87,7 @@ def get_server_data(server, player):
     online_now = datetime.utcnow() - timedelta(minutes=1) < stats.last_seen
 
     return {
-        'rank': stats.get_rank(),
+        'rank': stats.rank,
         'banned': stats.banned,
         'online_now': online_now,
         'first_seen': h.iso_date(stats.first_seen),

@@ -20,7 +20,7 @@ def get_ranking_data(server):
         .options(joinedload('player')) \
 
     for stats in player_stats:
-        online_now = datetime.utcnow() - timedelta(minutes = 1) < stats.last_seen
+        online_now = datetime.utcnow() - timedelta(minutes=1) < stats.last_seen
 
         retval.append((stats.player, h.elapsed_time_string(stats.time_spent), online_now))
 

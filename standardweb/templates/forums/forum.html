@@ -8,7 +8,6 @@
     <div class="button-area">
         {{ pages() }}
         <div class="controls">
-            <a href="">Mark all topics as read</a>
             {% if not forum.locked or not user or user.admin %}
                 <a href="{{ url_for('new_topic', forum_id=forum.id) }}" class="btn">New Topic</a>
             {% endif %}
@@ -58,7 +57,7 @@
                     </td>
                     <td>
                         <div class="count">
-                            <b>{{ topic.post_count }}</b> {{ 'reply' if topic.post_count == 1 else 'replies' }}
+                            <b>{{ topic.replies }}</b> {{ 'reply' if topic.replies == 1 else 'replies' }}
                         </div>
                         <div class="count">
                             <b>{{ topic.views }}</b> {{ 'view' if topic.views == 1 else 'views' }}

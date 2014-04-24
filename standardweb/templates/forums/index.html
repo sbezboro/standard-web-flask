@@ -1,6 +1,12 @@
 {% extends 'forums/base.html' %}
 
 {% block forum_content %}
+<div class="button-area">
+    <div class="controls">
+        <a href="">Mark all topics as read</a>
+    </div>
+</div>
+<div class="clear"></div>
 {% for category in categories %}
     <div class="forum-category">
         <h4>{{ category.name }}</h4>

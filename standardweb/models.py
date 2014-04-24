@@ -123,20 +123,20 @@ class PlayerStats(db.Model, Base):
     id = db.Column(db.Integer, primary_key=True)
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
-    time_spent = db.Column(db.Integer)
+    time_spent = db.Column(db.Integer, default=0)
     first_seen = db.Column(db.DateTime, default=datetime.utcnow)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-    banned = db.Column(db.Boolean)
-    pvp_logs = db.Column(db.Integer)
+    banned = db.Column(db.Boolean, default=False)
+    pvp_logs = db.Column(db.Integer, default=0)
 
     server = db.relationship('Server')
     player = db.relationship('Player')
 
-    def get_rank(self):
+    @property
+    def rank(self):
         return PlayerStats.query.filter(PlayerStats.server_id == self.server_id,
                                         PlayerStats.time_spent > self.time_spent,
                                         PlayerStats.player_id != self.player_id).count() + 1
-
 
 class Server(db.Model, Base):
     __tablename__ = 'server'
@@ -154,9 +154,9 @@ class ServerStatus(db.Model, Base):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
-    player_count = db.Column(db.Integer)
-    cpu_load = db.Column(db.Float)
-    tps = db.Column(db.Float)
+    player_count = db.Column(db.Integer, default=0)
+    cpu_load = db.Column(db.Float, default=0)
+    tps = db.Column(db.Float, default=0)
 
     server = db.relationship('Server')
 
@@ -284,6 +284,43 @@ class OreDiscoveryCount(db.Model, Base):
         ore_count.save()
 
 
+class IPTracking(db.Model, Base):
+    __tablename__ = 'iptracking'
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    ip = db.Column(db.String(15))
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    player = db.relationship('Player')
+    user = db.relationship('User')
+
+
+class PlayerActivity(db.Model, Base):
+    __tablename__ = 'playeractivity'
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    activity_type = db.Column(db.Integer)
+
+    server = db.relationship('Server')
+    player = db.relationship('Player')
+
+
+class VeteranStatus(db.Model, Base):
+    __tablename__ = 'veteranstatus'
+
+    id = db.Column(db.Integer, primary_key=True)
+    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    rank = db.Column(db.Integer)
+
+    player = db.relationship('Player')
+
+
 class ForumProfile(db.Model, Base):
     __tablename__ = 'forum_profile'
 
@@ -356,6 +393,10 @@ class ForumTopic(db.Model, Base):
     user = db.relationship('User')
     posts = db.relationship('ForumPost', foreign_keys='ForumPost.topic_id')
     last_post = db.relationship('ForumPost', foreign_keys='ForumTopic.last_post_id')
+
+    @property
+    def replies(self):
+        return self.post_count - 1
 
     @property
     def url(self):

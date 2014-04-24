@@ -68,6 +68,21 @@ rename table djangobb_forum_ban to forum_ban;
 rename table djangobb_forum_topic to forum_topic;
 rename table djangobb_forum_attachment to forum_attachment;
 
+drop table registration_registrationprofile;
+drop table djangobb_forum_topic_subscribers;
+drop table djangobb_forum_reputation;
+drop table djangobb_forum_report;
+drop table djangobb_forum_category_groups;
+drop table django_site;
+drop table django_session;
+drop table django_content_type;
+drop table django_admin_log;
+drop table auth_user_user_permissions;
+drop table auth_user_groups;
+drop table auth_permission;
+drop table auth_group_permissions;
+drop table auth_group;
+
 create table user (
   id int(11) not null auto_increment,
   username varchar(32) default null,
@@ -90,9 +105,17 @@ insert into user (id, username, player_id, uuid, full_name, email, password, adm
     from auth_user u
     left join player p on u.username = p.username;
 
+drop table auth_user;
+
 alter table forum_ban
-	modify column reason text default null,
-    add column by_user_id int(11) default null after user_id,
+    modify column reason text default null,
+    add column by_user_id int unsigned default null after user_id,
     drop key user_id,
-    add foreign key (by_user_id) references user (id)
+    add foreign key (by_user_id) references user (id),
     add foreign key (user_id) references user (id);
+
+alter table playerstats
+    drop column last_login;
+
+alter table veteranstatus
+    add column server_id int unsigned default 1 after id;

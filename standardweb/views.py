@@ -432,7 +432,7 @@ def forum_topic(topic_id):
                                             PlayerStats.player_id.in_(player_ids))
 
     player_stats = {
-        stats.player: (stats, stats.get_rank())
+        stats.player: (stats, stats.rank)
         for stats in player_stats
     }
 
