@@ -24,6 +24,9 @@ def api_func(function):
         
         del kwargs['version']
         return function(*args, **kwargs)
+
+    name = function.__name__
+    app.add_url_rule('/api/v<int:version>/%s' % name, name, decorator)
     
     return decorator
 
@@ -50,15 +53,14 @@ def server_api(function):
 
         setattr(g, 'server', server)
         
-        return function(request, *args, **kwargs)
+        return function(*args, **kwargs)
     
     return decorator
 
 
-@app.route('/api/v<int:version>/rank_query')
 @api_func
 @server_api
-def rank_query(request):
+def rank_query():
     username = request.args.get('username')
     uuid = request.args.get('uuid')
 
