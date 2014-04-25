@@ -88,15 +88,15 @@ create table user (
   username varchar(32) default null,
   player_id int(11) default null,
   uuid char(36) default null,
-  full_name varchar(100) not null,
-  email varchar(75) not null,
+  full_name varchar(100) default null,
+  email varchar(75) default null,
   password varchar(128) not null,
   admin tinyint(1) not null,
   last_login datetime not null,
   date_joined datetime not null,
   primary key (id),
   foreign key (player_id) references player (id),
-  unique key uuid (uuid)
+  unique key player_id_unique (player_id)
 ) engine=innodb DEFAULT charset=latin1;
 
 # must be done after player uuids are populated
@@ -119,3 +119,24 @@ alter table playerstats
 
 alter table veteranstatus
     add column server_id int unsigned default 1 after id;
+
+alter table forum_profile
+    drop column markup,
+    drop column privacy_permission,
+    drop column show_smilies,
+    drop column show_signatures,
+    drop column show_avatar,
+    drop column theme,
+    drop column avatar,
+    drop column language,
+    drop column time_zone,
+    drop column yahoo,
+    drop column aim,
+    drop column msn,
+    drop column icq,
+    drop column jabber,
+    drop column status,
+    modify column location varchar(30) default null,
+    modify column site varchar(200) default null,
+    modify column signature text default null,
+    modify column signature_html text default null;

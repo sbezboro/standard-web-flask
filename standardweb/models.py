@@ -17,7 +17,7 @@ import os
 
 
 
-def _get_or_create(cls, commit=True, **kwargs):
+def _get_or_create(cls, **kwargs):
     query = cls.query.filter_by(**kwargs)
 
     instance = query.first()
@@ -30,8 +30,7 @@ def _get_or_create(cls, commit=True, **kwargs):
             instance = cls(**kwargs)
 
             db.session.add(instance)
-            if commit:
-                db.session.commit()
+            db.session.commit()
 
             return instance, True
         except IntegrityError:
@@ -49,8 +48,8 @@ class Base(object):
             db.session.commit()
 
     @classmethod
-    def factory(cls, commit=True, **kwargs):
-        instance, created = _get_or_create(cls, commit=commit, **kwargs)
+    def factory(cls, **kwargs):
+        instance, created = _get_or_create(cls, **kwargs)
 
         return instance
 
@@ -61,12 +60,26 @@ class User(db.Model, Base):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30))
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
-    uuid = db.Column(db.String(36))
+    uuid = db.Column(db.String(32))
     email = db.Column(db.String(75))
     password = db.Column(db.String(128))
-    admin = db.Column(db.Boolean)
+    admin = db.Column(db.Boolean, default=False)
+    last_login = db.Column(db.DateTime, default=datetime.utcnow)
+    date_joined = db.Column(db.DateTime, default=datetime.utcnow)
 
     player = db.relationship('Player', backref=db.backref('user', uselist=False))
+
+    @classmethod
+    def create(cls, player, plaintext_password, commit=True):
+        user = cls(player=player, uuid=player.uuid)
+        user.set_password(plaintext_password)
+
+        user.save(commit=False)
+
+        forum_profile = ForumProfile(user=user)
+        forum_profile.save(commit=commit)
+
+        return user
 
     def check_password(self, plaintext_password):
         algorithm, iterations, salt, hash_val = self.password.split('$', 3)
@@ -190,6 +203,36 @@ class KillType(db.Model, Base):
     displayname = db.Column(db.String(100))
 
 
+class DeathEvent(db.Model, Base):
+    __tablename__ = 'deathevent'
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
+    death_type_id = db.Column(db.Integer, db.ForeignKey('deathtype.id'))
+    victim_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    killer_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+
+    server = db.relationship('Server')
+    death_type = db.relationship('DeathType')
+    killer = db.relationship('Player', foreign_keys='DeathEvent.killer_id')
+    victim = db.relationship('Player', foreign_keys='DeathEvent.victim_id')
+
+
+class KillEvent(db.Model, Base):
+    __tablename__ = 'killevent'
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
+    kill_type_id = db.Column(db.Integer, db.ForeignKey('killtype.id'))
+    killer_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+
+    server = db.relationship('Server')
+    kill_type = db.relationship('KillType')
+    killer = db.relationship('Player')
+
+
 class DeathCount(db.Model, Base):
     __tablename__ = 'deathcount'
 
@@ -198,7 +241,7 @@ class DeathCount(db.Model, Base):
     death_type_id = db.Column(db.Integer, db.ForeignKey('deathtype.id'))
     victim_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     killer_id = db.Column(db.Integer, db.ForeignKey('player.id'))
-    count = db.Column(db.Integer)
+    count = db.Column(db.Integer, default=0)
 
     server = db.relationship('Server')
     death_type = db.relationship('DeathType')
@@ -206,13 +249,13 @@ class DeathCount(db.Model, Base):
     victim = db.relationship('Player', foreign_keys='DeathCount.victim_id')
 
     @classmethod
-    def increment(cls, server, death_type, victim, killer):
+    def increment(cls, server, death_type, victim, killer, commit=True):
         death_count = cls.factory(server=server,
                                   death_type=death_type,
                                   victim=victim,
                                   killer=killer)
-        death_count.count += 1
-        death_count.save()
+        death_count.count = (death_count.count or 0) + 1
+        death_count.save(commit=commit)
 
 
 class KillCount(db.Model, Base):
@@ -222,19 +265,19 @@ class KillCount(db.Model, Base):
     server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
     kill_type_id = db.Column(db.Integer, db.ForeignKey('killtype.id'))
     killer_id = db.Column(db.Integer, db.ForeignKey('player.id'))
-    count = db.Column(db.Integer)
+    count = db.Column(db.Integer, default=0)
 
     server = db.relationship('Server')
     kill_type = db.relationship('KillType')
     killer = db.relationship('Player')
 
     @classmethod
-    def increment(cls, server, kill_type, killer):
+    def increment(cls, server, kill_type, killer, commit=True):
         kill_count = cls.factory(server=server,
                                  kill_type=kill_type,
                                  killer=killer)
-        kill_count.count += 1
-        kill_count.save()
+        kill_count.count = (kill_count.count or 0) + 1
+        kill_count.save(commit=commit)
 
 
 class MaterialType(db.Model, Base):
@@ -276,12 +319,12 @@ class OreDiscoveryCount(db.Model, Base):
     material_type = db.relationship('MaterialType')
 
     @classmethod
-    def increment(cls, server, material_type, player):
-        ore_count, created = cls.factory(server=server,
-                                         material_type=material_type,
-                                         player=player)
-        ore_count.count += 1
-        ore_count.save()
+    def increment(cls, server, material_type, player, commit=True):
+        ore_count = cls.factory(server=server,
+                                material_type=material_type,
+                                player=player)
+        ore_count.count = (ore_count.count or 0) + 1
+        ore_count.save(commit=commit)
 
 
 class IPTracking(db.Model, Base):
@@ -326,7 +369,7 @@ class ForumProfile(db.Model, Base):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    post_count = db.Column(db.Integer)
+    post_count = db.Column(db.Integer, default=0)
     signature = db.Column(db.Text())
     signature_html = db.Column(db.Text())
 

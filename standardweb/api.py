@@ -6,6 +6,7 @@ from flask import request
 from functools import wraps
 
 from standardweb.models import *
+from standardweb.lib.csrf import exempt_funcs
 from standardweb.lib import helpers as h
 
 from sqlalchemy import or_
@@ -14,8 +15,7 @@ from sqlalchemy.sql.expression import func
 
 # Base API function decorator that builds a list of view functions for use in urls.py. 
 def api_func(function):
-    function.csrf_exempt = True
-    
+
     @wraps(function)
     def decorator(*args, **kwargs):
         version = int(kwargs['version'])
@@ -25,8 +25,10 @@ def api_func(function):
         del kwargs['version']
         return function(*args, **kwargs)
 
+    exempt_funcs.add(decorator)
+
     name = function.__name__
-    app.add_url_rule('/api/v<int:version>/%s' % name, name, decorator)
+    app.add_url_rule('/api/v<int:version>/%s' % name, name, decorator, methods=['GET', 'POST'])
     
     return decorator
 
@@ -34,6 +36,7 @@ def api_func(function):
 # API function decorator for any api operation exposed to a Minecraft server.
 # This access must be authorized by server-id/secret-key pair combination.
 def server_api(function):
+
     @wraps(function)
     def decorator(*args, **kwargs):
         server = None
@@ -54,11 +57,123 @@ def server_api(function):
         setattr(g, 'server', server)
         
         return function(*args, **kwargs)
+
+    api_func(decorator)
     
     return decorator
 
 
-@api_func
+@server_api
+def log_death():
+    type = request.form.get('type')
+    victim_uuid = request.form.get('victim_uuid')
+    killer_uuid = request.form.get('killer_uuid')
+
+    victim = Player.query.filter_by(uuid=victim_uuid).first()
+
+    if victim_uuid == killer_uuid:
+        type = 'suicide'
+
+    death_type = DeathType.factory(type=type)
+
+    if type == 'player':
+        killer = Player.query.filter_by(uuid=killer_uuid).first()
+
+        death_event = DeathEvent(server=g.server, death_type=death_type, victim=victim, killer=killer)
+        DeathCount.increment(g.server, death_type, victim, killer, commit=False)
+    else:
+        death_event = DeathEvent(server=g.server, death_type=death_type, victim=victim)
+        DeathCount.increment(g.server, death_type, victim, None, commit=False)
+
+    death_event.save(commit=True)
+
+    return jsonify({
+        'err': 0
+    })
+
+
+@server_api
+def log_kill():
+    type = request.form.get('type')
+    killer_uuid = request.form.get('killer_uuid')
+
+    killer = Player.query.filter_by(uuid=killer_uuid).first()
+    if not killer:
+        return jsonify({
+            'err': 1
+        })
+
+    kill_type = KillType.factory(type=type)
+
+    kill_event = KillEvent(server=g.server, kill_type=kill_type, killer=killer)
+    KillCount.increment(g.server, kill_type, killer, commit=False)
+
+    kill_event.save(commit=True)
+
+    return jsonify({
+        'err': 0
+    })
+
+
+@server_api
+def log_ore_discovery():
+    uuid = request.form.get('uuid')
+    type = request.form.get('type')
+    x = int(request.form.get('x'))
+    y = int(request.form.get('y'))
+    z = int(request.form.get('z'))
+
+    player = Player.query.filter_by(uuid=uuid).first()
+
+    if not player:
+        return jsonify({
+            'err': 1
+        })
+
+    material_type = MaterialType.factory(type=type)
+
+    ore_event = OreDiscoveryEvent(server=g.server, material_type=material_type,
+                                  player=player, x=x, y=y, z=z)
+    OreDiscoveryCount.increment(g.server, material_type, player, commit=False)
+
+    ore_event.save(commit=True)
+
+    return jsonify({
+        'err': 0
+    })
+
+
+@server_api
+def register():
+    uuid = request.form.get('uuid')
+    password = request.form.get('password')
+
+    player = Player.query.filter_by(uuid=uuid).first()
+
+    if not player:
+        return jsonify({
+            'err': 1,
+            'message': 'Please try again later.'
+        })
+
+    user = User.query.filter_by(player=player).first()
+
+    if user:
+        user.set_password(password)
+        user.save(commit=True)
+
+        return jsonify({
+            'err': 0,
+            'message': 'Your website password has been changed!'
+        })
+
+    User.create(player, password, commit=True)
+    return jsonify({
+        'err': 0,
+        'message': 'Your username has been linked to a website account!'
+    })
+
+
 @server_api
 def rank_query():
     username = request.args.get('username')
@@ -68,19 +183,20 @@ def rank_query():
         player = Player.query.filter_by(uuid=uuid).first()
     else:
         player = Player.query.filter(or_(Player.username.ilike('%%%s%%' % username),
-                                          Player.nickname.ilike('%%%s%%' % username)))\
+                                         Player.nickname.ilike('%%%s%%' % username)))\
         .order_by(func.ifnull(Player.nickname, Player.username))\
         .limit(1).first()
 
     if not player:
         return jsonify({
-            'result': 0
+            'err': 1
         })
 
     stats = PlayerStats.query.filter_by(server=g.server, player=player).first()
+
     if not stats:
         return jsonify({
-            'result': 0
+            'err': 1
         })
 
     time = h.elapsed_time_string(stats.time_spent)
@@ -92,7 +208,7 @@ def rank_query():
         veteran_rank = None
 
     retval = {
-        'result': 1,
+        'err': 0,
         'rank': stats.rank,
         'time': time,
         'minutes': stats.time_spent
@@ -106,12 +222,41 @@ def rank_query():
     return jsonify(retval)
 
 
+@server_api
+def join_server():
+    # do nothing for now
+    return jsonify({
+        'err': 0
+    })
+
+
+@server_api
+def leave_server():
+    username = request.form.get('username')
+
+    player = Player.query.filter_by(username=username).first()
+
+    if player:
+        player_stats = PlayerStats.query.filter_by(server=g.server, player=player).first()
+
+        if player_stats:
+            player_stats.last_seen = datetime.utcnow()
+            player_stats.save(commit=True)
+
+    return jsonify({
+        'err': 0
+    })
+
+
+
 @api_func
-def servers(request):
-    result = [{
+def servers():
+    servers = [{
         'id': server.id,
         'address': server.address
-    } for server in Server.objects.all()]
+    } for server in Server.query.all()]
 
-    return jsonify(result)
-
+    return jsonify({
+        'err': 0,
+        'servers': servers
+    })
