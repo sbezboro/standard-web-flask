@@ -419,12 +419,13 @@ def forum_topic(topic_id):
         .joinedload(User.forum_ban)
     ).options(
         joinedload(ForumPost.attachments)
+    ).options(
+        joinedload(ForumPost.topic)
+        .joinedload(ForumTopic.forum)
     ).filter_by(topic_id=topic_id, deleted=False) \
     .order_by(ForumPost.created) \
     .limit(page_size) \
     .offset((page - 1) * page_size)
-
-    posts = list(posts)
 
     player_ids = set([post.user.player_id for post in posts])
 
@@ -432,7 +433,7 @@ def forum_topic(topic_id):
                                             PlayerStats.player_id.in_(player_ids))
 
     player_stats = {
-        stats.player: (stats, stats.rank)
+        stats.player: (stats, None)
         for stats in player_stats
     }
 
@@ -463,12 +464,12 @@ def forum_post(post_id):
     topic = post.topic
     if topic.post_count > POSTS_PER_PAGE:
         last_page = int(topic.post_count / POSTS_PER_PAGE) + 1
-        return redirect(url_for('forum_topic', topic_id=post.topic_id, p=last_page,_anchor=post.id))
+        return redirect(url_for('forum_topic', topic_id=post.topic_id, p=last_page, _anchor=post.id))
 
     return redirect(url_for('forum_topic', topic_id=post.topic_id, _anchor=post.id))
 
 
-@app.route('/forum/topic/<int:forum_id>/new_topic', methods=['GET', 'POST'])
+@app.route('/forums/topic/<int:forum_id>/new_topic', methods=['GET', 'POST'])
 def new_topic(forum_id):
     forum = Forum.query.get(forum_id)
 
@@ -507,7 +508,7 @@ def new_topic(forum_id):
         topic.post_count += 1
         topic.save(commit=True)
 
-        return redirect(url_for('forum_topic', topic_id=topic.id))
+        return redirect(topic.url)
 
     retval = {
         'forum': forum,
@@ -517,7 +518,7 @@ def new_topic(forum_id):
     return render_template('forums/new_topic.html', **retval)
 
 
-@app.route('/forum/topic/<int:topic_id>/new_post', methods=['POST'])
+@app.route('/forums/topic/<int:topic_id>/new_post', methods=['POST'])
 def new_post(topic_id):
     topic = ForumTopic.query.options(
         joinedload(ForumTopic.forum)
@@ -552,10 +553,10 @@ def new_post(topic_id):
 
         post.save(commit=True)
 
-        return redirect(url_for('forum_post', post_id=post.id))
+        return redirect(post.url)
 
 
-@app.route('/forum/topic/<int:topic_id>/status')
+@app.route('/forums/topic/<int:topic_id>/status')
 def forum_topic_status(topic_id):
     topic = ForumTopic.query.options(
         joinedload(ForumTopic.forum)
@@ -599,7 +600,7 @@ def forum_topic_status(topic_id):
     return redirect(topic.url)
 
 
-@app.route('/forum/post/<int:post_id>/delete')
+@app.route('/forums/post/<int:post_id>/delete')
 def forum_post_delete(post_id):
     post = ForumPost.query.options(
         joinedload(ForumPost.topic)
@@ -649,6 +650,8 @@ def forum_post_delete(post_id):
 
         post.topic.post_count = 0
         post.topic.deleted = True
+
+        # commit so the queries below will work properly
         post.topic.save(commit=True)
 
     # otherwise if this is the last post in the topic, update the topic's last
@@ -684,12 +687,14 @@ def forum_post_delete(post_id):
         post.topic.save(commit=False)
 
         redirect_url = post.topic.url
+        message = 'Post deleted'
     else:
         redirect_url = post.topic.forum.url
+        message = 'Topic deleted'
 
     db.session.commit()
 
-    flash('Post deleted', 'success')
+    flash(message, 'success')
 
     return redirect(redirect_url)
 
@@ -742,6 +747,10 @@ def forum_attachment(hash):
 @app.route('/chat')
 @app.route('/<int:server_id>/chat')
 def chat(server_id=None):
+    if not hasattr(g, 'user'):
+        flash('You must log in before you can do that', 'warning')
+        return redirect(url_for('login'))
+
     if not server_id:
         return redirect(url_for('chat', server_id=app.config['MAIN_SERVER_ID']))
 
@@ -750,8 +759,8 @@ def chat(server_id=None):
     if not server:
         abort(404)
 
-    if g.user:
-        player = Player.query.filter_by(username=g.user.username)
+    if hasattr(g, 'user'):
+        player = g.user.player
     else:
         player = None
 

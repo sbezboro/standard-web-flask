@@ -448,6 +448,9 @@ class ForumTopic(db.Model, Base):
     def update_read(self, user, commit=True):
         tracking = user.posttracking
 
+        self.views +=1
+        self.save(commit=True)
+
         if tracking.last_read and (tracking.last_read > self.last_post.created):
             return
 
