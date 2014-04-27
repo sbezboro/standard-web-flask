@@ -16,7 +16,9 @@ import os
 
 @app.before_request
 def user_session():
-    if request.endpoint and 'static' not in request.endpoint and session.get('user_id'):
+    if request.endpoint and 'static' not in request.endpoint \
+            and request.endpoint != 'face' and session.get('user_id'):
+        
         g.user = User.query.options(
             joinedload(User.player)
         ).options(

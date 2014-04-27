@@ -429,7 +429,7 @@ class ForumTopic(db.Model, Base):
     sticky = db.Column(db.Boolean, default=False)
     closed = db.Column(db.Boolean, default=False)
     deleted = db.Column(db.Boolean, default=False)
-    post_count = db.Column(db.Integer, default=1)
+    post_count = db.Column(db.Integer, default=0)
     last_post_id = db.Column(db.Integer, db.ForeignKey('forum_post.id'))
 
     forum = db.relationship('Forum')
