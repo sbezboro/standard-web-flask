@@ -958,13 +958,17 @@ fieldset {
     margin-top: 10px;
 }
 
+.topic-cell {
+    font-size: 14px;
+}
+
 .topic-cell .pages a {
     font-size: 10px;
     padding: 1px 2px;
 }
 
-.topic-cell {
-    font-size: 14px;
+.topic-cell .pages a:hover {
+    text-decoration: underline;
 }
 
 .topic-cell .name.active {

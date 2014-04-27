@@ -546,8 +546,10 @@ def new_post(topic_id):
         topic.forum.post_count += 1
         topic.forum.save(commit=False)
 
+        topic.updated = datetime.utcnow()
         topic.last_post = post
         topic.post_count += 1
+
         post.save(commit=True)
 
         return redirect(url_for('forum_post', post_id=post.id))
@@ -620,10 +622,38 @@ def forum_post_delete(post_id):
     if not user.admin and user not in post.topic.forum.moderators:
         abort(403)
 
+    first_post = ForumPost.query.join(ForumPost.topic) \
+        .filter(ForumTopic.id == post.topic_id) \
+        .order_by(ForumPost.created).first()
+
     post.deleted = True
     post.save(commit=True)
 
-    if post.id == post.topic.last_post_id:
+    # if its the first post being deleted, this means the topic will be deleted
+    # as well, so reduce the post count for every user in the topic
+    if post == first_post:
+        posts = ForumPost.query.join(ForumPost.topic) \
+            .filter(ForumPost.deleted == False, ForumTopic.id == post.topic_id)
+
+        for other_post in posts:
+            other_post.deleted = True
+            other_post.save(commit=False)
+
+            other_post.user.forum_profile.post_count -= 1
+            other_post.user.forum_profile.save(commit=False)
+
+            other_post.topic.forum.post_count -= 1
+
+        post.topic.forum.topic_count -= 1
+        post.topic.forum.save(commit=False)
+
+        post.topic.post_count = 0
+        post.topic.deleted = True
+        post.topic.save(commit=True)
+
+    # otherwise if this is the last post in the topic, update the topic's last
+    # post pointer to be the next latest post in the topic
+    elif post.id == post.topic.last_post_id:
         new_last_post = ForumPost.query.join(ForumPost.topic) \
             .filter(ForumPost.deleted == False, ForumTopic.id == post.topic_id) \
             .order_by(ForumPost.created.desc()).first()
@@ -631,13 +661,16 @@ def forum_post_delete(post_id):
         post.topic.last_post = new_last_post
         post.topic.save(commit=False)
 
-    if post.id == post.topic.forum.last_post_id:
+    # if this is the last post for the forum, or the topic is being deleted and the topic
+    # is the last topic of the forum, update the forum's last post pointer to be
+    # the next latest post in the forum
+    if (post == first_post and post.topic.last_post_id == post.topic.forum.last_post_id) or \
+                    post.id == post.topic.forum.last_post_id:
         new_last_post = ForumPost.query.join(ForumPost.topic).join(ForumTopic.forum) \
             .filter(ForumPost.deleted == False, Forum.id == post.topic.forum_id) \
             .order_by(ForumPost.created.desc()).first()
 
         post.topic.forum.last_post = new_last_post
-        post.topic.forum_last_topic = new_last_post.topic
         post.topic.forum.save(commit=False)
 
     post.user.forum_profile.post_count -= 1
@@ -646,15 +679,38 @@ def forum_post_delete(post_id):
     post.topic.forum.post_count -= 1
     post.topic.forum.save(commit=False)
 
-    post.topic.post_count -= 1
-    post.topic.save(commit=True)
+    if post.topic.post_count > 0:
+        post.topic.post_count -= 1
+        post.topic.save(commit=False)
+
+        redirect_url = post.topic.url
+    else:
+        redirect_url = post.topic.forum.url
+
+    db.session.commit()
 
     flash('Post deleted', 'success')
 
-    return redirect(post.topic.url)
+    return redirect(redirect_url)
 
 
-@app.route('/forum/ban')
+@app.route('/forums/all_read')
+def all_topics_read():
+    if not hasattr(g, 'user'):
+        flash('You must log in before you can do that', 'warning')
+        return redirect(url_for('login'))
+
+    user = g.user
+
+    user.posttracking.last_read = datetime.utcnow()
+    user.save(commit=True)
+
+    flash('All topics marked as read', 'success')
+
+    return redirect(request.referrer)
+
+
+@app.route('/forums/ban')
 def forum_ban():
     if not hasattr(g, 'user'):
         flash('You must log in before you can do that', 'warning')
@@ -673,6 +729,14 @@ def forum_ban():
     flash('User banned from forums', 'success')
 
     return redirect(request.referrer)
+
+
+@app.route('/attachment/<hash>')
+def forum_attachment(hash):
+    attachment = ForumAttachment.query.filter_by(hash=hash).first()
+    f = file(attachment.file_path, 'rb')
+
+    return send_file(f, mimetype=attachment.content_type, as_attachment=True)
 
 
 @app.route('/chat')
@@ -720,11 +784,3 @@ def admin(server_id=None):
     }
 
     return render_template('admin.html', **retval)
-
-
-@app.route('/attachment/<hash>')
-def forum_attachment(hash):
-    attachment = ForumAttachment.query.filter_by(hash=hash).first()
-    f = file(attachment.file_path, 'rb')
-
-    return send_file(f, mimetype=attachment.content_type, as_attachment=True)

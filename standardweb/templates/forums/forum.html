@@ -87,7 +87,6 @@
     <div class="button-area">
         {{ pages() }}
         <div class="controls">
-            <a href="">Mark all topics as read</a>
             {% if not forum.locked or not user or user.admin %}
                 <a href="{{ url_for('new_topic', forum_id=forum.id) }}" class="btn">New Topic</a>
             {% endif %}

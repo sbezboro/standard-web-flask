@@ -94,15 +94,20 @@
                         </span>
                     {% endif %}
                     {% if user %}
-                        {% if user.admin or user in topic.forum.moderators %}
-                            <a class="confirm" href="{{ url_for('forum_post_delete', post_id=post.id) }}">Delete</a> |
-                        {% endif %}
-                        {% if not topic.closed %}
-                            {% if user == topic.user or user.admin or user in topic.forum.moderators %}
-                                {# <a href="#">Edit</a> | #}
+                        {% with delete_topic = loop.index0 == 0 and not page - 1 %}
+                            {% if user.admin or user in topic.forum.moderators %}
+                                <a class="confirm" href="{{ url_for('forum_post_delete', post_id=post.id) }}">Delete {% if delete_topic %}topic{% endif %}</a>
+                                {% if not topic.closed %}
+                                    |
+                                {% endif %}
                             {% endif %}
-                            <a class="reply" href="#">Reply</a>
-                        {% endif %}
+                            {% if not topic.closed %}
+                                {% if user == topic.user or user.admin or user in topic.forum.moderators %}
+                                    {# <a href="#">Edit</a> | #}
+                                {% endif %}
+                                <a class="reply" href="#">Reply</a>
+                            {% endif %}
+                        {% endwith %}
                     {% endif %}
                 </div>
             </div>
@@ -112,7 +117,9 @@
         </div>
     </div>
     {% if user %}
-        {% if not topic.closed or user.admin %}
+        {% if topic.closed and not user.admin %}
+            This topic is closed
+        {% else %}
             <div class="new-post">
                 <h4>
                     Quick Reply
@@ -151,8 +158,6 @@
                 {% else %}
                     <a href="{{ url_for('forum_topic_status', topic_id=topic.id, status='sticky') }}">Sticky</a>
                 {% endif %}
-                |
-                <a href="#">Move</a>
             </div>
         {% endif %}
     {% else %}
