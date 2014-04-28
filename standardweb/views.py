@@ -315,7 +315,7 @@ def forums():
         if not user.posttracking:
             user.posttracking = ForumPostTracking(user=user)
             user.posttracking.save(commit=True)
-        
+
         read_topics = user.posttracking.get_topics()
         last_read = user.posttracking.last_read
 
@@ -485,7 +485,7 @@ def new_topic(forum_id):
 
     user = g.user
 
-    if forum.locked and not g.admin:
+    if forum.locked and not user.admin:
         abort(403)
 
     form = NewTopicForm()
