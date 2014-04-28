@@ -5,7 +5,6 @@ from flask import Request
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.contrib.cache import MemcachedCache
 
-import os
 import rollbar
 from rollbar.contrib.flask import report_exception
 
@@ -27,23 +26,24 @@ import views
 
 
 def set_up_rollbar():
-    rollbar.init(app.config['ROLLBAR_ACCESS_TOKEN'],
-                 'dev' if app.config['DEBUG'] else 'production',
-                 root='./',
-                 allow_logging_basic_config=False)
-
-    got_request_exception.connect(report_exception, app)
-
     class CustomRequest(Request):
         @property
         def rollbar_person(self):
             if hasattr(g, 'user'):
                 user = g.user
+
                 return {
                     'id': user.id,
                     'username': user.player.username if user.player else user.username,
                     'email': user.email
                 }
+
+    rollbar.init(app.config['ROLLBAR_ACCESS_TOKEN'],
+                 app.config['ROLLBAR_ENVIRONMENT'],
+                 root=app.config['ROLLBAR_ROOT'],
+                 handler='blocking')
+
+    got_request_exception.connect(report_exception, app)
 
     app.request_class = CustomRequest
 
