@@ -497,6 +497,10 @@ class ForumPost(db.Model, Base):
     def save(self, commit=True):
         from standardweb.lib import forums
         self.body_html = forums.convert_bbcode(self.body)
+
+        for pat, path in forums.emoticon_map:
+            self.body_html = pat.sub(path, self.body_html)
+
         return super(ForumPost, self).save(commit)
 
 

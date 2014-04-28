@@ -99,6 +99,10 @@ create table user (
   unique key player_id_unique (player_id)
 ) engine=innodb DEFAULT charset=latin1;
 
+#
+#
+#
+#
 # must be done after player uuids are populated
 insert into user (id, username, player_id, uuid, full_name, email, password, admin, last_login, date_joined)
     select u.id, IF(ISNULL(p.id), u.username, NULL), p.id, uuid, CONCAT(first_name, ' ', last_name), email, password, is_superuser, last_login, date_joined

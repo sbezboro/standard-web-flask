@@ -18,7 +18,8 @@
                         <abbr class="timeago" title="{{ post.created | iso_date }}">{{ post.created }}</abbr>
                     </a>
                 </h4>
-                <div class="post-author {% if post.user.admin %}admin{% endif %}">
+                <div class="post-author {% if post.user.admin %}admin{% endif %}"
+                     data-username="{{ post.user.player.username if post.user.player else post.user.username }}">
                     {% if post.user.player %}
                         {% with stats, rank = player_stats.get(post.user.player, (None, None)) %}
                             <a href="{{ url_for('player', username=post.user.player.username) }}">
@@ -165,12 +166,9 @@
     <script type="application/javascript">
         $('.reply').on('click', function(e) {
             var content = $(this).closest('.post-details').siblings('.post-content').attr('data-bbcode');
+            var username = $(this).closest('.post-details').siblings('.post-author').attr('data-username');
 
-            var username = 'test';
-
-            content = '[quote=Posted by ' + username + ']\n' + content + '[/quote]';
-
-            window.sceditor.val(window.sceditor.val() + content);
+            window.sceditor.val(window.sceditor.val() + '[quote=' + username + ']\n' + content + '[/quote]');
             window.sceditor.focus();
 
             $(document).scrollTop($(document).height());

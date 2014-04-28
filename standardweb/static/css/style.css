@@ -1037,6 +1037,10 @@ fieldset {
     margin: 4px 4px 10px;
 }
 
+.forum-post .post-content blockquote .quote-username {
+    font-style: italic;
+}
+
 .forum-post .post-content img {
     max-width: 100%;
 }
