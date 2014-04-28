@@ -29,7 +29,7 @@ import views
 def set_up_rollbar():
     rollbar.init(app.config['ROLLBAR_ACCESS_TOKEN'],
                  'dev' if app.config['DEBUG'] else 'production',
-                 root=os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+                 root='./',
                  allow_logging_basic_config=False)
 
     got_request_exception.connect(report_exception, app)
