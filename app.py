@@ -6,8 +6,6 @@ import sys
 
 
 if __name__ == '__main__':
-    app.config.from_object('settings')
-
     if len(sys.argv) == 2 and sys.argv[1] == 'shell':
         script.make_shell(lambda: {'app': app}, use_ipython=True)()
     else:
