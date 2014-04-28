@@ -509,7 +509,7 @@ class ForumPostTracking(db.Model, Base):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    topics =  db.Column(db.Text())
+    topics =  db.Column(db.Text(), default=None)
     last_read = db.Column(db.DateTime, default=None)
 
     user = db.relationship('User', backref=db.backref('posttracking', uselist=False))

@@ -312,6 +312,10 @@ def forums():
 
     if hasattr(g, 'user'):
         user = g.user
+        if not user.posttracking:
+            user.posttracking = ForumPostTracking(user=user)
+            user.posttracking.save(commit=True)
+        
         read_topics = user.posttracking.get_topics()
         last_read = user.posttracking.last_read
 
