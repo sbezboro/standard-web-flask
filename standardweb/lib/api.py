@@ -2,6 +2,8 @@ from standardweb.models import *
 from standardweb.lib.constants import *
 from standardweb.vendor.minecraft_api import MinecraftJsonApi
 
+import rollbar
+
 
 apis = {}
 
@@ -22,12 +24,22 @@ def _api_call(server, type, data=None):
             })
         else:
             result = api.call(type)
-    except Exception as e:
-        print e
+    except:
+        rollbar.report_exc_info(extra_data={'server_id': server.id,
+                                            'type': type,
+                                            'data': data})
         return None
     
     if result.get('result') == API_CALL_RESULTS['exception']:
-        raise Exception(result.get('message'))
+        extra_data = {
+            'server_id': server.id,
+            'message': result.get('message'),
+            'data': data
+        }
+
+        rollbar.report_message('Exception while calling server API', level='error',
+                               extra_data=extra_data)
+        return None
     
     return result
 

@@ -6,14 +6,10 @@ def migrate_post_topic_counts():
         for forum in category.forums:
             post_count = 0
 
-            forum.topic_count = ForumTopic.query.filter_by(deleted=False,
-                                                           forum=forum)\
-                .count()
+            forum.topic_count = ForumTopic.query.filter_by(deleted=False, forum=forum).count()
 
             for topic in forum.topics:
-                topic.post_count = ForumPost.query.filter_by(deleted=False,
-                                                             topic=topic)\
-                .count()
+                topic.post_count = ForumPost.query.filter_by(deleted=False, topic=topic).count()
                 topic.save(commit=False)
 
                 post_count += topic.post_count

@@ -6,8 +6,11 @@ from standardweb.lib import api
 from standardweb.lib.constants import *
 
 from datetime import datetime, timedelta
+import time
 
 import requests
+
+import rollbar
 
 
 def _query_server(server, mojang_status):
@@ -137,18 +140,32 @@ def _get_mojang_status():
 
 
 def main():
-    app.config.from_object('settings')
-
     mojang_status = _get_mojang_status()
 
+    durations = []
+
     for server in Server.query.filter_by(id=5, online=True):
+        start = int(round(time.time() * 1000))
+
         try:
             _query_server(server, mojang_status)
         except:
             db.session.rollback()
+            rollbar.report_exc_info(extra_data={'server_id': server.id})
             raise
         else:
             db.session.commit()
+            duration = int(round(time.time() * 1000)) - start
+            durations.append((server.id, duration))
+            print 'Done with server %d in %d milliseconds' % (server.id, duration)
+
+    extra_data = {'server.%d.ms' % server_id: duration for server_id, duration in durations}
+    extra_data['login'] = mojang_status.login
+    extra_data['session'] = mojang_status.session
+    rollbar.report_message('Server queries complete', 'debug',
+                           extra_data=extra_data)
+
+
 
 
 if __name__ == '__main__':
