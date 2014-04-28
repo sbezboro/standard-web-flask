@@ -747,10 +747,6 @@ def forum_attachment(hash):
 @app.route('/chat')
 @app.route('/<int:server_id>/chat')
 def chat(server_id=None):
-    if not hasattr(g, 'user'):
-        flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login'))
-
     if not server_id:
         return redirect(url_for('chat', server_id=app.config['MAIN_SERVER_ID']))
 

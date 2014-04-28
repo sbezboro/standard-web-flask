@@ -144,7 +144,7 @@ def main():
 
     durations = []
 
-    for server in Server.query.filter_by(id=5, online=True):
+    for server in Server.query.filter_by(online=True):
         start = int(round(time.time() * 1000))
 
         try:
