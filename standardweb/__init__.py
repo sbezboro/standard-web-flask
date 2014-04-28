@@ -41,7 +41,8 @@ def set_up_rollbar():
     rollbar.init(app.config['ROLLBAR_ACCESS_TOKEN'],
                  app.config['ROLLBAR_ENVIRONMENT'],
                  root=app.config['ROLLBAR_ROOT'],
-                 handler='blocking')
+                 handler='blocking',
+                 allow_logging_basic_config=False)
 
     got_request_exception.connect(report_exception, app)
 
