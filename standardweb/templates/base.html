@@ -45,7 +45,7 @@
                         {% if not user.admin %}
                             <a class="{% block select_player %}{% endblock %}" href="{{ url_for('player', username=user.player.username) }}">{{ user.player.username|face_thumb }}{{ user.player.username }}</a>
                         {% endif %}
-                        <a href="/logout">Log out</a>
+                        <a href="{{ url_for('logout') }}">Log out</a>
                     {% else %}
                         <a href="#" onclick="alert('Log in to the Minecraft server (standardsurvival.com) and type /register to create an account!')">Sign up</a>
                         <a class="{% block select_login %}{% endblock %}" href="{{ url_for('login', next=request.path) }}">Log in</a>
@@ -61,23 +61,22 @@
                 </div>
                 <ul id="mobile-nav-menu" style="display:none;">
                     <li><a href="/">Home</a></li>
-                    <li><a href="/ranking">Ranking</a></li>
-                    <li><a href="/leaderboards">Leaderboards</a></li>
-                    <li><a href="/forum">Forum</a></li>
-                    <li><a href="/chat">Live Chat</a></li>
-                    {% if user and user.admin %}<li><a href="/analytics">Analytics</a></li>{% endif %}
-                    {% if user and user.admin %}<li><a href="/server-admin">Server Admin</a></li>{% endif %}
+                    <li><a href="{{ url_for('ranking', server_id=server.id if server else None) }}">Ranking</a></li>
+                    <li><a href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a></li>
+                    <li><a href="{{ url_for('forums') }}">Forums</a></li>
+                    <li><a href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a></li>
+                    {% if user and user.admin %}<li><a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a></li>{% endif %}
                         <li>&nbsp;</li>
                     {% if user %}
                         {% if not user.admin %}
                             <li><a href="{{ url_for('player', username=user.player.username) }}">{{ user.player.username|face_thumb }}{{ user.player.username }}</a></li>
                         {% endif %}
-                        <li><a href="/logout">Log out</a></li>
+                        <li><a href="{{ url_for('logout') }}">Log out</a></li>
                     {% else %}
                         <li><a href="#" onclick="alert('Log in to the Minecraft server (standardsurvival.com) and type /register to create an account!')">Sign up</a></li>
-                        <li><a href="/login?next={{ request.path }}">Log in</a></li>
+                        <li><a href="{{ url_for('login', next=request.path) }}">Log in</a></li>
                     {% endif %}
-                    <li><form class="form-inline" method="GET" action="/search">
+                    <li><form class="form-inline" method="GET" action="{{ url_for('player_search') }}">
                         <input class="placeholder" type="text" name="q" placeholder="Player search" value="{{ query }}"/>
                     </form></li>
                 </ul>
