@@ -70,7 +70,7 @@ def send_stats(server, data):
 
 
 def forum_post(username, forum_name, topic_name, path):
-    base_url = url_for('', _external=True)
+    base_url = url_for('index', _external=True).rstrip('/')
     
     for server in Server.query.filter_by(online=True):
         data = {

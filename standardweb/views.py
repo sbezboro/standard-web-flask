@@ -9,6 +9,7 @@ from flask import send_file
 from flask import session
 
 from standardweb.forms import LoginForm, PostForm, NewTopicForm
+from standardweb.lib import api
 from standardweb.lib import cache as libcache
 from standardweb.lib import leaderboards as libleaderboards
 from standardweb.lib import player as libplayer
@@ -512,6 +513,9 @@ def new_topic(forum_id):
         topic.post_count += 1
         topic.save(commit=True)
 
+        api.forum_post(user.player.username if user.player else user.username,
+                       topic.forum.name, topic.name, post.url)
+
         return redirect(topic.url)
 
     retval = {
@@ -556,6 +560,9 @@ def new_post(topic_id):
         topic.post_count += 1
 
         post.save(commit=True)
+
+        api.forum_post(user.player.username if user.player else user.username,
+                       topic.forum.name, topic.name, post.url)
 
         return redirect(post.url)
 
