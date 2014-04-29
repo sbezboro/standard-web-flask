@@ -54,7 +54,7 @@ def convert_bbcode(text):
 
 def _render_size(tag_name, value, options, parent, context):
     size = int(options.get('size', 1))
-    return '<font size="%d">%s</span>' % (size, value)
+    return '<font size="%d">%s</font>' % (size, value)
 
 
 
