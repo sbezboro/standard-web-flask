@@ -8,7 +8,7 @@ from flask import render_template
 from flask import send_file
 from flask import session
 
-from standardweb.forms import LoginForm, NewPostForm, NewTopicForm
+from standardweb.forms import LoginForm, PostForm, NewTopicForm
 from standardweb.lib import cache as libcache
 from standardweb.lib import leaderboards as libleaderboards
 from standardweb.lib import player as libplayer
@@ -444,7 +444,7 @@ def forum_topic(topic_id):
     if hasattr(g, 'user'):
         topic.update_read(g.user)
 
-    form = NewPostForm()
+    form = PostForm()
 
     retval = {
         'topic': topic,
@@ -537,7 +537,7 @@ def new_post(topic_id):
 
     user = g.user
 
-    form = NewPostForm()
+    form = PostForm()
 
     if form.validate_on_submit():
         body = request.form['body']
@@ -558,6 +558,51 @@ def new_post(topic_id):
         post.save(commit=True)
 
         return redirect(post.url)
+
+
+@app.route('/forums/post/<int:post_id>/edit', methods=['GET', 'POST'])
+def edit_post(post_id):
+    post = ForumPost.query.options(
+        joinedload(ForumPost.topic)
+        .joinedload(ForumTopic.forum)
+        .joinedload(Forum.moderators)
+    ).options(
+        joinedload(ForumPost.user)
+        .joinedload(User.forum_profile)
+    ).get(post_id)
+
+    if not post:
+        abort(404)
+
+    if not hasattr(g, 'user'):
+        flash('You must log in before you can do that', 'warning')
+        return redirect(url_for('login'))
+
+    user = g.user
+
+    if user != post.user and not user.admin and user not in post.topic.forum.moderators:
+        abort(403)
+
+    form = PostForm(obj=post)
+
+    if form.validate_on_submit():
+        body = request.form['body']
+
+        post.body = body
+
+        post.updated = datetime.utcnow()
+        post.updated_by = user
+
+        post.save(commit=True)
+
+        return redirect(post.url)
+
+    retval = {
+        'post': post,
+        'form': form
+    }
+
+    return render_template('forums/edit_post.html', **retval)
 
 
 @app.route('/forums/topic/<int:topic_id>/status')

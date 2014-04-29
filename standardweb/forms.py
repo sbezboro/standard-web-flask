@@ -60,5 +60,5 @@ class NewTopicForm(BaseForm):
     body = TextAreaField('Body', validators=[DataRequired()])
 
 
-class NewPostForm(BaseForm):
+class PostForm(BaseForm):
     body = TextAreaField('Body', validators=[DataRequired()])

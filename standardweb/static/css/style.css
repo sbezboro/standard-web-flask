@@ -1115,6 +1115,10 @@ fieldset {
     resize: vertical;
 }
 
+.new-topic a, .new-post a {
+    font-size: 12px;
+}
+
 #refreshImage {
     margin-bottom: -2px;
 }

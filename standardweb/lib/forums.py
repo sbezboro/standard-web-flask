@@ -13,7 +13,7 @@ _emoticon_map = {
     ':angel:': 'emoticons/angel.png',
     ':angry:': 'emoticons/angry.png',
     '8-\)': 'emoticons/cool.png',
-    ':\'\(': 'emoticons/cwy.png',
+    ":'\(": 'emoticons/cwy.png',
     ':ermm:': 'emoticons/ermm.png',
     ':D': 'emoticons/grin.png',
     '<3': 'emoticons/heart.png',
@@ -53,8 +53,19 @@ def convert_bbcode(text):
 
 
 def _render_size(tag_name, value, options, parent, context):
-    size = int(options.get('size', 1))
-    return '<font size="%d">%s</font>' % (size, value)
+    if 'size' in options:
+        size = int(options.get('size', 1))
+    elif len(options) == 1:
+        key, val = options.items()[0]
+
+        if val:
+            size = val
+        elif key:
+            size = key
+    else:
+        size = 1
+
+    return '<font size="%s">%s</font>' % (size, value)
 
 
 
