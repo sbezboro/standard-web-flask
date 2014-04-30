@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Standard Survival Minecraft Server{% endblock %}
+
+{% block select_signup %}selected{% endblock %}
+{% block content %}
+  <div id="main">
+    <div class="center-section">
+      <h2>Sign up</h2>
+        <fieldset>
+          {% include 'includes/messages.html' %}
+          <p class="help">
+            To create an account or change your password, log in to any Minecraft server (for example <b>standardsurvival.com</b>) and type the <code>/register</code> command.
+          </p>
+        </fieldset>
+    </div>
+  </div>
+{% endblock %}
+
+

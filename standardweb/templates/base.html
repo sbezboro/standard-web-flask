@@ -39,7 +39,9 @@
                 <a class="{% block select_leaderboards %}{% endblock %}" href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a>
                 <a class="{% block select_forum %}{% endblock %}" href="{{ url_for('forums') }}">Forums</a>
                 <a class="{% block select_chat %}{% endblock %}" href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a>
-                {% if user and user.admin %}<a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a>{% endif %}
+                {% if user and user.admin %}
+                    <a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a>
+                {% endif %}
                 <div id="right">
                     {% if user %}
                         {% if not user.admin %}
@@ -47,7 +49,7 @@
                         {% endif %}
                         <a href="{{ url_for('logout') }}">Log out</a>
                     {% else %}
-                        <a href="#" onclick="alert('Log in to the Minecraft server (standardsurvival.com) and type /register to create an account!')">Sign up</a>
+                        <a class="{% block select_signup %}{% endblock %}" href="{{ url_for('signup') }}">Sign up</a>
                         <a class="{% block select_login %}{% endblock %}" href="{{ url_for('login', next=request.path) }}">Log in</a>
                     {% endif %}
                     <form class="form-inline" method="GET" action="{{ url_for('player_search') }}">
@@ -73,7 +75,7 @@
                         {% endif %}
                         <li><a href="{{ url_for('logout') }}">Log out</a></li>
                     {% else %}
-                        <li><a href="#" onclick="alert('Log in to the Minecraft server (standardsurvival.com) and type /register to create an account!')">Sign up</a></li>
+                        <li><a href="{{ url_for('signup') }}">Sign up</a></li>
                         <li><a href="{{ url_for('login', next=request.path) }}">Log in</a></li>
                     {% endif %}
                     <li><form class="form-inline" method="GET" action="{{ url_for('player_search') }}">

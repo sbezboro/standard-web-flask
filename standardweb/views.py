@@ -76,6 +76,11 @@ def logout():
     return redirect(request.referrer)
 
 
+@app.route('/signup')
+def signup():
+    return render_template('signup.html')
+
+
 @app.route('/search')
 def player_search():
     query = request.args.get('q')
