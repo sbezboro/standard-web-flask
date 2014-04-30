@@ -551,6 +551,7 @@ class ForumBan(db.Model, Base):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    ban_start = db.Column(db.DateTime, default=datetime.utcnow)
     reason = db.Column(db.Text())
     by_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 

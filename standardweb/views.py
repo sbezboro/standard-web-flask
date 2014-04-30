@@ -125,6 +125,8 @@ def player_list():
 @app.route('/<int:server_id>/player_graph')
 def player_graph(server_id=None):
     server = Server.query.get(server_id or app.config['MAIN_SERVER_ID'])
+    if not server:
+        abort(404)
 
     week_index = request.args.get('weekIndex')
 
@@ -154,6 +156,8 @@ def player(username, server_id=None):
                                 server_id=app.config['MAIN_SERVER_ID']))
 
     server = Server.query.get(server_id)
+    if not server:
+        abort(404)
 
     template = 'player.html'
     retval = {
@@ -202,6 +206,8 @@ def ranking(server_id=None):
         return redirect(url_for('ranking', server_id=app.config['MAIN_SERVER_ID']))
 
     server = Server.query.get(server_id)
+    if not server:
+        abort(404)
 
     ranking = libserver.get_ranking_data(server)
 
@@ -507,12 +513,16 @@ def new_topic(forum_id):
 
     user = g.user
 
+    if user.forum_ban:
+        abort(403)
+
     if forum.locked and not user.admin:
         abort(403)
 
     form = NewTopicForm()
 
     if form.validate_on_submit():
+
         title = request.form['title']
         body = request.form['body']
 
@@ -562,6 +572,9 @@ def new_post(topic_id):
 
     user = g.user
 
+    if user.forum_ban:
+        abort(403)
+
     form = PostForm()
 
     if form.validate_on_submit():
@@ -607,6 +620,9 @@ def edit_post(post_id):
         return redirect(url_for('login', next=request.path))
 
     user = g.user
+
+    if user.forum_ban:
+        abort(403)
 
     if user != post.user and not user.admin and user not in post.topic.forum.moderators:
         abort(403)
@@ -849,6 +865,10 @@ def chat(server_id=None):
 @app.route('/admin')
 @app.route('/<int:server_id>/admin')
 def admin(server_id=None):
+    if not g.user:
+        flash('You must log in before you can do that', 'warning')
+        return redirect(url_for('login', next=request.path))
+
     if not g.user.admin:
         abort(403)
 
