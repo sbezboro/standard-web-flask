@@ -87,7 +87,7 @@ def player_search():
     page = request.args.get('p')
 
     try:
-        page = int(page) if page else 0
+        page = max(int(page), 0) if page else 0
     except:
         page = 0
 
@@ -361,7 +361,7 @@ def forum(forum_id):
     page = request.args.get('p')
 
     try:
-        page = int(page) if page else 0
+        page = max(int(page), 0) if page else 0
     except:
         page = 0
 
@@ -426,7 +426,7 @@ def forum_topic(topic_id):
     page = request.args.get('p')
 
     try:
-        page = int(page) if page else 0
+        page = max(int(page), 0) if page else 0
     except:
         page = 0
 
