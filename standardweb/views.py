@@ -86,7 +86,10 @@ def player_search():
     query = request.args.get('q')
     page = request.args.get('p')
 
-    page = int(page) if page else 0
+    try:
+        page = int(page) if page else 0
+    except:
+        page = 0
 
     page_size = 20
 
@@ -356,7 +359,11 @@ def forum(forum_id):
     page_size = TOPICS_PER_PAGE
 
     page = request.args.get('p')
-    page = int(page) if page else 1
+
+    try:
+        page = int(page) if page else 0
+    except:
+        page = 0
 
     if page < 1 or page > forum.topic_count / page_size + 1:
         return redirect(url_for('forum', forum_id=forum_id))
@@ -417,7 +424,11 @@ def forum_topic(topic_id):
     page_size = POSTS_PER_PAGE
 
     page = request.args.get('p')
-    page = int(page) if page else 1
+
+    try:
+        page = int(page) if page else 0
+    except:
+        page = 0
 
     if page < 1 or page > topic.post_count / page_size + 1:
         return redirect(url_for('forum_topic', topic_id=topic_id))
