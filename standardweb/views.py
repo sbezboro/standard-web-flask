@@ -361,9 +361,9 @@ def forum(forum_id):
     page = request.args.get('p')
 
     try:
-        page = max(int(page), 0) if page else 0
+        page = max(int(page), 1) if page else 1
     except:
-        page = 0
+        page = 1
 
     if page < 1 or page > forum.topic_count / page_size + 1:
         return redirect(url_for('forum', forum_id=forum_id))
@@ -426,9 +426,9 @@ def forum_topic(topic_id):
     page = request.args.get('p')
 
     try:
-        page = max(int(page), 0) if page else 0
+        page = max(int(page), 1) if page else 1
     except:
-        page = 0
+        page = 1
 
     if page < 1 or page > topic.post_count / page_size + 1:
         return redirect(url_for('forum_topic', topic_id=topic_id))
