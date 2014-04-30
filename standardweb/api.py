@@ -49,12 +49,7 @@ def server_api(function):
             auth = request.headers['Authorization'].split(' ')[1]
             server_id, secret_key = auth.strip().decode('base64').split(':')
 
-            cache_key = '%s-%s' % (server_id, secret_key)
-            server = _server_cache.get(cache_key)
-
-            if not server:
-                server = Server.query.filter_by(id=server_id, secret_key=secret_key).first()
-                _server_cache[cache_key] = server
+            server = Server.query.filter_by(id=server_id, secret_key=secret_key).first()
 
         if not server:
             abort(403)
