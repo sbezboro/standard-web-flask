@@ -316,6 +316,7 @@ def forums():
 
     if g.user:
         user = g.user
+
         if not user.posttracking:
             user.posttracking = ForumPostTracking(user=user)
             user.posttracking.save(commit=True)

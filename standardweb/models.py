@@ -446,10 +446,13 @@ class ForumTopic(db.Model, Base):
         return url_for('forum_topic', topic_id=self.id)
 
     def update_read(self, user, commit=True):
-        tracking = user.posttracking
-
         self.views +=1
         self.save(commit=True)
+
+        tracking = user.posttracking
+
+        if not tracking:
+            return
 
         if tracking.last_read and (tracking.last_read > self.last_post.created):
             return
