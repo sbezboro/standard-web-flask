@@ -24,6 +24,8 @@ def user_session():
         ).options(
             joinedload(User.posttracking)
         ).get(session['user_id'])
+    else:
+        g.user = None
 
 
 @app.before_request
@@ -72,7 +74,7 @@ def override_url_for():
 def rts_auth_data():
     data = {}
 
-    if hasattr(g, 'user'):
+    if g.user:
         user_id = g.user.id
         username = g.user.player.username if g.user.player else g.user.username
         admin = g.user.admin

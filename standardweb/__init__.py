@@ -29,7 +29,7 @@ def set_up_rollbar():
     class CustomRequest(Request):
         @property
         def rollbar_person(self):
-            if hasattr(g, 'user'):
+            if g.user:
                 user = g.user
 
                 return {

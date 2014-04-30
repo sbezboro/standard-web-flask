@@ -877,11 +877,13 @@ fieldset {
 }
 
 .forum-topic-table tr.closed img {
-    opacity: 0.3;
+    opacity: 0.5;
+    filter: Alpha(opacity=50);
 }
 
 .forum-topic-table tr.closed .ansi-container {
-    opacity: 0.3;
+    opacity: 0.5;
+    filter: Alpha(opacity=50);
 }
 
 .forum-topic-table tr.closed a {
@@ -1154,7 +1156,7 @@ fieldset {
 }
 
 fieldset > .alert {
-    margin-top: 0px;
+    margin-top: 0;
 }
 
 .alert.error {
@@ -1203,7 +1205,8 @@ fieldset > .alert {
     text-decoration: none;
     cursor: pointer;
     color: #aaa;
-    opacity: 0.7;
+    opacity: 0.4;
+    filter: Alpha(opacity=40);
 }
 
 .small {

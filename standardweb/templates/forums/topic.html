@@ -101,7 +101,7 @@
                                 {% endif %}
                             {% endif %}
                             {% if not topic.closed %}
-                                {% if user == topic.user or user.admin or user in topic.forum.moderators %}
+                                {% if user == post.user or user.admin or user in topic.forum.moderators %}
                                     <a href="{{ url_for('edit_post', post_id=post.id) }}">Edit</a> |
                                 {% endif %}
                                 <a class="reply" href="#">Reply</a>
@@ -160,7 +160,7 @@
             </div>
         {% endif %}
     {% else %}
-        You must <a href="{{ url_for('login') }}">login</a> before you can post a reply
+        You must <a href="{{ url_for('login', next=request.path) }}">login</a> before you can post a reply
     {% endif %}
 
     <script type="application/javascript">

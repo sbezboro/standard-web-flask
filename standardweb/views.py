@@ -70,7 +70,10 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
-    return redirect(url_for('index'))
+
+    flash('Successfully logged out', 'success')
+
+    return redirect(request.referrer)
 
 
 @app.route('/search')
@@ -311,7 +314,7 @@ def forums():
 
     active_forum_ids = set()
 
-    if hasattr(g, 'user'):
+    if g.user:
         user = g.user
         if not user.posttracking:
             user.posttracking = ForumPostTracking(user=user)
@@ -373,7 +376,7 @@ def forum(forum_id):
 
     active_topic_ids = set()
 
-    if hasattr(g, 'user'):
+    if g.user:
         user = g.user
         read_topics = user.posttracking.get_topics()
         last_read = user.posttracking.last_read
@@ -442,7 +445,7 @@ def forum_topic(topic_id):
         for stats in player_stats
     }
 
-    if hasattr(g, 'user'):
+    if g.user:
         topic.update_read(g.user)
 
     form = PostForm()
@@ -481,8 +484,9 @@ def new_topic(forum_id):
     if not forum:
         abort(404)
 
-    if not hasattr(g, 'user'):
-        return redirect(url_for('login'))
+    if not g.user:
+        flash('You must log in before you can do that', 'warning')
+        return redirect(url_for('login', next=request.path))
 
     user = g.user
 
@@ -532,12 +536,12 @@ def new_post(topic_id):
         joinedload(ForumTopic.forum)
     ).get(topic_id)
 
-    if not topic:
+    if not topic or topic.deleted:
         abort(404)
 
-    if not hasattr(g, 'user'):
+    if not g.user:
         flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login'))
+        return redirect(url_for('login', next=request.path))
 
     user = g.user
 
@@ -578,12 +582,12 @@ def edit_post(post_id):
         .joinedload(User.forum_profile)
     ).get(post_id)
 
-    if not post:
+    if not post or post.deleted:
         abort(404)
 
-    if not hasattr(g, 'user'):
+    if not g.user:
         flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login'))
+        return redirect(url_for('login', next=request.path))
 
     user = g.user
 
@@ -622,9 +626,9 @@ def forum_topic_status(topic_id):
     if not topic:
         abort(404)
 
-    if not hasattr(g, 'user'):
+    if not g.user:
         flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login'))
+        return redirect(url_for('login', next=request.path))
 
     user = g.user
 
@@ -670,9 +674,9 @@ def forum_post_delete(post_id):
     if not post:
         abort(404)
 
-    if not hasattr(g, 'user'):
+    if not g.user:
         flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login'))
+        return redirect(url_for('login', next=request.path))
 
     user = g.user
 
@@ -757,9 +761,9 @@ def forum_post_delete(post_id):
 
 @app.route('/forums/all_read')
 def all_topics_read():
-    if not hasattr(g, 'user'):
+    if not g.user:
         flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login'))
+        return redirect(url_for('login', next=request.path))
 
     user = g.user
 
@@ -773,9 +777,9 @@ def all_topics_read():
 
 @app.route('/forums/ban')
 def forum_ban():
-    if not hasattr(g, 'user'):
+    if not g.user:
         flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login'))
+        return redirect(url_for('login', next=request.path))
 
     user = g.user
 
@@ -811,7 +815,7 @@ def chat(server_id=None):
     if not server:
         abort(404)
 
-    if hasattr(g, 'user'):
+    if g.user:
         player = g.user.player
     else:
         player = None

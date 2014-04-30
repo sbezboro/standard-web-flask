@@ -27,7 +27,7 @@
       {% if not user %}
         <br>
         <div>
-          You must be <a href="{{ url_for('login') }}">logged in</a> to the website to be able to chat!
+          You must be <a href="{{ url_for('login', next=request.path) }}">logged in</a> to the website to be able to chat!
         </div>
       {% endif %}
       <table class="players-table">

@@ -12,6 +12,10 @@ from standardweb.lib import helpers as h
 from sqlalchemy import or_
 from sqlalchemy.sql.expression import func
 
+import rollbar
+
+
+_server_cache = {}
 
 # Base API function decorator that builds a list of view functions for use in urls.py. 
 def api_func(function):
@@ -44,12 +48,13 @@ def server_api(function):
         if request.headers.get('Authorization'):
             auth = request.headers['Authorization'].split(' ')[1]
             server_id, secret_key = auth.strip().decode('base64').split(':')
-        
-            #cache_key = 'api-%s-%s' % (server_id, secret_key)
-            #server = cache.get(cache_key)
-            #if not server:
-            server = Server.query.filter_by(id=server_id, secret_key=secret_key).first()
-                #cache.set(cache_key, server, 3600)
+
+            cache_key = '%s-%s' % (server_id, secret_key)
+            server = _server_cache.get(cache_key)
+
+            if not server:
+                server = Server.query.filter_by(id=server_id, secret_key=secret_key).first()
+                _server_cache[cache_key] = server
 
         if not server:
             abort(403)
@@ -168,6 +173,9 @@ def register():
         })
 
     User.create(player, password, commit=True)
+
+    rollbar.report_message('Website account created', level='info', request=request)
+
     return jsonify({
         'err': 0,
         'message': 'Your username has been linked to a website account!'
@@ -253,7 +261,8 @@ def leave_server():
 def servers():
     servers = [{
         'id': server.id,
-        'address': server.address
+        'address': server.address,
+        'online': server.online
     } for server in Server.query.all()]
 
     return jsonify({
