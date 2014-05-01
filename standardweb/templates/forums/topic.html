@@ -157,6 +157,8 @@
                 {% else %}
                     <a href="{{ url_for('forum_topic_status', topic_id=topic.id, status='sticky') }}">Sticky</a>
                 {% endif %}
+                |
+                <a href="{{ url_for('move_topic', topic_id=topic.id) }}">Move</a>
             </div>
         {% endif %}
     {% else %}

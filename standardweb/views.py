@@ -8,7 +8,7 @@ from flask import render_template
 from flask import send_file
 from flask import session
 
-from standardweb.forms import LoginForm, PostForm, NewTopicForm
+from standardweb.forms import LoginForm, MoveTopicForm, PostForm, NewTopicForm
 from standardweb.lib import api
 from standardweb.lib import cache as libcache
 from standardweb.lib import leaderboards as libleaderboards
@@ -500,7 +500,7 @@ def forum_post(post_id):
     return redirect(url_for('forum_topic', topic_id=post.topic_id, _anchor=post.id))
 
 
-@app.route('/forums/topic/<int:forum_id>/new_topic', methods=['GET', 'POST'])
+@app.route('/forum/<int:forum_id>/new_topic', methods=['GET', 'POST'])
 def new_topic(forum_id):
     forum = Forum.query.get(forum_id)
 
@@ -522,7 +522,6 @@ def new_topic(forum_id):
     form = NewTopicForm()
 
     if form.validate_on_submit():
-
         title = request.form['title']
         body = request.form['body']
 
@@ -790,6 +789,75 @@ def forum_post_delete(post_id):
     flash(message, 'success')
 
     return redirect(redirect_url)
+
+
+@app.route('/forums/topic/<int:topic_id>/move', methods=['GET', 'POST'])
+def move_topic(topic_id):
+    topic = ForumTopic.query.options(
+        joinedload(ForumTopic.forum)
+    ).get(topic_id)
+
+    if not topic or topic.deleted:
+        abort(404)
+
+    if not g.user:
+        flash('You must log in before you can do that', 'warning')
+        return redirect(url_for('login', next=request.path))
+
+    user = g.user
+
+    if not user.admin and not user.moderated_forums:
+        abort(403)
+
+    all_categories = ForumCategory.query.options(
+        joinedload(ForumCategory.forums)
+    ).join(ForumCategory.forums) \
+        .filter(Forum.id != topic.forum_id, Forum.locked == False) \
+        .order_by(ForumCategory.position)
+
+    form = MoveTopicForm()
+
+    choices = []
+    for category in all_categories:
+        choices.append((category.name, [(str(x.id), x.name) for x in category.forums if x != topic.forum]))
+
+    form.destination.choices = choices
+
+    if form.validate_on_submit():
+        to_forum_id = form.destination.data
+        to_forum = Forum.query.get(to_forum_id)
+
+        if topic == topic.forum.last_post.topic:
+            new_last_post = ForumPost.query.join(ForumPost.topic).join(ForumTopic.forum) \
+                .filter(ForumPost.deleted == False, Forum.id == topic.forum_id,
+                        ForumTopic.id != topic.id) \
+                .order_by(ForumPost.created.desc()).first()
+            topic.forum.last_post = new_last_post
+
+        topic.forum.post_count -= topic.post_count
+        topic.forum.topic_count -= 1
+        topic.forum.save(commit=False)
+
+        if topic.updated > to_forum.last_post.created:
+            to_forum.last_post = topic.last_post
+
+        to_forum.topic_count += 1
+        to_forum.post_count += topic.post_count
+        to_forum.save(commit=False)
+
+        topic.forum = to_forum
+        topic.save(commit=True)
+
+        flash('Topic moved', 'success')
+
+        return redirect(to_forum.url)
+
+    retval = {
+        'topic': topic,
+        'form': form
+    }
+
+    return render_template('forums/move_topic.html', **retval)
 
 
 @app.route('/forums/all_read')

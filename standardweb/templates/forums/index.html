@@ -3,7 +3,9 @@
 {% block forum_content %}
 <div class="button-area">
     <div class="controls">
-        <a href="{{ url_for('all_topics_read') }}">Mark all topics as read</a>
+        {% if user %}
+            <a href="{{ url_for('all_topics_read') }}">Mark all topics as read</a>
+        {% endif %}
     </div>
 </div>
 <div class="clear"></div>
