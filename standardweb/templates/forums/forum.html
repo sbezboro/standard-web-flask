@@ -1,5 +1,7 @@
 {% extends 'forums/base.html' %}
 
+{% block title %}{{ forum.name }} - Standard Survival Forum{% endblock %}
+
 {% block forum_content %}
     <div class="breadcrumbs">
         <a href="{{ url_for('forums') }}">Forums</a> &rarr;
