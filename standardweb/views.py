@@ -915,7 +915,7 @@ def _redirect_old_url(old_rule, endpoint, route_kw_func=None):
 
 _redirect_old_url('/forum/', 'forums')
 _redirect_old_url('/forum/topic/<int:topic_id>/', 'forum_topic', lambda topic_id: {'topic_id': topic_id})
-_redirect_old_url('/forum/post<int:post_id>/', 'forum_post', lambda post_id: {'post_id': post_id})
+_redirect_old_url('/forum/post/<int:post_id>/', 'forum_post', lambda post_id: {'post_id': post_id})
 
 
 @app.route('/chat')
