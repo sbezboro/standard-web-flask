@@ -28,6 +28,7 @@ import StringIO
 from PIL import Image
 
 import requests
+import rollbar
 
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
@@ -562,12 +563,20 @@ def new_post(topic_id):
         joinedload(ForumTopic.forum)
     ).get(topic_id)
 
-    if not topic or topic.deleted:
+    if not topic:
         abort(404)
 
     if not g.user:
         flash('You must log in before you can do that', 'warning')
         return redirect(url_for('login', next=request.path))
+
+    if topic.deleted:
+        flash('That topic no longer exists', 'warning')
+        return redirect(url_for('forum', forum_id=topic.forum_id))
+
+    if topic.closed:
+        flash('That topic has been locked', 'warning')
+        return redirect(url_for('forum', forum_id=topic.forum_id))
 
     user = g.user
 
@@ -971,11 +980,13 @@ def admin(server_id=None):
 
 @app.errorhandler(403)
 def forbidden(e):
+    rollbar.report_message('403', request=request)
     return render_template('403.html'), 403
 
 
 @app.errorhandler(404)
 def page_not_found(e):
+    rollbar.report_message('404', request=request)
     return render_template('404.html'), 404
 
 
