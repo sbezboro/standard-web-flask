@@ -1030,6 +1030,7 @@ fieldset {
 
 .forum-post .post-content {
     padding: 10px;
+    overflow-x: auto;
 }
 
 .forum-post .post-content blockquote {
