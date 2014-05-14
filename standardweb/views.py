@@ -378,8 +378,8 @@ def forum_search():
     form.forum_id.choices = choices
 
     form.sort_by.choices = [
-        ('post_asc', 'Post Date Ascending'),
-        ('post_desc', 'Post Date Descending ')
+        ('post_desc', 'Post Date Descending '),
+        ('post_asc', 'Post Date Ascending')
     ]
 
     retval = {
