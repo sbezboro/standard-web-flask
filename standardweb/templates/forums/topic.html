@@ -94,7 +94,7 @@
                         <span class="updated">
                             Edited by
                             {% if post.updated_by.player %}
-                                <b>{{ post.updated_by.player.displayname_html|safe }}</b>
+                                <b>{{ post.updated_by.player.displayname|safe }}</b>
                             {% else %}
                                 <b>{{ post.updated_by.username }}</b>
                             {% endif %}
