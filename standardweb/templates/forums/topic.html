@@ -45,7 +45,7 @@
                                     {% if stats.is_online %}
                                         Now
                                     {% else %}
-                                        <abbr class="timeago" title="{{ stats.last_seen }}"></abbr>
+                                        <abbr class="timeago" title="{{ stats.last_seen | iso_date }}"></abbr>
                                     {% endif %}
                                 {% endif %}
                             </div>
