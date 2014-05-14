@@ -1,0 +1,154 @@
+{% extends 'forums/base.html' %}
+
+{% block title %}Search - Standard Survival Forums{% endblock %}
+
+{% block forum_content %}
+    <div class="breadcrumbs">
+        <a href="{{ url_for('forums') }}">Forums</a> &rarr;
+        Search
+    </div>
+    <div class="forum-form-section forum-search">
+        <h4>
+            Search
+        </h4>
+        <div>
+            <form action="{{ url_for('forum_search') }}" method="get">
+                <fieldset>
+                    <div class="control-group">
+                        <label class="control-label">{{ form.query.label }}</label>
+                        <span class="control-errors">{% if form.query.errors %}{{ form.query.errors[0] }}{% endif %}</span>
+                        <div class="control">{{ form.query() }}</div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">{{ form.forum_id.label }}</label>
+                        <span class="control-errors">{% if form.forum_id.errors %}{{ form.forum_id.errors[0] }}{% endif %}</span>
+                        <div class="control">{{ form.forum_id() }}</div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">{{ form.sort_by.label }}</label>
+                        <span class="control-errors">{% if form.sort_by.errors %}{{ form.sort_by.errors[0] }}{% endif %}</span>
+                        <div class="control">{{ form.sort_by() }}</div>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control">
+                            <input class="btn" type="submit" value="Search">
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    {% if query %}
+        <div class="button-area">
+            {{ pages() }}
+        </div>
+        <div class="forum">
+            <h4>Search results</h4>
+            {% if num_topics %}
+                <table class="forum-topic-table">
+                    {% for topic in topics %}
+                        <tr class="{% if topic.sticky %}sticky{% else %}{% if topic.user.admin %}admin{% endif %} {% if topic.closed %}closed{% endif %}{% endif %}">
+                            <td>
+                                {% if topic.closed %}
+                                    <img src="{{ url_for('static', filename='images/forums/closed_topic.png') }}">
+                                {% elif active %}
+                                    <img src="{{ url_for('static', filename='images/forums/active_topic.png') }}">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='images/forums/inactive_topic.png') }}">
+                                {% endif %}
+                            </td>
+                            <td class="topic-cell">
+                                {% if topic.sticky %}Sticky:{% endif %}
+                                <a class="name {% if active %}active{% endif %}" href="{{ url_for('forum_topic', topic_id=topic.id, query=query) }}">{{ topic.name }}</a>
+                                <div class="description">
+                                    {% if topic.user.player %}
+                                        <a href="{{ url_for('player', username=topic.user.player.username) }}">
+                                            {{ topic.user.player.username|face_thumb }} {{ topic.user.player.displayname_html|safe }}
+                                        </a>
+                                    {% else %}
+                                        {{ topic.user.username }}
+                                    {% endif %} -
+                                    <abbr class="timeago" title="{{ topic.created | iso_date }}">{{ topic.created }}</abbr>
+                                    {% if topic.post_count > 20 %}
+                                        -
+                                        <span class="pages">
+                                        {% for page in range(1, (topic.post_count // 20) + 2) %}
+                                            {% if page > 1 %}
+                                                <a href="{{ url_for('forum_topic', topic_id=topic.id, p=page, query=query) }}">{{ page }}</a>
+                                            {% else %}
+                                                <a href="{{ url_for('forum_topic', topic_id=topic.id, query=query) }}">{{ page }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="count">
+                                    <b>{{ topic.replies }}</b> {{ 'reply' if topic.replies == 1 else 'replies' }}
+                                </div>
+                                <div class="count">
+                                    <b>{{ topic.views }}</b> {{ 'view' if topic.views == 1 else 'views' }}
+                                </div>
+                            </td>
+                            <td class="last-post-cell">
+                                {% with last_post = topic.last_post, last_post_user = last_post.user %}
+                                <div>
+                                    <b>Last post:</b> <a href="{{ last_post.url }}"><abbr class="timeago" title="{{ last_post.created | iso_date }}">{{ last_post.created }}</abbr></a>
+                                </div>
+                                <div>
+                                    {% if last_post_user.player %}
+                                        <a href="{{ url_for('player', username=last_post_user.player.username) }}">
+                                            {{ last_post_user.player.username|face_thumb }} {{ last_post_user.player.displayname_html|safe }}
+                                        </a>
+                                    {% else %}
+                                        {{ last_post_user.username }}
+                                    {% endif %}
+                                </div>
+                                {% endwith %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <div class="forum-search-empty">
+                    No results found
+                </div>
+            {% endif %}
+        </div>
+        <div class="button-area">
+            {{ pages() }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% macro pages() %}
+    {% if num_topics > page_size %}
+        <div class="pages">
+            <b>Pages:</b>
+            {% with end_page = ((num_topics - 1) // page_size) + 1 %}
+            {% for p in range(1, end_page + 1) %}
+                {% if (p - page)|abs >= 3 and not p == end_page and not p == 1 %}
+                    {% if (p - page)|abs == 3 %}
+                        ...
+                    {% endif %}
+                    {% continue %}
+                {% endif %}
+
+                {% with args = request.args.copy(), tmp = args.pop('p', None) %}
+                    {% if p == page %}
+                        <span>{{ p }}</span>
+                    {% elif p != 1 %}
+                        <a href="{{ url_for('forum_search', p=p, **args) }}">{{ p }}</a>
+                    {% else %}
+                        <a href="{{ url_for('forum_search', **args) }}">{{ p }}</a>
+                    {% endif %}
+                {% endwith %}
+            {% endfor %}
+            {% endwith %}
+        </div>
+    {% endif %}
+{%- endmacro %}

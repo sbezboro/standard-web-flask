@@ -9,12 +9,12 @@ from pbkdf2 import pbkdf2_bin
 
 from sqlalchemy.exc import IntegrityError
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import binascii
 import hashlib
 import os
-
+import re
 
 
 def _get_or_create(cls, **kwargs):
@@ -144,6 +144,10 @@ class PlayerStats(db.Model, Base):
 
     server = db.relationship('Server')
     player = db.relationship('Player')
+
+    @property
+    def is_online(self):
+        return datetime.utcnow() - self.last_seen < timedelta(minutes=1)
 
     @property
     def rank(self):
@@ -496,6 +500,16 @@ class ForumPost(db.Model, Base):
     @property
     def url(self):
         return url_for('forum_post', post_id=self.id)
+
+    def get_body_html(self, highlight=None):
+        result = self.body_html.replace('djangobb_forum/img/smilies', 'images/forums/emoticons')
+
+        if highlight:
+            return re.sub(r'(%s)' % re.escape(highlight),
+                          r'<span class="search-match">\1</span>',
+                          result, flags=re.IGNORECASE)
+
+        return result
 
     def save(self, commit=True):
         from standardweb.lib import forums

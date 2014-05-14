@@ -4,6 +4,7 @@
 <div class="button-area">
     <div class="controls">
         {% if user %}
+            <a href="{{ url_for('forum_search') }}">Search</a>
             <a href="{{ url_for('all_topics_read') }}">Mark all topics as read</a>
         {% endif %}
     </div>

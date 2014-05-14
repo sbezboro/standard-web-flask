@@ -10,6 +10,7 @@
     <div class="button-area">
         {{ pages() }}
         <div class="controls">
+            <a href="{{ url_for('forum_search', forum_id=forum.id) }}">Search this forum</a>
             {% if not forum.locked or not user or user.admin %}
                 <a href="{{ url_for('new_topic', forum_id=forum.id) }}" class="btn">New Topic</a>
             {% endif %}
@@ -89,6 +90,7 @@
     <div class="button-area">
         {{ pages() }}
         <div class="controls">
+            <a href="{{ url_for('forum_search', forum_id=forum.id) }}">Search this forum</a>
             {% if not forum.locked or not user or user.admin %}
                 <a href="{{ url_for('new_topic', forum_id=forum.id) }}" class="btn">New Topic</a>
             {% endif %}
@@ -100,7 +102,7 @@
     {% if forum.topic_count > page_size %}
         <div class="pages">
             <b>Pages:</b>
-            {% with end_page = (forum.topic_count // page_size) + 1 %}
+            {% with end_page = ((forum.topic_count - 1) // page_size) + 1 %}
             {% for p in range(1, end_page + 1) %}
                 {% if (p - page)|abs >= 3 and not p == end_page and not p == 1 %}
                     {% if (p - page)|abs == 3 %}

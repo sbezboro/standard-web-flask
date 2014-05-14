@@ -84,12 +84,10 @@ def get_server_data(server, player):
     other_deaths = sorted(other_deaths, key=lambda k: (-k['count'], k['type']))
     other_kills = sorted(other_kills, key=lambda k: (-k['count'], k['type']))
 
-    online_now = datetime.utcnow() - timedelta(minutes=1) < stats.last_seen
-
     return {
         'rank': stats.rank,
         'banned': stats.banned,
-        'online_now': online_now,
+        'online_now': stats.is_online,
         'first_seen': h.iso_date(stats.first_seen),
         'last_seen': h.iso_date(stats.last_seen),
         'time_spent': h.elapsed_time_string(stats.time_spent),

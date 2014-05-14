@@ -40,6 +40,13 @@
                                 {% if stats %}
                                     <br/>
                                     <b>Time played:</b> {{ h.elapsed_time_string(stats.time_spent) }}
+                                    <br/>
+                                    <b>Last seen:</b>
+                                    {% if stats.is_online %}
+                                        Online now
+                                    {% else %}
+                                        <abbr class="timeago" title="{{ stats.last_seen }}"></abbr>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         {% endwith %}
@@ -63,7 +70,7 @@
                     <div class="clear"></div>
                 </div>
                 <div class="post-content" data-bbcode="{{ post.body }}">
-                    {{ post.body_html|replace('djangobb_forum/img/smilies', 'images/forums/emoticons')|safe }}
+                    {{ post.get_body_html(request.args.query)|safe }}
                 </div>
                 <div class="post-extras">
                     {% if post.attachments %}
@@ -121,7 +128,7 @@
         {% if topic.closed and not user.admin %}
             This topic is closed
         {% else %}
-            <div class="new-post">
+            <div class="forum-form-section">
                 <h4>
                     Quick Reply
                 </h4>
@@ -186,7 +193,7 @@
     {% if topic.post_count > page_size %}
         <div class="pages">
             <b>Pages:</b>
-            {% with end_page = (topic.post_count // page_size) + 1 %}
+            {% with end_page = ((topic.post_count - 1) // page_size) + 1 %}
             {% for p in range(1, end_page + 1) %}
                 {% if (p - page)|abs >= 3 and not p == end_page and not p == 1 %}
                     {% if (p - page)|abs == 3 %}

@@ -1083,43 +1083,57 @@ fieldset {
     filter: Alpha(opacity=20);
 }
 
-.new-topic, .new-post {
+.forum-post .search-match {
+    background: #ff0;
+    font-weight: bold;
+}
+
+.forum-form-section {
     background: #fff;
     border: 1px solid #ddd;
 }
 
-.new-topic fieldset, .new-post fieldset {
+.forum-form-section fieldset {
     padding: 26px 30px;
 }
 
-.new-topic .control-group, .new-post .control-group {
+.forum-form-section .control-group {
     margin: 0 0 14px;
 }
 
-.new-topic .control-label, .new-post .control-label {
+.forum-form-section .control-label {
     font-size: 14px;
     font-weight: bold;
     width: 100px;
     float: none;
 }
 
-.new-topic .control, .new-post .control {
+.forum-form-section .control {
     margin-top: 4px;
     margin-left: 0;
 }
 
-.new-topic input[type='text'], .new-post input[type='text'] {
+.forum-form-section input[type='text'] {
     width: 50%;
 }
 
-.new-topic textarea, .new-post textarea {
+.forum-form-section textarea {
     width: 100%;
     height: 250px;
     resize: vertical;
 }
 
-.new-topic a, .new-post a {
+.forum-form-section a {
     font-size: 12px;
+}
+
+.forum-search {
+    margin-bottom: 20px;
+}
+
+.forum-search-empty {
+    padding: 20px;
+    background: #fff;
 }
 
 #refreshImage {

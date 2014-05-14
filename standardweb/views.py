@@ -8,7 +8,7 @@ from flask import render_template
 from flask import send_file
 from flask import session
 
-from standardweb.forms import LoginForm, MoveTopicForm, PostForm, NewTopicForm
+from standardweb.forms import LoginForm, MoveTopicForm, PostForm, NewTopicForm, ForumSearchForm
 from standardweb.lib import api
 from standardweb.lib import cache as libcache
 from standardweb.lib import leaderboards as libleaderboards
@@ -354,6 +354,104 @@ def forums():
     return render_template('forums/index.html', **retval)
 
 
+@app.route('/forums/search')
+def forum_search():
+    all_categories = ForumCategory.query.options(
+        joinedload(ForumCategory.forums)
+    ).order_by(ForumCategory.position).all()
+
+    page_size = POSTS_PER_PAGE
+
+    page = request.args.get('p')
+
+    try:
+        page = max(int(page), 1) if page else 1
+    except:
+        page = 1
+
+    form = ForumSearchForm(request.args)
+
+    choices = [('', 'All forums')]
+    for category in all_categories:
+        choices.append((category.name, [(str(x.id), x.name) for x in category.forums]))
+
+    form.forum_id.choices = choices
+
+    form.sort_by.choices = [
+        ('post_asc', 'Post Date Ascending'),
+        ('post_desc', 'Post Date Descending ')
+    ]
+
+    retval = {
+        'form': form
+    }
+
+    if 'query' in request.args and form.validate():
+        query = form.query.data
+        forum_id = form.forum_id.data
+        sort_by = form.sort_by.data
+
+        order = ForumPost.created.asc()
+
+        if sort_by == 'post_asc':
+            order = ForumPost.created.asc()
+        elif sort_by == 'post_desc':
+            order = ForumPost.created.desc()
+
+        # the result here is a list of topic ids associated with posts,
+        # but the topic ids can show up duplicated (ie. more than one
+        # matching post in the same topic)
+        result = ForumPost.query.with_entities(ForumPost.topic_id) \
+            .join(ForumPost.topic).filter(ForumPost.deleted == False,
+                                          ForumPost.body.ilike('%%%s%%' % query)) \
+            .order_by(order)
+
+        if forum_id:
+            result = result.filter(ForumTopic.forum_id == forum_id)
+
+        topic_ids = []
+        seen = set()
+
+        # remove duplicate topics by ordering the most recent matching
+        # post's topic higher
+        if sort_by == 'post_asc':
+            for topic_id in [x for x in reversed([x for x, in result])]:
+                if topic_id not in seen and not seen.add(topic_id):
+                    topic_ids.insert(0, topic_id)
+        else:
+            for topic_id, in result:
+                if topic_id not in seen and not seen.add(topic_id):
+                    topic_ids.append(topic_id)
+
+        num_topics = len(topic_ids)
+        start = (page - 1) * page_size
+        topic_ids = topic_ids[start:start + page_size]
+
+        result = ForumTopic.query.options(
+            joinedload(ForumTopic.user)
+            .joinedload(User.player)
+        ).options(
+            joinedload(ForumTopic.last_post)
+            .joinedload(ForumPost.user)
+            .joinedload(User.player)
+        ).filter(ForumTopic.id.in_(topic_ids))
+
+        if topic_ids:
+            result = result.order_by(func.field(ForumTopic.id, *topic_ids))
+
+        topics = result.all()
+
+        retval.update({
+            'query': query,
+            'topics': topics,
+            'num_topics': num_topics,
+            'page_size': page_size,
+            'page': page
+        })
+
+    return render_template('forums/search.html', **retval)
+
+
 @app.route('/forum/<int:forum_id>')
 def forum(forum_id):
     forum = Forum.query.options(
@@ -455,9 +553,9 @@ def forum_topic(topic_id):
         joinedload(ForumPost.topic)
         .joinedload(ForumTopic.forum)
     ).filter_by(topic_id=topic_id, deleted=False) \
-    .order_by(ForumPost.created) \
-    .limit(page_size) \
-    .offset((page - 1) * page_size)
+        .order_by(ForumPost.created) \
+        .limit(page_size) \
+        .offset((page - 1) * page_size)
 
     player_ids = set([post.user.player_id for post in posts])
 
