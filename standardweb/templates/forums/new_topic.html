@@ -13,7 +13,7 @@
             New Topic
         </h4>
         <div>
-            <form action="{{ url_for('new_topic', forum_id=forum.id) }}" method="post">
+            <form class="post-form" action="{{ url_for('new_topic', forum_id=forum.id) }}" method="post">
                 {{ form.hidden_tag() }}
                 <fieldset>
                     <div class="control-group">

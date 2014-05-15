@@ -14,6 +14,10 @@ def migrate_post_topic_counts():
 
                 post_count += topic.post_count
 
+                for post in topic.posts:
+                    # rebuild body_html
+                    post.save(commit=False)
+
             forum.post_count = post_count
             forum.save(commit=False)
 
@@ -37,4 +41,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    with app.test_request_context():
+        main()

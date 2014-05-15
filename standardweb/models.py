@@ -502,14 +502,12 @@ class ForumPost(db.Model, Base):
         return url_for('forum_post', post_id=self.id)
 
     def get_body_html(self, highlight=None):
-        result = self.body_html.replace('djangobb_forum/img/smilies', 'images/forums/emoticons')
-
         if highlight:
             return re.sub(r'(%s)' % re.escape(highlight),
                           r'<span class="search-match">\1</span>',
-                          result, flags=re.IGNORECASE)
+                          self.body_html, flags=re.IGNORECASE)
 
-        return result
+        return self.body_html
 
     def save(self, commit=True):
         from standardweb.lib import forums
