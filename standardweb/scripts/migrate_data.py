@@ -15,7 +15,7 @@ def migrate_post_topic_counts():
                 post_count += topic.post_count
 
                 for post in topic.posts:
-                    post.body.replace('[size ', '[size=')
+                    post.body = post.body.replace('[size ', '[size=')
                     post.save(commit=False)
 
             forum.post_count = post_count
