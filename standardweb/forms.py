@@ -3,12 +3,15 @@ from standardweb.lib import csrf
 from flask import request
 
 from flask_wtf import Form
-from wtforms import HiddenField, PasswordField, SelectField, TextField, TextAreaField
-from wtforms.validators import DataRequired, Length
+from wtforms import HiddenField, FileField, PasswordField, SelectField, TextField, TextAreaField
+from wtforms.validators import DataRequired, Length, ValidationError
 from wtforms.widgets import HTMLString, html_params, Select
 
 from urlparse import urljoin
 from urlparse import urlparse
+
+
+VALID_IMAGE_UPLOAD_EXTENSIONS = set(['jpg', 'jpeg', 'gif', 'png'])
 
 
 def _is_safe_url(target):
@@ -111,6 +114,17 @@ class BaseForm(Form):
             self.csrf_token.data = csrf.get_token()
 
 
+class ImageUploadForm(BaseForm):
+    image = FileField('Image (Optional)')
+
+    def validate_image(self, field):
+        if field.data and not isinstance(field.data, basestring):
+            extension = field.data.filename.rsplit('.', 1)[1]
+
+            if extension not in VALID_IMAGE_UPLOAD_EXTENSIONS:
+                raise ValidationError('Must be an image file')
+
+
 # inspired by http://flask.pocoo.org/snippets/63/
 class RedirectForm(BaseForm):
     next = HiddenField()
@@ -127,12 +141,12 @@ class LoginForm(RedirectForm):
     password = PasswordField('Password', validators=[DataRequired()])
 
 
-class NewTopicForm(BaseForm):
+class NewTopicForm(ImageUploadForm):
     title = TextField('Title', validators=[DataRequired()])
     body = TextAreaField('Body', validators=[DataRequired()])
 
 
-class PostForm(BaseForm):
+class PostForm(ImageUploadForm):
     body = TextAreaField('Body', validators=[DataRequired()])
 
 

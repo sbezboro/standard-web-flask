@@ -11,6 +11,7 @@ from flask import session
 from standardweb.forms import LoginForm, MoveTopicForm, PostForm, NewTopicForm, ForumSearchForm
 from standardweb.lib import api
 from standardweb.lib import cache as libcache
+from standardweb.lib import forums as libforums
 from standardweb.lib import leaderboards as libleaderboards
 from standardweb.lib import player as libplayer
 from standardweb.lib import server as libserver
@@ -516,7 +517,7 @@ def forum(forum_id):
     return render_template('forums/forum.html', **retval)
 
 
-@app.route('/forums/topic/<int:topic_id>')
+@app.route('/forums/topic/<int:topic_id>', methods=['GET', 'POST'])
 def forum_topic(topic_id):
     topic = ForumTopic.query.options(
         joinedload(ForumTopic.forum)
@@ -567,10 +568,54 @@ def forum_topic(topic_id):
         for stats in player_stats
     }
 
-    if g.user:
-        topic.update_read(g.user)
+    user = g.user
+
+    if user:
+        topic.update_read(user)
 
     form = PostForm()
+
+    if form.validate_on_submit():
+        if not user:
+            flash('You must log in before you can do that', 'warning')
+            return redirect(url_for('login', next=request.path))
+
+        if topic.deleted:
+            flash('That topic no longer exists', 'warning')
+            return redirect(url_for('forum', forum_id=topic.forum_id))
+
+        if topic.closed:
+            flash('That topic has been locked', 'warning')
+            return redirect(url_for('forum', forum_id=topic.forum_id))
+
+        if user.forum_ban:
+            abort(403)
+
+        body = form.body.data
+        image = form.image.data
+
+        post = ForumPost(topic_id=topic.id, user=user, body=body, user_ip=request.remote_addr)
+
+        user.forum_profile.post_count += 1
+        user.forum_profile.save(commit=False)
+
+        topic.forum.last_post = post
+        topic.forum.post_count += 1
+        topic.forum.save(commit=False)
+
+        topic.updated = datetime.utcnow()
+        topic.last_post = post
+        topic.post_count += 1
+
+        post.save(commit=True)
+
+        if image:
+            libforums.save_attachment(post, image, commit=True)
+
+        api.forum_post(user.player.username if user.player else user.username,
+                       topic.forum.name, topic.name, post.url)
+
+        return redirect(post.url)
 
     retval = {
         'topic': topic,
@@ -621,8 +666,9 @@ def new_topic(forum_id):
     form = NewTopicForm()
 
     if form.validate_on_submit():
-        title = request.form['title']
-        body = request.form['body']
+        title = form.title.data
+        body = form.body.data
+        image = form.image.data
 
         topic = ForumTopic(forum=forum, user=user, name=title)
         topic.save(commit=True)
@@ -642,6 +688,9 @@ def new_topic(forum_id):
         topic.post_count += 1
         topic.save(commit=True)
 
+        if image:
+            libforums.save_attachment(post, image, commit=True)
+
         api.forum_post(user.player.username if user.player else user.username,
                        topic.forum.name, topic.name, post.url)
 
@@ -653,58 +702,6 @@ def new_topic(forum_id):
     }
 
     return render_template('forums/new_topic.html', **retval)
-
-
-@app.route('/forums/topic/<int:topic_id>/new_post', methods=['POST'])
-def new_post(topic_id):
-    topic = ForumTopic.query.options(
-        joinedload(ForumTopic.forum)
-    ).get(topic_id)
-
-    if not topic:
-        abort(404)
-
-    if not g.user:
-        flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login', next=request.path))
-
-    if topic.deleted:
-        flash('That topic no longer exists', 'warning')
-        return redirect(url_for('forum', forum_id=topic.forum_id))
-
-    if topic.closed:
-        flash('That topic has been locked', 'warning')
-        return redirect(url_for('forum', forum_id=topic.forum_id))
-
-    user = g.user
-
-    if user.forum_ban:
-        abort(403)
-
-    form = PostForm()
-
-    if form.validate_on_submit():
-        body = request.form['body']
-
-        post = ForumPost(topic_id=topic.id, user=user, body=body, user_ip=request.remote_addr)
-
-        user.forum_profile.post_count += 1
-        user.forum_profile.save(commit=False)
-
-        topic.forum.last_post = post
-        topic.forum.post_count += 1
-        topic.forum.save(commit=False)
-
-        topic.updated = datetime.utcnow()
-        topic.last_post = post
-        topic.post_count += 1
-
-        post.save(commit=True)
-
-        api.forum_post(user.player.username if user.player else user.username,
-                       topic.forum.name, topic.name, post.url)
-
-        return redirect(post.url)
 
 
 @app.route('/forums/post/<int:post_id>/edit', methods=['GET', 'POST'])
@@ -1021,6 +1018,7 @@ def _redirect_old_url(old_rule, endpoint, route_kw_func=None):
     app.add_url_rule(old_rule, endpoint + '_old', redirector)
 
 _redirect_old_url('/forum/', 'forums')
+_redirect_old_url('/forum/<int:forum_id>/', 'forum', lambda forum_id: {'forum_id': forum_id})
 _redirect_old_url('/forum/topic/<int:topic_id>/', 'forum_topic', lambda topic_id: {'topic_id': topic_id})
 _redirect_old_url('/forum/post/<int:post_id>/', 'forum_post', lambda post_id: {'post_id': post_id})
 

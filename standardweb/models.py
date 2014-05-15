@@ -549,6 +549,13 @@ class ForumAttachment(db.Model, Base):
 
     post = db.relationship('ForumPost', backref=db.backref('attachments'))
 
+    def save(self, commit=True):
+        import hashlib
+
+        self.hash = hashlib.sha1(self.name + app.config['SECRET_KEY']).hexdigest()
+
+        return super(ForumAttachment, self).save(commit)
+
     @property
     def url(self):
         return url_for('forum_attachment', hash=self.hash)
