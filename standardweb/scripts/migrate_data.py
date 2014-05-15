@@ -15,7 +15,7 @@ def migrate_post_topic_counts():
                 post_count += topic.post_count
 
                 for post in topic.posts:
-                    # rebuild body_html
+                    post.body.replace('[size ', '[size=')
                     post.save(commit=False)
 
             forum.post_count = post_count
@@ -27,8 +27,6 @@ def migrate_post_topic_counts():
 
 
 def main():
-    app.config.from_object('settings')
-
     try:
         migrate_post_topic_counts()
     except:
@@ -42,4 +40,6 @@ def main():
 
 if __name__ == '__main__':
     with app.test_request_context():
+        app.config.from_object('settings')
+
         main()
