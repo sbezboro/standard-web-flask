@@ -115,7 +115,7 @@ class BaseForm(Form):
 
 
 class ImageUploadForm(BaseForm):
-    image = FileField('Image (Optional)')
+    image = FileField('Image (optional)')
 
     def validate_image(self, field):
         if field.data and not isinstance(field.data, basestring):

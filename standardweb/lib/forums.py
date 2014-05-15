@@ -43,7 +43,7 @@ _emoticon_map = {
 }
 
 emoticon_map = [
-    (re.compile(cgi.escape(k)), '<img src="%s"/>' % '/static/images/forums/' + v)
+    (re.compile(cgi.escape(k)), '<img src="%s"/>' % ('/static/images/forums/' + v))
     for k, v in _emoticon_map.iteritems()
 ]
 
