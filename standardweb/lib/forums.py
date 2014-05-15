@@ -53,8 +53,10 @@ def convert_bbcode(text):
 
 
 def _render_size(tag_name, value, options, parent, context):
+    size = 1
+
     if 'size' in options:
-        size = int(options.get('size', 1))
+        size = options['size']
     elif len(options) == 1:
         key, val = options.items()[0]
 
@@ -62,11 +64,8 @@ def _render_size(tag_name, value, options, parent, context):
             size = val
         elif key:
             size = key
-    else:
-        size = 1
 
     return '<font size="%s">%s</font>' % (size, value)
-
 
 
 def _render_quote(tag_name, value, options, parent, context):
