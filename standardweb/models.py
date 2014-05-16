@@ -357,6 +357,23 @@ class PlayerActivity(db.Model, Base):
     player = db.relationship('Player')
 
 
+player_title = db.Table('player_title',
+    db.Column('player_id', db.Integer, db.ForeignKey('player.id')),
+    db.Column('title_id', db.Integer, db.ForeignKey('title.id')))
+
+
+class Title(db.Model, Base):
+    __tablename__ = 'title'
+
+    id = db.Column(db.Integer, primary_key=True)
+    created = db.Column(db.DateTime, default=datetime.utcnow)
+    name = db.Column(db.String(20))
+    displayname = db.Column(db.String(40))
+
+    players = db.relationship('Player', secondary=player_title,
+                              backref=db.backref('titles'))
+
+
 class VeteranStatus(db.Model, Base):
     __tablename__ = 'veteranstatus'
 
