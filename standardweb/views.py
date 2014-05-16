@@ -11,7 +11,6 @@ from flask import session
 from standardweb.forms import LoginForm, MoveTopicForm, PostForm, NewTopicForm, ForumSearchForm
 from standardweb.lib import api
 from standardweb.lib import cache as libcache
-from standardweb.lib import forums as libforums
 from standardweb.lib import leaderboards as libleaderboards
 from standardweb.lib import player as libplayer
 from standardweb.lib import server as libserver
@@ -610,7 +609,8 @@ def forum_topic(topic_id):
         post.save(commit=True)
 
         if image:
-            libforums.save_attachment(post, image, commit=True)
+            if not ForumAttachment.create_attachment(post.id, image, commit=True):
+                flash('There was a problem with the upload', 'error')
 
         api.forum_post(user.player.username if user.player else user.username,
                        topic.forum.name, topic.name, post.url)
@@ -689,7 +689,8 @@ def new_topic(forum_id):
         topic.save(commit=True)
 
         if image:
-            libforums.save_attachment(post, image, commit=True)
+            if not ForumAttachment.create_attachment(post.id, image, commit=True):
+                flash('There was a problem with the upload', 'error')
 
         api.forum_post(user.player.username if user.player else user.username,
                        topic.forum.name, topic.name, post.url)
@@ -1006,7 +1007,7 @@ def forum_attachment(hash):
     attachment = ForumAttachment.query.filter_by(hash=hash).first()
     f = file(attachment.file_path, 'rb')
 
-    return send_file(f, mimetype=attachment.content_type, as_attachment=True)
+    return send_file(f, mimetype=attachment.content_type)
 
 
 def _redirect_old_url(old_rule, endpoint, route_kw_func=None):

@@ -549,10 +549,28 @@ class ForumAttachment(db.Model, Base):
 
     post = db.relationship('ForumPost', backref=db.backref('attachments'))
 
+    @classmethod
+    def create_attachment(cls, post_id, image, commit=True):
+        try:
+            content_type = image.headers.get('Content-Type')
+            image_content = image.content
+            size = len(image_content)
+            path = str(post_id)
+
+            attachment = cls(post_id=post_id, size=size, content_type=content_type, path=path, name=image.filename)
+            attachment.save(commit=commit)
+
+            with open(attachment.file_path, 'w') as f:
+                f.write(image_content)
+
+            return attachment
+        except:
+            return None
+
     def save(self, commit=True):
         import hashlib
 
-        self.hash = hashlib.sha1(self.name + app.config['SECRET_KEY']).hexdigest()
+        self.hash = hashlib.sha1(self.path + app.config['SECRET_KEY']).hexdigest()
 
         return super(ForumAttachment, self).save(commit)
 

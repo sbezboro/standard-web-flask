@@ -1,5 +1,3 @@
-from standardweb.models import ForumAttachment
-
 import bbcode
 
 import cgi
@@ -81,16 +79,3 @@ _bbcode_parser.add_simple_formatter('youtube', '<iframe width="516" height="315"
 
 _bbcode_parser.add_formatter('size', _render_size)
 _bbcode_parser.add_formatter('quote', _render_quote)
-
-
-def save_attachment(post, image, commit=True):
-    content_type = image.headers.get('Content-Type')
-    image_content = image.stream.read()
-    size = len(image_content)
-    path = str(post.id)
-
-    attachment = ForumAttachment(post_id=post.id, size=size, content_type=content_type, path=path, name=image.filename)
-    attachment.save(commit=commit)
-
-    with open(attachment.file_path, 'w') as f:
-        f.write(image_content)

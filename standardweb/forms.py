@@ -12,6 +12,7 @@ from urlparse import urlparse
 
 
 VALID_IMAGE_UPLOAD_EXTENSIONS = set(['jpg', 'jpeg', 'gif', 'png'])
+MAX_UPLOAD_FILE_SIZE = 1024 * 1024 * 5 # 5MB
 
 
 def _is_safe_url(target):
@@ -120,9 +121,16 @@ class ImageUploadForm(BaseForm):
     def validate_image(self, field):
         if field.data and not isinstance(field.data, basestring):
             extension = field.data.filename.rsplit('.', 1)[1]
+            content = field.data.stream.read()
+            length = len(content)
 
-            if extension not in VALID_IMAGE_UPLOAD_EXTENSIONS:
+            if extension.lower() not in VALID_IMAGE_UPLOAD_EXTENSIONS:
                 raise ValidationError('Must be an image file')
+
+            if length > MAX_UPLOAD_FILE_SIZE:
+                raise ValidationError('File must be smaller than %dMB' % (MAX_UPLOAD_FILE_SIZE / 1024 / 1024))
+
+            field.data.content = content
 
 
 # inspired by http://flask.pocoo.org/snippets/63/
