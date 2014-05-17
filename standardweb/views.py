@@ -441,6 +441,12 @@ def forum_search():
 
         topics = result.all()
 
+        if page == 1:
+            rollbar.report_message('Forum searched', level='info', request=request, extra_data={
+                'query': query,
+                'num_topics': num_topics
+            })
+
         retval.update({
             'query': query,
             'topics': topics,
