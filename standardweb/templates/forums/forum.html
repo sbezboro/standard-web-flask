@@ -22,68 +22,8 @@
         <table class="forum-topic-table">
             {% for topic in topics %}
                 {% with active = topic.id in active_topic_ids %}
-                <tr class="{% if topic.sticky %}sticky{% else %}{% if topic.user.admin %}admin{% endif %} {% if topic.closed %}closed{% endif %}{% endif %}">
-                    <td>
-                        {% if topic.closed %}
-                            <img src="{{ url_for('static', filename='images/forums/closed_topic.png') }}">
-                        {% elif active %}
-                            <img src="{{ url_for('static', filename='images/forums/active_topic.png') }}">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='images/forums/inactive_topic.png') }}">
-                        {% endif %}
-                    </td>
-                    <td class="topic-cell">
-                        {% if topic.sticky %}Sticky:{% endif %}
-                        <a class="name {% if active %}active{% endif %}" href="{{ topic.url }}">{{ topic.name }}</a>
-                        <div class="description">
-                            {% if topic.user.player %}
-                                <a href="{{ url_for('player', username=topic.user.player.username) }}">
-                                    {{ topic.user.player.username|face_thumb }} {{ topic.user.player.displayname_html|safe }}
-                                </a>
-                            {% else %}
-                                {{ topic.user.username }}
-                            {% endif %} -
-                            <abbr class="timeago" title="{{ topic.created | iso_date }}">{{ topic.created }}</abbr>
-                            {% if topic.post_count > 20 %}
-                                -
-                                <span class="pages">
-                                {% for page in range(1, (topic.post_count // 20) + 2) %}
-                                    {% if page > 1 %}
-                                        <a href="{{ url_for('forum_topic', topic_id=topic.id, p=page) }}">{{ page }}</a>
-                                    {% else %}
-                                        <a href="{{ url_for('forum_topic', topic_id=topic.id) }}">{{ page }}</a>
-                                    {% endif %}
-                                {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="count">
-                            <b>{{ topic.replies }}</b> {{ 'reply' if topic.replies == 1 else 'replies' }}
-                        </div>
-                        <div class="count">
-                            <b>{{ topic.views }}</b> {{ 'view' if topic.views == 1 else 'views' }}
-                        </div>
-                    </td>
-                    <td class="last-post-cell">
-                        {% with last_post = topic.last_post, last_post_user = last_post.user %}
-                        <div>
-                            <b>Last post:</b> <a href="{{ last_post.url }}"><abbr class="timeago" title="{{ last_post.created | iso_date }}">{{ last_post.created }}</abbr></a>
-                        </div>
-                        <div>
-                            {% if last_post_user.player %}
-                                <a href="{{ url_for('player', username=last_post_user.player.username) }}">
-                                    {{ last_post_user.player.username|face_thumb }} {{ last_post_user.player.displayname_html|safe }}
-                                </a>
-                            {% else %}
-                                {{ last_post_user.username }}
-                            {% endif %}
-                        </div>
-                        {% endwith %}
-                    </td>
-                </tr>
-            {% endwith %}
+                    {{ topic_row(topic, active=active) }}
+                {% endwith %}
             {% endfor %}
         </table>
     </div>
