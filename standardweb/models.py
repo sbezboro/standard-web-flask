@@ -184,7 +184,6 @@ class MojangStatus(db.Model, Base):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     website = db.Column(db.Boolean)
-    login = db.Column(db.Boolean)
     session = db.Column(db.Boolean)
     account = db.Column(db.Boolean)
     auth = db.Column(db.Boolean)

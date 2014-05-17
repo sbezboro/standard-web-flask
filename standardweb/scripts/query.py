@@ -110,30 +110,23 @@ def _query_server(server, mojang_status):
 
 
 def _get_mojang_status():
+    statuses = {}
+
     try:
         resp = requests.get('http://status.mojang.com/check')
         result = resp.json()
 
-        website = result[0].get('minecraft.net') == 'green'
-        login = result[1].get('login.minecraft.net') == 'green'
-        session = result[2].get('session.minecraft.net') == 'green'
-        account = result[3].get('account.mojang.com') == 'green'
-        auth = result[4].get('auth.mojang.com') == 'green'
-        skins = result[5].get('skins.minecraft.net') == 'green'
+        for status in result:
+            for k, v in status.items():
+                statuses[k] = v == 'green'
     except:
-        website = False
-        login = False
-        session = False
-        account = False
-        auth = False
-        skins = False
+        pass
 
-    mojang_status = MojangStatus(website=website,
-                                 login=login,
-                                 session=session,
-                                 account=account,
-                                 auth=auth,
-                                 skins=skins)
+    mojang_status = MojangStatus(website=statuses.get('minecraft.net', False),
+                                 session=statuses.get('session.minecraft.net', False),
+                                 account=statuses.get('account.mojang.com', False),
+                                 auth=statuses.get('auth.mojang.com', False),
+                                 skins=statuses.get('skins.minecraft.net', False))
     mojang_status.save(commit=True)
 
     return mojang_status
