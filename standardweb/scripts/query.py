@@ -102,7 +102,6 @@ def _query_server(server, mojang_status):
 
     api.send_stats(server, {
         'player_stats': player_stats,
-        'login': mojang_status.login,
         'session': mojang_status.session,
         'account': mojang_status.account,
         'auth': mojang_status.auth
@@ -153,7 +152,6 @@ def main():
             print 'Done with server %d in %d milliseconds' % (server.id, duration)
 
     extra_data = {'server.%d.ms' % server_id: duration for server_id, duration in durations}
-    extra_data['login'] = mojang_status.login
     extra_data['session'] = mojang_status.session
     rollbar.report_message('Server queries complete', 'debug',
                            extra_data=extra_data)
