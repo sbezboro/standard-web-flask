@@ -378,7 +378,7 @@ def forum_search():
     form.forum_id.choices = choices
 
     form.sort_by.choices = [
-        ('post_desc', 'Post Date Descending '),
+        ('post_desc', 'Post Date Descending'),
         ('post_asc', 'Post Date Ascending')
     ]
 
@@ -1038,7 +1038,7 @@ def chat(server_id=None):
 
     server = Server.query.get(server_id)
 
-    if not server:
+    if not server or not server.online:
         abort(404)
 
     if g.user:
@@ -1070,7 +1070,7 @@ def admin(server_id=None):
 
     server = Server.query.get(server_id)
 
-    if not server:
+    if not server or not server.online:
         abort(404)
 
     retval = {
