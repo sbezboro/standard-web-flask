@@ -1114,6 +1114,10 @@ fieldset {
 }
 
 .forum-form-section input[type='text'] {
+    width: 30%;
+}
+
+.forum-form-section input[type='text'].big {
     width: 50%;
 }
 

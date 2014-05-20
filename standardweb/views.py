@@ -386,12 +386,13 @@ def forum_search():
         'form': form
     }
 
-    if 'query' in request.args and form.validate():
+    if ('query' in request.args or 'user_id' in request.args) and form.validate():
         query = form.query.data
         forum_id = form.forum_id.data
         sort_by = form.sort_by.data
+        user_id = form.user_id.data
 
-        order = ForumPost.created.asc()
+        order = ForumPost.created.desc()
 
         if sort_by == 'post_asc':
             order = ForumPost.created.asc()
@@ -402,9 +403,13 @@ def forum_search():
         # but the topic ids can show up duplicated (ie. more than one
         # matching post in the same topic)
         result = ForumPost.query.with_entities(ForumPost.topic_id) \
-            .join(ForumPost.topic).filter(ForumPost.deleted == False,
-                                          ForumPost.body.ilike('%%%s%%' % query)) \
+            .join(ForumPost.topic).filter(ForumPost.deleted == False) \
             .order_by(order)
+
+        if user_id:
+            result = result.filter(ForumPost.user_id == user_id)
+        else:
+            result = result.filter(ForumPost.body.ilike('%%%s%%' % query))
 
         if forum_id:
             result = result.filter(ForumTopic.forum_id == forum_id)
@@ -441,7 +446,9 @@ def forum_search():
 
         topics = result.all()
 
-        if page == 1:
+        if user_id:
+            retval['by_user'] = User.query.options(joinedload(User.player)).get(user_id)
+        elif page == 1:
             rollbar.report_message('Forum searched', level='info', request=request, extra_data={
                 'query': query,
                 'num_topics': num_topics
@@ -569,7 +576,7 @@ def forum_topic(topic_id):
                                             PlayerStats.player_id.in_(player_ids))
 
     player_stats = {
-        stats.player: (stats, None)
+        stats.player: stats
         for stats in player_stats
     }
 

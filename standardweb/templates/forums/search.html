@@ -5,7 +5,11 @@
 {% block forum_content %}
     <div class="breadcrumbs">
         <a href="{{ url_for('forums') }}">Forums</a> &rarr;
-        Search
+        {% if query or by_user %}
+            <a href="{{ url_for('forum_search') }}">Search</a>
+        {% else %}
+            Search
+        {% endif %}
     </div>
     <div class="forum-form-section forum-search">
         <h4>
@@ -14,11 +18,26 @@
         <div>
             <form action="{{ url_for('forum_search') }}" method="get">
                 <fieldset>
-                    <div class="control-group">
-                        <label class="control-label">{{ form.query.label }}</label>
-                        <span class="control-errors">{% if form.query.errors %}{{ form.query.errors[0] }}{% endif %}</span>
-                        <div class="control">{{ form.query() }}</div>
-                    </div>
+                    {% if by_user %}
+                        <input type="hidden" name="user_id" value="{{ form.user_id.data }}" />
+                        <div class="control-group">
+                            <label class="control-label">{{ form.user_id.label }}</label>
+                            <span class="control-errors">{% if form.user_id.errors %}{{ form.user_id.errors[0] }}{% endif %}</span>
+                            <div class="control">
+                                {% if by_user.player %}
+                                    {{ by_user.player.displayname_html|safe }}
+                                {% else %}
+                                    {{ by_user.username }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="control-group">
+                            <label class="control-label">{{ form.query.label }}</label>
+                            <span class="control-errors">{% if form.query.errors %}{{ form.query.errors[0] }}{% endif %}</span>
+                            <div class="control">{{ form.query() }}</div>
+                        </div>
+                    {% endif %}
 
                     <div class="control-group">
                         <label class="control-label">{{ form.forum_id.label }}</label>
@@ -41,7 +60,7 @@
             </form>
         </div>
     </div>
-    {% if query %}
+    {% if query or by_user %}
         <div class="button-area">
             {{ pages() }}
         </div>

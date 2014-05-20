@@ -23,7 +23,7 @@
                 <div class="post-author {% if post.user.admin %}admin{% endif %}"
                      data-username="{{ post.user.player.username if post.user.player else post.user.username }}">
                     {% if post.user.player %}
-                        {% with stats, rank = player_stats.get(post.user.player, (None, None)) %}
+                        {% with stats = player_stats.get(post.user.player) %}
                             <a href="{{ url_for('player', username=post.user.player.username) }}">
                                 {{ post.user.player.username | face_large }}
                             </a>
@@ -36,7 +36,7 @@
                                         ({{ post.user.player.username }})
                                     {% endif %}
                                 </h5>
-                                <b>Posts:</b> {{ post.user.forum_profile.post_count }}
+                                <b>Posts:</b> {{ post.user.forum_profile.post_count }} - <a href="{{ url_for('forum_search', user_id=post.user.id) }}">see all</a>
                                 {% if stats %}
                                     <br/>
                                     <b>Time played:</b> {{ h.elapsed_time_string(stats.time_spent) }}
@@ -130,7 +130,7 @@
         {% else %}
             <div class="forum-form-section">
                 <h4>
-                    Quick Reply
+                    Reply
                 </h4>
                 <div>
                     <form class="post-form" action="{{ url_for('forum_topic', topic_id=topic.id, p=page) }}" method="post" enctype="multipart/form-data">

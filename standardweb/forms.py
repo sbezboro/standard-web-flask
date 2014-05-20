@@ -4,7 +4,7 @@ from flask import request
 
 from flask_wtf import Form
 from wtforms import HiddenField, FileField, PasswordField, SelectField, TextField, TextAreaField
-from wtforms.validators import DataRequired, Length, ValidationError
+from wtforms.validators import DataRequired, Length, Optional, ValidationError
 from wtforms.widgets import HTMLString, html_params, Select
 
 from urlparse import urljoin
@@ -163,6 +163,7 @@ class MoveTopicForm(BaseForm):
 
 
 class ForumSearchForm(BaseForm):
-    query = TextField('Post contains', validators=[DataRequired(), Length(min=3)])
-    forum_id = ExtendedSelectField('Forum')
-    sort_by = SelectField('Sort by', validators=[DataRequired()])
+    query = TextField('Post contains', validators=[Optional(), Length(min=3)])
+    user_id = TextField('User', validators=[Optional()])
+    forum_id = ExtendedSelectField('Forum', validators=[Optional()], default='')
+    sort_by = SelectField('Sort by', validators=[Optional()], default='')
