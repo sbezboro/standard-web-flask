@@ -173,7 +173,10 @@ def player(username, server_id=None):
                                     server_id=app.config['MAIN_SERVER_ID']))
     else:
         retval['username'] = username
-        player = Player.query.filter_by(username=username).first()
+        player = Player.query.options(
+            joinedload(Player.user)
+            .joinedload(User.forum_profile)
+        ).filter_by(username=username).first()
 
     if not player:
         # the username doesn't belong to any player seen on any server

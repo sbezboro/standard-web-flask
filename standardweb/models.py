@@ -395,6 +395,16 @@ class ForumProfile(db.Model, Base):
 
     user = db.relationship('User', backref=db.backref('forum_profile', uselist=False))
 
+    @property
+    def last_post(self):
+        post = ForumPost.query.filter(ForumPost.deleted == False,
+                                      ForumPost.user_id == self.user_id) \
+            .order_by(ForumPost.created.desc()) \
+            .limit(1) \
+            .first()
+
+        return post
+
 
 class ForumCategory(db.Model, Base):
     __tablename__ = 'forum_category'

@@ -34,6 +34,26 @@
                     <span class="banned">BANNED</span>
                 {% endif %}
             </h1>
+            {% if player.user %}
+                {% with profile = player.user.forum_profile, last_post = profile.last_post %}
+                    {% if profile and profile.post_count and last_post %}
+                        <div class="player-forum-section">
+                            <h3>Forum posts:</h3>
+                            <a href="{{ url_for('forum_search', user_id=player.user.id) }}">{{ profile.post_count }}</a>
+                        </div>
+                        <div class="player-forum-section">
+                            <h3>Last post:</h3> <a href="{{ last_post.url }}"><abbr class="timeago" title="{{ last_post.created | iso_date }}">{{ last_post.created | iso_date }}</abbr></a>
+                        </div>
+                        {% if profile.location %}
+                        <div class="player-forum-section">
+                            <h3>Location:</h3>
+                            <a href="https://maps.google.com/maps?q={{ profile.location }}">{{ profile.location }}</a>
+                        </div>
+                        {% endif %}
+                        <div class="clear"></div>
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
         </div>
     </div>
     <div class="nav-header">
