@@ -187,8 +187,8 @@ def rank_query():
     else:
         player = Player.query.filter(or_(Player.username.ilike('%%%s%%' % username),
                                          Player.nickname.ilike('%%%s%%' % username)))\
-        .order_by(func.ifnull(Player.nickname, Player.username))\
-        .limit(1).first()
+            .order_by(func.ifnull(Player.nickname, Player.username))\
+            .limit(1).first()
 
     if not player:
         return jsonify({

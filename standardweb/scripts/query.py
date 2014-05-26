@@ -5,6 +5,8 @@ from standardweb.models import *
 from standardweb.lib import api
 from standardweb.lib.constants import *
 
+from sqlalchemy.orm import joinedload
+
 from datetime import datetime, timedelta
 import time
 
@@ -23,7 +25,9 @@ def _query_server(server, mojang_status):
         username = player_info['username']
         uuid = player_info['uuid']
 
-        player = Player.query.filter_by(uuid=uuid).first()
+        player = Player.query.options(
+            joinedload(Player.titles)
+        ).filter_by(uuid=uuid).first()
 
         if player:
             if player.username != username:
@@ -69,6 +73,31 @@ def _query_server(server, mojang_status):
         stats.pvp_logs = player_info.get('pvp_logs')
         stats.time_spent = (stats.time_spent or 0) + 1
         stats.save(commit=False)
+
+        veteran_statuses = VeteranStatus.query.filter_by(player=player)
+        for veteran_status in veteran_statuses:
+            server_id = veteran_status.server_id
+            rank = veteran_status.rank
+
+            server_name = {
+                1: 'SS I',
+                2: 'SS II',
+                4: 'SS III'
+            }[server_id]
+
+            if rank <= 10:
+                veteran_group = 'Top 10 Veteran'
+            elif rank <= 40:
+                veteran_group = 'Top 40 Veteran'
+            else:
+                veteran_group = 'Veteran'
+
+            title_name = '%s %s' % (server_name, veteran_group)
+            title = Title.query.filter_by(name=title_name).first()
+
+            if title and title not in player.titles:
+                player.titles.append(title)
+                player.save(commit=False)
         
         player_stats.append({
             'username': player.username,
@@ -155,8 +184,6 @@ def main():
     extra_data['session'] = mojang_status.session
     rollbar.report_message('Server queries complete', 'debug',
                            extra_data=extra_data)
-
-
 
 
 if __name__ == '__main__':
