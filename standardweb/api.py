@@ -11,6 +11,7 @@ from standardweb.lib import helpers as h
 
 from sqlalchemy import or_
 from sqlalchemy.sql.expression import func
+from sqlalchemy.orm import joinedload
 
 import rollbar
 
@@ -183,9 +184,13 @@ def rank_query():
     uuid = request.args.get('uuid')
 
     if uuid:
-        player = Player.query.filter_by(uuid=uuid).first()
+        player = Player.query.options(
+            joinedload(Player.titles)
+        ).filter_by(uuid=uuid).first()
     else:
-        player = Player.query.filter(or_(Player.username.ilike('%%%s%%' % username),
+        player = Player.query.options(
+                joinedload(Player.titles)
+            ).filter(or_(Player.username.ilike('%%%s%%' % username),
                                          Player.nickname.ilike('%%%s%%' % username)))\
             .order_by(func.ifnull(Player.nickname, Player.username))\
             .limit(1).first()
@@ -204,24 +209,42 @@ def rank_query():
 
     time = h.elapsed_time_string(stats.time_spent)
 
-    veteran_status = VeteranStatus.query.filter_by(server_id=1, player=player).first()
-    if veteran_status:
-        veteran_rank = veteran_status.rank
-    else:
-        veteran_rank = None
+    veteran_statuses = VeteranStatus.query.filter_by(player=player)
+    for veteran_status in veteran_statuses:
+        server_id = veteran_status.server_id
+        rank = veteran_status.rank
+
+        server_name = {
+            1: 'SS I',
+            2: 'SS II',
+            4: 'SS III'
+        }[server_id]
+
+        if rank <= 10:
+            veteran_group = 'Top 10 Veteran'
+        elif rank <= 40:
+            veteran_group = 'Top 40 Veteran'
+        else:
+            veteran_group = 'Veteran'
+
+        title_name = '%s %s' % (server_name, veteran_group)
+        title = Title.query.filter_by(name=title_name).first()
+
+        if title and title not in player.titles:
+            player.titles.append(title)
+            player.save(commit=True)
+
+    titles = [{'name': x.name, 'broadcast': x.broadcast} for x in player.titles]
 
     retval = {
         'err': 0,
         'rank': stats.rank,
         'time': time,
-        'minutes': stats.time_spent
+        'minutes': stats.time_spent,
+        'username': player.username,
+        'titles': titles
     }
 
-    if veteran_rank:
-        retval['veteran_rank'] = veteran_rank
-
-    retval['username'] = player.username
-    
     return jsonify(retval)
 
 

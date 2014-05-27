@@ -74,36 +74,14 @@ def _query_server(server, mojang_status):
         stats.time_spent = (stats.time_spent or 0) + 1
         stats.save(commit=False)
 
-        veteran_statuses = VeteranStatus.query.filter_by(player=player)
-        for veteran_status in veteran_statuses:
-            server_id = veteran_status.server_id
-            rank = veteran_status.rank
+        titles = [{'name': x.name, 'broadcast': x.broadcast} for x in player.titles]
 
-            server_name = {
-                1: 'SS I',
-                2: 'SS II',
-                4: 'SS III'
-            }[server_id]
-
-            if rank <= 10:
-                veteran_group = 'Top 10 Veteran'
-            elif rank <= 40:
-                veteran_group = 'Top 40 Veteran'
-            else:
-                veteran_group = 'Veteran'
-
-            title_name = '%s %s' % (server_name, veteran_group)
-            title = Title.query.filter_by(name=title_name).first()
-
-            if title and title not in player.titles:
-                player.titles.append(title)
-                player.save(commit=False)
-        
         player_stats.append({
             'username': player.username,
             'uuid': player.uuid,
             'minutes': stats.time_spent,
-            'rank': stats.rank
+            'rank': stats.rank,
+            'titles': titles
         })
     
     five_minutes_ago = datetime.utcnow() - timedelta(minutes=10)

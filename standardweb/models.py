@@ -368,6 +368,7 @@ class Title(db.Model, Base):
     created = db.Column(db.DateTime, default=datetime.utcnow)
     name = db.Column(db.String(20))
     displayname = db.Column(db.String(40))
+    broadcast = db.Column(db.Boolean, default=False)
 
     players = db.relationship('Player', secondary=player_title,
                               backref=db.backref('titles'))
