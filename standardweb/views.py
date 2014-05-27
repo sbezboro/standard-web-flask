@@ -1048,8 +1048,11 @@ def chat(server_id=None):
 
     server = Server.query.get(server_id)
 
-    if not server or not server.online:
+    if not server:
         abort(404)
+
+    if not server.online:
+        return redirect(url_for('chat', server_id=app.config['MAIN_SERVER_ID']))
 
     if g.user:
         player = g.user.player
@@ -1080,8 +1083,11 @@ def admin(server_id=None):
 
     server = Server.query.get(server_id)
 
-    if not server or not server.online:
+    if not server:
         abort(404)
+
+    if not server.online:
+        return redirect(url_for('admin', server_id=app.config['MAIN_SERVER_ID']))
 
     retval = {
         'server': server,

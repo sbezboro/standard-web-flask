@@ -60,7 +60,7 @@
         <div class="inner">
             <ul>
                 {% for s in servers %}
-                <li {% if s == server %}class="selected"{% endif %}>
+                <li class="{% if s == server %}selected{% endif %}">
                     <a class="tooltip" href="/{{s.id}}/player/{{ player.username }}" title="Address: {{ s.address }}">{{ s.name }}</a>
                 </li>
                 {% endfor %}
