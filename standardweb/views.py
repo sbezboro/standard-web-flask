@@ -276,7 +276,7 @@ def groups(server_id=None):
         joinedload(Group.members)
     ).filter_by(server=server) \
         .order_by(Group.member_count.desc(), Group.name) \
-        .limit(page_size + 1) \
+        .limit(page_size) \
         .offset((page - 1) * page_size)
 
     group_count = Group.query.filter_by(server=server).count()
