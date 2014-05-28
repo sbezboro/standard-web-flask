@@ -5,6 +5,7 @@ from standardweb.models import *
 from standardweb.lib import api
 from standardweb.lib.constants import *
 
+from sqlalchemy import not_
 from sqlalchemy.orm import joinedload
 
 from datetime import datetime, timedelta
@@ -83,7 +84,58 @@ def _query_server(server, mojang_status):
             'rank': stats.rank,
             'titles': titles
         })
-    
+
+    server_groups = server_status.get('groups', [])
+    group_uids = [x['uid'] for x in server_groups]
+    groups = Group.query.filter(Group.server == server, Group.uid.in_(group_uids))
+    group_map = {x.uid: x for x in groups}
+
+    for group_info in server_groups:
+        uid = group_info['uid']
+        name = group_info['name']
+        established = group_info['established']
+        land_count = group_info['land_count']
+        land_limit = group_info['land_limit']
+        members = group_info['members']
+
+        established = datetime.utcfromtimestamp(established / 1000)
+
+        group = group_map.get(uid)
+        if not group:
+            group = Group(uid=uid, server=server)
+
+        group.name = name
+        group.established = established
+        group.land_count = land_count
+        group.land_limit = land_limit
+        group.member_count = len(members)
+        group.save(commit=False)
+
+        player_stats = [p for p in PlayerStats.query.join(Player)
+            .filter(PlayerStats.server == server, Player.username.in_(members))]
+
+        for stat in player_stats:
+            stat.group = group
+            stat.save(commit=False)
+
+    removed_group_ids = []
+    removed_groups = Group.query.filter(Group.server == server, not_(Group.uid.in_(group_uids)))
+    for group in removed_groups:
+        removed_group_ids.append(group.id)
+
+    if removed_group_ids:
+        groupless = PlayerStats.query.filter(PlayerStats.server == server,
+                                             PlayerStats.group_id.in_(removed_group_ids))
+
+        for stat in groupless:
+            stat.group = None
+            stat.save(commit=False)
+
+        db.session.flush()
+
+        for group in removed_groups:
+            db.session.delete(group)
+
     five_minutes_ago = datetime.utcnow() - timedelta(minutes=10)
     result = PlayerStats.query.filter(PlayerStats.server == server,
                                       PlayerStats.last_seen > five_minutes_ago)

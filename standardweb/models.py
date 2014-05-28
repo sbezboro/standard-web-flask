@@ -141,9 +141,11 @@ class PlayerStats(db.Model, Base):
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     banned = db.Column(db.Boolean, default=False)
     pvp_logs = db.Column(db.Integer, default=0)
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'))
 
     server = db.relationship('Server')
     player = db.relationship('Player')
+    group = db.relationship('Group', backref=db.backref('members'))
 
     @property
     def is_online(self):
@@ -354,6 +356,21 @@ class PlayerActivity(db.Model, Base):
 
     server = db.relationship('Server')
     player = db.relationship('Player')
+
+
+class Group(db.Model, Base):
+    __tablename__ = 'group'
+
+    id = db.Column(db.Integer, primary_key=True)
+    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
+    uid = db.Column(db.String(32))
+    name = db.Column(db.String(20))
+    established = db.Column(db.DateTime)
+    land_count = db.Column(db.Integer)
+    land_limit = db.Column(db.Integer)
+    member_count = db.Column(db.Integer)
+
+    server = db.relationship('Server')
 
 
 player_title = db.Table('player_title',
