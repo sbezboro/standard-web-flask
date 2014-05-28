@@ -111,10 +111,10 @@ def _query_server(server, mojang_status):
         group.member_count = len(members)
         group.save(commit=False)
 
-        player_stats = [p for p in PlayerStats.query.join(Player)
+        stats = [p for p in PlayerStats.query.join(Player)
             .filter(PlayerStats.server == server, Player.username.in_(members))]
 
-        for stat in player_stats:
+        for stat in stats:
             stat.group = group
             stat.save(commit=False)
 
