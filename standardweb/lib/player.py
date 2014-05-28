@@ -28,7 +28,9 @@ def get_server_data(server, player):
     a particular server, or None if the player hasn't played on
     the given server yet.
     """
-    stats = PlayerStats.query.filter_by(server_id=server.id, player_id=player.id).first()
+    stats = PlayerStats.query.options(
+        joinedload(PlayerStats.group)
+    ).filter_by(server_id=server.id, player_id=player.id).first()
     if not stats:
         return stats
 
@@ -99,5 +101,6 @@ def get_server_data(server, player):
         'pvp_death_count': pvp_death_count,
         'other_kill_count': other_kill_count,
         'other_death_count': other_death_count,
-        'pvp_logs': stats.pvp_logs
+        'pvp_logs': stats.pvp_logs,
+        'group': stats.group
     }

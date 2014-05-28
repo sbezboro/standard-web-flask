@@ -36,6 +36,7 @@
             <div class="desktop">
                 <a href="/" class="strong {% block select_index %}{% endblock %}">Standard Survival</a>
                 <a class="{% block select_ranking %}{% endblock %}" href="{{ url_for('ranking', server_id=server.id if server else None) }}">Ranking</a>
+                <a class="{% block select_groups %}{% endblock %}" href="{{ url_for('groups', server_id=server.id if server else None) }}">Groups</a>
                 <a class="{% block select_leaderboards %}{% endblock %}" href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a>
                 <a class="{% block select_forum %}{% endblock %}" href="{{ url_for('forums') }}">Forums</a>
                 <a class="{% block select_chat %}{% endblock %}" href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a>
@@ -64,6 +65,7 @@
                 <ul id="mobile-nav-menu" style="display:none;">
                     <li><a href="/">Home</a></li>
                     <li><a href="{{ url_for('ranking', server_id=server.id if server else None) }}">Ranking</a></li>
+                    <li><a href="{{ url_for('groups', server_id=server.id if server else None) }}">Groups</a></li>
                     <li><a href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a></li>
                     <li><a href="{{ url_for('forums') }}">Forums</a></li>
                     <li><a href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a></li>

@@ -34,6 +34,7 @@ import rollbar
 PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
 TOPICS_PER_PAGE = 40
 POSTS_PER_PAGE = 20
+GROUPS_PER_PAGE = 10
 
 @app.route('/')
 def index():
@@ -250,6 +251,69 @@ def leaderboards(server_id=None):
     }
 
     return render_template('leaderboards.html', **retval)
+
+
+@app.route('/groups')
+@app.route('/<int:server_id>/groups')
+def groups(server_id=None):
+    if not server_id:
+        return redirect(url_for('groups', server_id=app.config['MAIN_SERVER_ID']))
+
+    server = Server.query.get(server_id)
+    if not server:
+        abort(404)
+
+    page_size = GROUPS_PER_PAGE
+
+    page = request.args.get('p')
+
+    try:
+        page = max(int(page), 1) if page else 1
+    except:
+        page = 1
+
+    groups = Group.query.options(
+        joinedload(Group.members)
+    ).filter_by(server=server) \
+        .order_by(Group.member_count.desc(), Group.name) \
+        .limit(page_size + 1) \
+        .offset((page - 1) * page_size)
+
+    group_count = Group.query.filter_by(server=server).count()
+
+    retval = {
+        'server': server,
+        'servers': Server.query.all(),
+        'groups': groups,
+        'group_count': group_count,
+        'page': page,
+        'page_size': page_size
+    }
+
+    return render_template('groups.html', **retval)
+
+
+@app.route('/group/<name>')
+@app.route('/<int:server_id>/group/<name>')
+def group(name, server_id=None):
+    if not server_id:
+        return redirect(url_for('group', name=name,
+                                server_id=app.config['MAIN_SERVER_ID']))
+
+    server = Server.query.get(server_id)
+    if not server:
+        abort(404)
+
+    group = Group.query.options(
+        joinedload(Group.members)
+    ).filter_by(server=server, name=name).first()
+
+    retval = {
+        'server': server,
+        'group': group
+    }
+
+    return render_template('group.html', **retval)
 
 
 def _face_last_modified(username, size=16):

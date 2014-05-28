@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Groups - {{ server.address }} - Standard Survival Minecraft Server{% endblock %}
+
+{% block select_groups %}selected{% endblock %}
+{% block content %}
+    <div class="nav-header">
+        <div class="inner">
+            <ul>
+                {% for s in servers %}
+                <li {% if server == s %}class="selected"{% endif %}>
+                    <a class="tooltip" href="/{{s.id}}/groups" title="Address: {{ s.address }}">{{ s.name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div id="main">
+        <h2>Groups</h2>
+        <div class="groups">
+            {{ pages() }}
+            <table class="group-table">
+                {% for group in groups %}
+                    <tr>
+                        <td>
+                            <h3>
+                                <a href="{{ url_for('group', server_id=server.id, name=group.name) }}">
+                                    {{ group.name|safe }}
+                                </a>
+                            </h3>
+                            {% for member in group.members %}
+                                <a class="tooltip" href="{{ url_for('player', server_id=server.id, username=member.username) }}" title="{{ member.displayname }}">
+                                    {{ member.username|face_thumb }}
+                                </a>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {{ group.member_count }} {{'member' if group.member_count == 1 else 'members'}}
+                        </td>
+                        <td>
+                            Established <abbr class="timeago" title="{{ group.established|iso_date }}">{{ group.established|iso_date }}</abbr>
+                        </td>
+                    </tr>
+                {% else %}
+                    <h3>No groups exist on this server</h3>
+                {% endfor %}
+            </table>
+            {{ pages() }}
+        </div>
+    </div>
+{% endblock %}
+
+{% macro pages() %}
+    {% if group_count > page_size %}
+        <div class="pages">
+            <b>Pages:</b>
+            {% with end_page = ((group_count - 1) // page_size) + 1 %}
+            {% for p in range(1, end_page + 1) %}
+                {% if (p - page)|abs >= 3 and not p == end_page and not p == 1 %}
+                    {% if (p - page)|abs == 3 %}
+                        ...
+                    {% endif %}
+                    {% continue %}
+                {% endif %}
+
+                {% if p == page %}
+                    <span>{{ p }}</span>
+                {% elif p != 1 %}
+                    <a href="{{ url_for('groups', server_id=server.id, p=p) }}">{{ p }}</a>
+                {% else %}
+                    <a href="{{ url_for('groups', server_id=server.id) }}">{{ p }}</a>
+                {% endif %}
+            {% endfor %}
+            {% endwith %}
+        </div>
+    {% endif %}
+{%- endmacro %}

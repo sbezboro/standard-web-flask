@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if group %}
+        {{ group.name }} - {{ server.address }} - Standard Survival Minecraft Server
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if group %}
+    <div id="sub-header">
+        <div class="player-header">
+            <h1>
+                Group: {{ group.name }}
+            </h1>
+        </div>
+    </div>
+    {% endif %}
+    <div id="main">
+        {% if group %}
+            <div class="player-stat-section">
+                <h2>Server</h2>
+                {{ server.name }}
+            </div>
+            <div class="player-stat-section">
+                <h2>Established</h2>
+                <abbr class="timeago" title="{{ group.established|iso_date }}">{{ group.established|iso_date }}</abbr>
+            </div>
+            <div class="player-stat-section">
+                <h2>Land count</h2>
+                {{ group.land_count }}
+            </div>
+            <div class="player-stat-section">
+                <h2>Land limit</h2>
+                {{ group.land_limit }}
+            </div>
+            <div class="clear"></div>
+            <div class="player-stat-section">
+                <h2>Members</h2>
+                {{ group.member_count }}
+                <br/>
+                <br/>
+                {% for member in group.members %}
+                    <div class="stat-row">
+                        <div class="player">
+                            <a href="{{ url_for('player', server_id=server.id, username=member.username) }}">
+                                {{ member.username|face_thumb }}
+                                <div class="username">
+                                    {{ member.displayname_html|safe }}
+                                </div>
+                            </a>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <h2>That group does not exist</h2>
+        {% endif %}
+    </div>
+{% endblock %}

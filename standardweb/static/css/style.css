@@ -302,11 +302,11 @@ fieldset {
     display: inline-block;
 }
 
-#player-list a, .ranking-table a, .player-stat-section a, .leaderboard-table a, .search-list a {
+#player-list a, .ranking-table a, .player-stat-section a, .leaderboard-table a, .group-table a, .search-list a {
     color: #545454;
 }
 
-#player-list a:hover, .ranking-table a:hover, .player-stat-section a:hover, .leaderboard-table a:hover, .search-list a:hover {
+#player-list a:hover, .ranking-table a:hover, .player-stat-section a:hover, .leaderboard-table a:hover, .group-table a:hover, .search-list a:hover {
     color: #AAA;
 }
 
@@ -725,6 +725,66 @@ fieldset {
     text-align: right;
     width: 1px;
     white-space: nowrap;
+}
+
+.group-table {
+    width: 100%;
+    font-size: 18px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-collapse: collapse;
+}
+
+.group-table h3 {
+    margin: 0;
+    display: inline;
+}
+
+.group-table tr {
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ddd;
+}
+
+.group-table tr:hover {
+    background: #f9f9f9;
+}
+
+.group-table td {
+    text-align: center;
+    padding: 30px;
+}
+
+.group-table td:nth-child(1) {
+    width: 35%;
+    text-align: left;
+}
+
+.group-table td:nth-child(2) {
+    width: 10%;
+    text-align: right;
+}
+
+.group-table td:nth-child(3) {
+    width: 20%;
+    text-align: right;
+}
+
+.groups .pages {
+    font-size: 14px;
+    display: inline-block;
+    margin: 16px 0;
+}
+
+.groups .pages span {
+    padding: 2px 5px;
+}
+
+.groups .pages a {
+    background: #fff;
+    color: #696969;
+    border: 1px solid #ddd;
+    padding: 2px 4px;
 }
 
 .leaderboard-section {

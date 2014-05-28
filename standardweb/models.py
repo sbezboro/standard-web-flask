@@ -145,7 +145,7 @@ class PlayerStats(db.Model, Base):
 
     server = db.relationship('Server')
     player = db.relationship('Player')
-    group = db.relationship('Group', backref=db.backref('members'))
+    group = db.relationship('Group')
 
     @property
     def is_online(self):
@@ -371,6 +371,10 @@ class Group(db.Model, Base):
     member_count = db.Column(db.Integer)
 
     server = db.relationship('Server')
+    members = db.relationship('Player',
+                              secondary='join(PlayerStats, Player, PlayerStats.player_id == Player.id)',
+                              primaryjoin='Group.id == PlayerStats.group_id',
+                              secondaryjoin='PlayerStats.player_id == Player.id')
 
 
 player_title = db.Table('player_title',

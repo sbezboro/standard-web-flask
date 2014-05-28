@@ -91,6 +91,13 @@
                 <h2>Time played</h2>
                 {{ time_spent }}
             </div>
+            {% if group %}
+                <div class="player-stat-section">
+                    <h2>Group</h2>
+                    <a href="{{ url_for('group', server_id=server.id, name=group.name) }}">{{ group.name }}</a>
+                </div>
+                <div class="clear"></div>
+            {% endif %}
             {% if pvp_logs %}
                 <div class="player-stat-section">
                     <h2>PVP logs</h2>
@@ -107,7 +114,7 @@
                     {% with killer = kill.player %}
                         <div class="stat-row">
                             <div class="player">
-                                <a href="/{{ server.id }}/player/{{ killer.username }}">
+                                <a href="{{ url_for('player', server_id=server.id, username=killer.username) }}">
                                     {{ killer.username|face_thumb }}
                                     <div class="username">
                                         {{ killer.displayname_html|safe }}
@@ -129,7 +136,7 @@
                     {% with victim = death.player %}
                         <div class="stat-row">
                             <div class="player">
-                                <a href="/{{ server.id }}/player/{{ victim.username }}">
+                                <a href="{{ url_for('player', server_id=server.id, username=victim.username) }}">
                                     {{ victim.username|face_thumb }}
                                     <div class="username">
                                         {{ victim.displayname_html|safe }}
