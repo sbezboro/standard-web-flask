@@ -16,6 +16,96 @@ import requests
 import rollbar
 
 
+def _handle_groups(server, server_groups):
+    group_uids = [x['uid'] for x in server_groups]
+    groups = Group.query.filter(Group.server == server, Group.uid.in_(group_uids))
+    group_map = {x.uid: x for x in groups}
+
+    for group_info in server_groups:
+        uid = group_info['uid']
+        name = group_info['name']
+        established = group_info['established']
+        land_count = group_info['land_count']
+        land_limit = group_info['land_limit']
+        lock_count = group_info['lock_count']
+        members = group_info['members']
+        leader = group_info['leader']
+        moderators = group_info['moderators']
+        invites = group_info['invites']
+
+        established = datetime.utcfromtimestamp(established / 1000)
+        moderators = set(moderators)
+        invites = set(invites)
+
+        group = group_map.get(uid)
+        if not group:
+            group = Group(uid=uid, server=server)
+
+        group.name = name
+        group.established = established
+        group.land_count = land_count
+        group.land_limit = land_limit
+        group.member_count = len(members)
+        group.lock_count = lock_count
+        group.save(commit=False)
+
+        stats = [p for p in PlayerStats.query.options(
+            joinedload(PlayerStats.player)
+        ).join(Player).filter(PlayerStats.server == server, Player.username.in_(members))]
+
+        for stat in stats:
+            if stat.player.username == leader:
+                stat.is_leader = True
+                stat.is_moderator = False
+            elif stat.player.username in moderators:
+                stat.is_leader = False
+                stat.is_moderator = True
+            else:
+                stat.is_leader = False
+                stat.is_moderator = False
+
+            stat.group = group
+            stat.save(commit=False)
+
+        if group.id:
+            removed_invites = GroupInvite.query.filter(GroupInvite.group_id == group.id,
+                                                       not_(GroupInvite.invite.in_(invites)))
+            for group_invite in removed_invites:
+                db.session.delete(group_invite)
+
+            existing_invites = GroupInvite.query.filter_by(group=group)
+            existing_invites = set([x.invite for x in existing_invites])
+
+            for invite in (invites - existing_invites):
+                group_invite = GroupInvite(group=group, invite=invite)
+                group_invite.save(commit=False)
+
+    removed_group_ids = []
+    removed_groups = Group.query.filter(Group.server == server, not_(Group.uid.in_(group_uids)))
+    for group in removed_groups:
+        removed_group_ids.append(group.id)
+
+    if removed_group_ids:
+        groupless = PlayerStats.query.filter(PlayerStats.server == server,
+                                             PlayerStats.group_id.in_(removed_group_ids))
+
+        for stat in groupless:
+            stat.group = None
+            stat.is_leader = False
+            stat.is_moderator = False
+            stat.save(commit=False)
+
+        removed_invites = GroupInvite.query.filter(GroupInvite.group_id.in_(removed_group_ids))
+
+        for group_invite in removed_invites:
+            db.session.delete(group_invite)
+
+        db.session.flush()
+
+        for group in removed_groups:
+            db.session.delete(group)
+
+
 def _query_server(server, mojang_status):
     server_status = api.get_server_status(server) or {}
     
@@ -85,56 +175,7 @@ def _query_server(server, mojang_status):
             'titles': titles
         })
 
-    server_groups = server_status.get('groups', [])
-    group_uids = [x['uid'] for x in server_groups]
-    groups = Group.query.filter(Group.server == server, Group.uid.in_(group_uids))
-    group_map = {x.uid: x for x in groups}
-
-    for group_info in server_groups:
-        uid = group_info['uid']
-        name = group_info['name']
-        established = group_info['established']
-        land_count = group_info['land_count']
-        land_limit = group_info['land_limit']
-        members = group_info['members']
-
-        established = datetime.utcfromtimestamp(established / 1000)
-
-        group = group_map.get(uid)
-        if not group:
-            group = Group(uid=uid, server=server)
-
-        group.name = name
-        group.established = established
-        group.land_count = land_count
-        group.land_limit = land_limit
-        group.member_count = len(members)
-        group.save(commit=False)
-
-        stats = [p for p in PlayerStats.query.join(Player)
-            .filter(PlayerStats.server == server, Player.username.in_(members))]
-
-        for stat in stats:
-            stat.group = group
-            stat.save(commit=False)
-
-    removed_group_ids = []
-    removed_groups = Group.query.filter(Group.server == server, not_(Group.uid.in_(group_uids)))
-    for group in removed_groups:
-        removed_group_ids.append(group.id)
-
-    if removed_group_ids:
-        groupless = PlayerStats.query.filter(PlayerStats.server == server,
-                                             PlayerStats.group_id.in_(removed_group_ids))
-
-        for stat in groupless:
-            stat.group = None
-            stat.save(commit=False)
-
-        db.session.flush()
-
-        for group in removed_groups:
-            db.session.delete(group)
+    _handle_groups(server, server_status.get('groups', []))
 
     five_minutes_ago = datetime.utcnow() - timedelta(minutes=10)
     result = PlayerStats.query.filter(PlayerStats.server == server,

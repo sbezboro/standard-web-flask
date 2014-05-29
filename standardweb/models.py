@@ -142,6 +142,8 @@ class PlayerStats(db.Model, Base):
     banned = db.Column(db.Boolean, default=False)
     pvp_logs = db.Column(db.Integer, default=0)
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'))
+    is_leader = db.Column(db.Boolean, default=False)
+    is_moderator = db.Column(db.Boolean, default=False)
 
     server = db.relationship('Server')
     player = db.relationship('Player')
@@ -369,6 +371,7 @@ class Group(db.Model, Base):
     land_count = db.Column(db.Integer)
     land_limit = db.Column(db.Integer)
     member_count = db.Column(db.Integer)
+    lock_count = db.Column(db.Integer)
 
     server = db.relationship('Server')
     members = db.relationship('Player',
@@ -376,6 +379,13 @@ class Group(db.Model, Base):
                               primaryjoin='Group.id == PlayerStats.group_id',
                               secondaryjoin='PlayerStats.player_id == Player.id')
 
+class GroupInvite(db.Model, Base):
+    __tablename__ = 'group_invite'
+
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), primary_key=True)
+    invite = db.Column(db.String(30), primary_key=True)
+
+    group = db.relationship('Group', backref=db.backref('invites'))
 
 player_title = db.Table('player_title',
     db.Column('player_id', db.Integer, db.ForeignKey('player.id')),
