@@ -21,6 +21,8 @@ def _handle_groups(server, server_groups):
     groups = Group.query.filter(Group.server == server, Group.uid.in_(group_uids))
     group_map = {x.uid: x for x in groups}
 
+    group_playerstat_ids = []
+
     for group_info in server_groups:
         uid = group_info['uid']
         name = group_info['name']
@@ -49,36 +51,47 @@ def _handle_groups(server, server_groups):
         group.lock_count = lock_count
         group.save(commit=False)
 
-        stats = [p for p in PlayerStats.query.options(
-            joinedload(PlayerStats.player)
-        ).join(Player).filter(PlayerStats.server == server, Player.username.in_(members))]
+        if members:
+            stats = [p for p in PlayerStats.query.options(
+                joinedload(PlayerStats.player)
+            ).join(Player).filter(PlayerStats.server == server, Player.username.in_(members))]
 
-        for stat in stats:
-            if stat.player.username == leader:
-                stat.is_leader = True
-                stat.is_moderator = False
-            elif stat.player.username in moderators:
-                stat.is_leader = False
-                stat.is_moderator = True
-            else:
-                stat.is_leader = False
-                stat.is_moderator = False
+            for stat in stats:
+                group_playerstat_ids.append(stat.id)
 
-            stat.group = group
-            stat.save(commit=False)
+                if stat.player.username == leader:
+                    stat.is_leader = True
+                    stat.is_moderator = False
+                elif stat.player.username in moderators:
+                    stat.is_leader = False
+                    stat.is_moderator = True
+                else:
+                    stat.is_leader = False
+                    stat.is_moderator = False
 
-        if group.id:
-            removed_invites = GroupInvite.query.filter(GroupInvite.group_id == group.id,
-                                                       not_(GroupInvite.invite.in_(invites)))
-            for group_invite in removed_invites:
-                db.session.delete(group_invite)
+                stat.group = group
+                stat.save(commit=False)
 
-            existing_invites = GroupInvite.query.filter_by(group=group)
-            existing_invites = set([x.invite for x in existing_invites])
+            if group.id and invites:
+                removed_invites = GroupInvite.query.filter(GroupInvite.group_id == group.id,
+                                                           not_(GroupInvite.invite.in_(invites)))
+                for group_invite in removed_invites:
+                    db.session.delete(group_invite)
 
-            for invite in (invites - existing_invites):
-                group_invite = GroupInvite(group=group, invite=invite)
-                group_invite.save(commit=False)
+                existing_invites = GroupInvite.query.filter_by(group=group)
+                existing_invites = set([x.invite for x in existing_invites])
+
+                for invite in (invites - existing_invites):
+                    group_invite = GroupInvite(group=group, invite=invite)
+                    group_invite.save(commit=False)
+
+    for groupless in PlayerStats.query.filter(PlayerStats.server == server,
+                                              PlayerStats.group_id.isnot(None),
+                                              not_(PlayerStats.id.in_(group_playerstat_ids))):
+        groupless.group = None
+        groupless.is_leader = False
+        groupless.is_moderator = False
+        groupless.save(commit=False)
 
     removed_group_ids = []
     removed_groups = Group.query.filter(Group.server == server, not_(Group.uid.in_(group_uids)))
@@ -86,15 +99,6 @@ def _handle_groups(server, server_groups):
         removed_group_ids.append(group.id)
 
     if removed_group_ids:
-        groupless = PlayerStats.query.filter(PlayerStats.server == server,
-                                             PlayerStats.group_id.in_(removed_group_ids))
-
-        for stat in groupless:
-            stat.group = None
-            stat.is_leader = False
-            stat.is_moderator = False
-            stat.save(commit=False)
-
         removed_invites = GroupInvite.query.filter(GroupInvite.group_id.in_(removed_group_ids))
 
         for group_invite in removed_invites:
