@@ -379,6 +379,7 @@ class Group(db.Model, Base):
                               primaryjoin='Group.id == PlayerStats.group_id',
                               secondaryjoin='PlayerStats.player_id == Player.id')
 
+
 class GroupInvite(db.Model, Base):
     __tablename__ = 'group_invite'
 

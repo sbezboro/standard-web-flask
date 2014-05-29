@@ -304,13 +304,33 @@ def group(name, server_id=None):
     if not server:
         abort(404)
 
+    user = g.user
+
     group = Group.query.options(
         joinedload(Group.members)
     ).filter_by(server=server, name=name).first()
 
+    leader = Player.query.join(PlayerStats)\
+        .filter(PlayerStats.server == server, PlayerStats.is_leader == True).first()
+
+    moderators = Player.query.join(PlayerStats)\
+        .filter(PlayerStats.server == server, PlayerStats.is_moderator == True).all()
+
+    all_members = group.members
+    members = filter(lambda x: x != leader and x not in moderators, all_members)
+
+    invites = group.invites
+
+    show_internals = user.player in all_members or user.admin
+
     retval = {
         'server': server,
-        'group': group
+        'group': group,
+        'leader': leader,
+        'moderators': moderators,
+        'members': members,
+        'invites': invites,
+        'show_internals': show_internals
     }
 
     return render_template('group.html', **retval)

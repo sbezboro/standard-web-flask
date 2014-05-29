@@ -96,15 +96,14 @@
                     <h2>Group</h2>
                     <a href="{{ url_for('group', server_id=server.id, name=group.name) }}">{{ group.name }}</a>
                 </div>
-                <div class="clear"></div>
             {% endif %}
             {% if pvp_logs %}
                 <div class="player-stat-section">
                     <h2>PVP logs</h2>
                     {{ pvp_logs }}
                 </div>
-                <div class="clear"></div>
             {% endif %}
+            <div class="clear"></div>
             <div class="player-stat-section">
                 <h2>PVP kills</h2>
                 {{ pvp_kill_count }}
