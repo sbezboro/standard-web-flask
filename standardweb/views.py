@@ -1090,17 +1090,18 @@ def forum_attachment(hash):
     return send_file(f, mimetype=attachment.content_type)
 
 
-def _redirect_old_url(old_rule, endpoint, route_kw_func=None):
+def _redirect_old_url(old_rule, endpoint, route_kw_func=None, append=None):
     def redirector(**route_kw):
         if route_kw_func:
             return redirect(url_for(endpoint, **route_kw_func(**route_kw)))
         return redirect(url_for(endpoint), 301)
 
-    app.add_url_rule(old_rule, endpoint + '_old', redirector)
+    app.add_url_rule(old_rule, endpoint + '_old' + (append if append else ''), redirector)
 
 _redirect_old_url('/forum/', 'forums')
 _redirect_old_url('/forum/<int:forum_id>/', 'forum', lambda forum_id: {'forum_id': forum_id})
 _redirect_old_url('/forum/topic/<int:topic_id>/', 'forum_topic', lambda topic_id: {'topic_id': topic_id})
+_redirect_old_url('/forum/topic/<int:topic_id>/post/add/', 'forum_topic', lambda topic_id: {'topic_id': topic_id}, append='1')
 _redirect_old_url('/forum/post/<int:post_id>/', 'forum_post', lambda post_id: {'post_id': post_id})
 _redirect_old_url('/forum/user/<username>/', 'player', lambda username: {'username': username})
 
