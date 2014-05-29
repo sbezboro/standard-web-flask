@@ -323,7 +323,9 @@ def group(name, server_id=None):
 
     invites = group.invites
 
-    show_internals = user.player in all_members or user.admin
+    show_internals = False
+    if user:
+        show_internals = user.player in all_members or user.admin
 
     retval = {
         'server': server,
