@@ -311,10 +311,12 @@ def group(name, server_id=None):
     ).filter_by(server=server, name=name).first()
 
     leader = Player.query.join(PlayerStats)\
-        .filter(PlayerStats.server == server, PlayerStats.is_leader == True).first()
+        .filter(PlayerStats.server == server, PlayerStats.group == group,
+                PlayerStats.is_leader == True).first()
 
     moderators = Player.query.join(PlayerStats)\
-        .filter(PlayerStats.server == server, PlayerStats.is_moderator == True).all()
+        .filter(PlayerStats.server == server, PlayerStats.group == group,
+                PlayerStats.is_moderator == True).all()
 
     all_members = group.members
     members = filter(lambda x: x != leader and x not in moderators, all_members)
