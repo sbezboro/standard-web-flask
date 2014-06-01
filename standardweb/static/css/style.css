@@ -1452,6 +1452,12 @@ a:hover .ansi-container {
     .leaderboard-stat-section .stat-row {
         width: 100%;
     }
+
+    .mobile-title {
+        padding: 5px 0;
+        float: left;
+        color: #fff;
+    }
     
     .mobile-nav {
         text-align: right;
