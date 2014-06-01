@@ -727,6 +727,10 @@ fieldset {
     white-space: nowrap;
 }
 
+.group-lists {
+    font-size: 13px;
+}
+
 .group-table {
     width: 100%;
     border: 1px solid #ddd;

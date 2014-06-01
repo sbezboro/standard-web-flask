@@ -17,6 +17,10 @@
     </div>
     <div id="main">
         <h2>Groups</h2>
+        <div class="group-lists">
+            {{ mode_link(mode, 'Largest') }}
+            {{ mode_link(mode, 'Oldest') }}
+        </div>
         <div class="groups">
             {% if groups %}
                 {{ pages() }}
@@ -52,6 +56,14 @@
     </div>
 {% endblock %}
 
+{% macro mode_link(current_mode, mode) %}
+    {% if current_mode == mode.lower() %}
+        {{ mode }}
+    {% else %}
+        <a href="{{ url_for('groups', server_id=server.id, mode=mode.lower(), p=page if page > 1 else None) }}">{{ mode }}</a>
+    {% endif %}
+{%- endmacro %}
+
 {% macro pages() %}
     {% if group_count > page_size %}
         <div class="pages">
@@ -68,9 +80,9 @@
                 {% if p == page %}
                     <span>{{ p }}</span>
                 {% elif p != 1 %}
-                    <a href="{{ url_for('groups', server_id=server.id, p=p) }}">{{ p }}</a>
+                    <a href="{{ url_for('groups', server_id=server.id, mode=mode, p=p) }}">{{ p }}</a>
                 {% else %}
-                    <a href="{{ url_for('groups', server_id=server.id) }}">{{ p }}</a>
+                    <a href="{{ url_for('groups', server_id=server.id, mode=mode) }}">{{ p }}</a>
                 {% endif %}
             {% endfor %}
             {% endwith %}

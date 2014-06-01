@@ -255,7 +255,8 @@ def leaderboards(server_id=None):
 
 @app.route('/groups')
 @app.route('/<int:server_id>/groups')
-def groups(server_id=None):
+@app.route('/<int:server_id>/groups/<mode>')
+def groups(server_id=None, mode=None):
     if not server_id:
         return redirect(url_for('groups', server_id=app.config['MAIN_SERVER_ID']))
 
@@ -272,10 +273,18 @@ def groups(server_id=None):
     except:
         page = 1
 
+    if not mode:
+        return redirect(url_for('groups', server_id=server_id, mode='largest'))
+
+    if mode == 'oldest':
+        order = Group.established.asc(),
+    else:
+        order = Group.member_count.desc(), Group.name
+
     groups = Group.query.options(
         joinedload(Group.members)
     ).filter_by(server=server) \
-        .order_by(Group.member_count.desc(), Group.name) \
+        .order_by(*order) \
         .limit(page_size) \
         .offset((page - 1) * page_size).all()
 
@@ -287,7 +296,8 @@ def groups(server_id=None):
         'groups': groups,
         'group_count': group_count,
         'page': page,
-        'page_size': page_size
+        'page_size': page_size,
+        'mode': mode
     }
 
     return render_template('groups.html', **retval)
@@ -456,7 +466,7 @@ def forum_search():
 
     page_size = POSTS_PER_PAGE
 
-    page = request.args.get('p')
+    page = request.args.get('p') or request.args.get('page')
 
     try:
         page = max(int(page), 1) if page else 1

@@ -30,7 +30,7 @@
                             <div class="post-author-details">
                                 <h5>
                                     {% if stats and stats.group %}
-                                        <a href="{{ url_for('group', name=stats.group.name) }}">[{{ stats.group.name }}]</a>
+                                        [<a href="{{ url_for('group', name=stats.group.name) }}">{{ stats.group.name }}</a>]
                                     {% endif %}
                                     <a href="{{ url_for('player', username=post.user.player.username) }}">
                                         {{ post.user.player.displayname_html|safe }}
