@@ -18,34 +18,36 @@
     <div id="main">
         <h2>Groups</h2>
         <div class="groups">
-            {{ pages() }}
-            <table class="group-table">
-                {% for group in groups %}
-                    <tr>
-                        <td>
-                            <h3>
-                                <a href="{{ url_for('group', server_id=server.id, name=group.name) }}">
-                                    {{ group.name|safe }}
-                                </a>
-                            </h3>
-                            {% for member in group.members %}
-                                <a class="tooltip" href="{{ url_for('player', server_id=server.id, username=member.username) }}" title="{{ member.displayname }}">
-                                    {{ member.username|face_thumb }}
-                                </a>
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {{ group.member_count }} {{'member' if group.member_count == 1 else 'members'}}
-                        </td>
-                        <td>
-                            Established <abbr class="timeago" title="{{ group.established|iso_date }}">{{ group.established|iso_date }}</abbr>
-                        </td>
-                    </tr>
-                {% else %}
-                    <h3>No groups exist on this server</h3>
-                {% endfor %}
-            </table>
-            {{ pages() }}
+            {% if groups %}
+                {{ pages() }}
+                <table class="group-table">
+                    {% for group in groups %}
+                        <tr>
+                            <td>
+                                <h3>
+                                    <a href="{{ url_for('group', server_id=server.id, name=group.name) }}">
+                                        {{ group.name|safe }}
+                                    </a>
+                                </h3>
+                                {% for member in group.members %}
+                                    <a class="tooltip" href="{{ url_for('player', server_id=server.id, username=member.username) }}" title="{{ member.displayname }}">
+                                        {{ member.username|face_thumb }}
+                                    </a>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {{ group.member_count }} {{'member' if group.member_count == 1 else 'members'}}
+                            </td>
+                            <td>
+                                Established <abbr class="timeago" title="{{ group.established|iso_date }}">{{ group.established|iso_date }}</abbr>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                {{ pages() }}
+            {% else %}
+                <h3>No groups exist on this server</h3>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

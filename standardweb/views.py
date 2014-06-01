@@ -277,7 +277,7 @@ def groups(server_id=None):
     ).filter_by(server=server) \
         .order_by(Group.member_count.desc(), Group.name) \
         .limit(page_size) \
-        .offset((page - 1) * page_size)
+        .offset((page - 1) * page_size).all()
 
     group_count = Group.query.filter_by(server=server).count()
 
@@ -309,6 +309,9 @@ def group(name, server_id=None):
     group = Group.query.options(
         joinedload(Group.members)
     ).filter_by(server=server, name=name).first()
+
+    if not group:
+        return render_template('group.html', name=name), 404
 
     leader = Player.query.join(PlayerStats)\
         .filter(PlayerStats.server == server, PlayerStats.group == group,
@@ -1118,7 +1121,7 @@ def _redirect_old_url(old_rule, endpoint, route_kw_func=None, append=None):
     def redirector(**route_kw):
         if route_kw_func:
             return redirect(url_for(endpoint, **route_kw_func(**route_kw)))
-        return redirect(url_for(endpoint), 301)
+        return redirect(url_for(endpoint, **request.args), 301)
 
     app.add_url_rule(old_rule, endpoint + '_old' + (append if append else ''), redirector)
 
@@ -1128,6 +1131,7 @@ _redirect_old_url('/forum/topic/<int:topic_id>/', 'forum_topic', lambda topic_id
 _redirect_old_url('/forum/topic/<int:topic_id>/post/add/', 'forum_topic', lambda topic_id: {'topic_id': topic_id}, append='1')
 _redirect_old_url('/forum/post/<int:post_id>/', 'forum_post', lambda post_id: {'post_id': post_id})
 _redirect_old_url('/forum/user/<username>/', 'player', lambda username: {'username': username})
+_redirect_old_url('/forum/search/', 'forum_search')
 
 
 @app.route('/chat')

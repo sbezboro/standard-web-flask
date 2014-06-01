@@ -8,13 +8,13 @@
 
 {% block content %}
     {% if group %}
-    <div id="sub-header">
-        <div class="player-header">
-            <h1>
-                Group: {{ group.name }}
-            </h1>
+        <div id="sub-header">
+            <div class="player-header">
+                <h1>
+                    Group: {{ group.name }}
+                </h1>
+            </div>
         </div>
-    </div>
     {% endif %}
     <div id="main">
         {% if group %}
@@ -84,7 +84,7 @@
                 </div>
             {% endif %}
         {% else %}
-            <h2>That group does not exist</h2>
+            <h2>The group {{ name }} does not exist</h2>
         {% endif %}
     </div>
 {% endblock %}
