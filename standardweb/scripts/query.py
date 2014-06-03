@@ -23,6 +23,24 @@ def _handle_groups(server, server_groups):
 
     group_playerstat_ids = []
 
+    removed_group_ids = []
+    removed_groups = Group.query.filter(Group.server == server, not_(Group.uid.in_(group_uids)))
+    for group in removed_groups:
+        removed_group_ids.append(group.id)
+
+    if removed_group_ids:
+        removed_invites = GroupInvite.query.filter(GroupInvite.group_id.in_(removed_group_ids))
+
+        for group_invite in removed_invites:
+            db.session.delete(group_invite)
+
+        db.session.flush()
+
+        for group in removed_groups:
+            db.session.delete(group)
+
+    db.session.flush()
+
     for group_info in server_groups:
         uid = group_info['uid']
         name = group_info['name']
@@ -92,22 +110,6 @@ def _handle_groups(server, server_groups):
         groupless.is_leader = False
         groupless.is_moderator = False
         groupless.save(commit=False)
-
-    removed_group_ids = []
-    removed_groups = Group.query.filter(Group.server == server, not_(Group.uid.in_(group_uids)))
-    for group in removed_groups:
-        removed_group_ids.append(group.id)
-
-    if removed_group_ids:
-        removed_invites = GroupInvite.query.filter(GroupInvite.group_id.in_(removed_group_ids))
-
-        for group_invite in removed_invites:
-            db.session.delete(group_invite)
-
-        db.session.flush()
-
-        for group in removed_groups:
-            db.session.delete(group)
 
 
 def _query_server(server, mojang_status):
