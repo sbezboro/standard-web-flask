@@ -22,7 +22,7 @@ paramiko==1.12.3
 pycrypto==2.6.1
 python-memcached==1.53
 requests==2.3.0
-rollbar==0.7.5
+rollbar==0.8.0
 simple-pbkdf2==1.0
 six==1.5.2
 wsgiref==0.1.2
