@@ -163,7 +163,7 @@ class MoveTopicForm(BaseForm):
 
 
 class ForumSearchForm(BaseForm):
-    query = TextField('Post contains', validators=[Optional(), Length(min=3)])
+    query = TextField('Topic title or post contents', validators=[Optional(), Length(min=3)])
     user_id = TextField('User', validators=[Optional()])
     forum_id = ExtendedSelectField('Forum', validators=[Optional()], default='')
     sort_by = SelectField('Sort by', validators=[Optional()], default='')

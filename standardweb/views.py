@@ -508,6 +508,7 @@ def forum_search():
         # matching post in the same topic)
         result = ForumPost.query.with_entities(ForumPost.topic_id) \
             .join(ForumPost.topic).filter(ForumPost.deleted == False) \
+            .filter(ForumTopic.name.ilike('%%%s%%' % query)) \
             .order_by(order)
 
         if user_id:
