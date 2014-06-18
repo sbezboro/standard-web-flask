@@ -1138,10 +1138,13 @@ def _redirect_old_url(old_rule, endpoint, route_kw_func=None, append=None):
 _redirect_old_url('/forum/', 'forums')
 _redirect_old_url('/forum/<int:forum_id>/', 'forum', lambda forum_id: {'forum_id': forum_id})
 _redirect_old_url('/forum/topic/<int:topic_id>/', 'forum_topic', lambda topic_id: {'topic_id': topic_id})
-_redirect_old_url('/forum/topic/<int:topic_id>/post/add/', 'forum_topic', lambda topic_id: {'topic_id': topic_id}, append='1')
+_redirect_old_url('/forum/topic/<int:topic_id>/post/add/', 'forum_topic', lambda topic_id: {'topic_id': topic_id},
+                  append='1')
 _redirect_old_url('/forum/post/<int:post_id>/', 'forum_post', lambda post_id: {'post_id': post_id})
 _redirect_old_url('/forum/user/<username>/', 'player', lambda username: {'username': username})
-_redirect_old_url('/forum/search/', 'forum_search')
+_redirect_old_url('/faces/<username>.png', 'face', lambda username: {'username': username})
+_redirect_old_url('/faces/<int:size>/<username>.png', 'face', lambda size, username: {'size': size, 'username': username},
+                  append='1')
 
 
 @app.route('/chat')
