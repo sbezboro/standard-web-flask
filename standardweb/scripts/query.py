@@ -23,24 +23,6 @@ def _handle_groups(server, server_groups):
 
     group_playerstat_ids = []
 
-    removed_group_ids = []
-    removed_groups = Group.query.filter(Group.server == server, not_(Group.uid.in_(group_uids)))
-    for group in removed_groups:
-        removed_group_ids.append(group.id)
-
-    if removed_group_ids:
-        removed_invites = GroupInvite.query.filter(GroupInvite.group_id.in_(removed_group_ids))
-
-        for group_invite in removed_invites:
-            db.session.delete(group_invite)
-
-        db.session.flush()
-
-        for group in removed_groups:
-            db.session.delete(group)
-
-    db.session.flush()
-
     for group_info in server_groups:
         uid = group_info['uid']
         name = group_info['name']
@@ -58,6 +40,11 @@ def _handle_groups(server, server_groups):
         invites = set(invites)
 
         group = group_map.get(uid)
+
+        # group could have been destroyed and recreated with the same name
+        if not group:
+            group = Group.query.filter_by(name=name).first()
+
         if not group:
             group = Group(uid=uid, server=server)
 
@@ -110,6 +97,26 @@ def _handle_groups(server, server_groups):
         groupless.is_leader = False
         groupless.is_moderator = False
         groupless.save(commit=False)
+
+    db.session.flush()
+
+    removed_group_ids = []
+    removed_groups = Group.query.filter(Group.server == server, not_(Group.uid.in_(group_uids)))
+    for group in removed_groups:
+        removed_group_ids.append(group.id)
+
+    if removed_group_ids:
+        removed_invites = GroupInvite.query.filter(GroupInvite.group_id.in_(removed_group_ids))
+
+        for group_invite in removed_invites:
+            db.session.delete(group_invite)
+
+        db.session.flush()
+
+        for group in removed_groups:
+            db.session.delete(group)
+
+    db.session.commit()
 
 
 def _query_server(server, mojang_status):
@@ -181,8 +188,6 @@ def _query_server(server, mojang_status):
             'titles': titles
         })
 
-    _handle_groups(server, server_status.get('groups', []))
-
     five_minutes_ago = datetime.utcnow() - timedelta(minutes=10)
     result = PlayerStats.query.filter(PlayerStats.server == server,
                                       PlayerStats.last_seen > five_minutes_ago)
@@ -212,6 +217,8 @@ def _query_server(server, mojang_status):
         'account': mojang_status.account,
         'auth': mojang_status.auth
     })
+
+    _handle_groups(server, server_status.get('groups', []))
 
 
 def _get_mojang_status():
