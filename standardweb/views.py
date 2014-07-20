@@ -60,6 +60,9 @@ def login():
             session['user_id'] = user.id
             session.permanent = True
 
+            user.last_login = datetime.utcnow()
+            user.save(commit=True)
+
             flash('Successfully logged in', 'success')
 
             return redirect(next_path or url_for('index'))

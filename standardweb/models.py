@@ -64,7 +64,7 @@ class User(db.Model, Base):
     email = db.Column(db.String(75))
     password = db.Column(db.String(128))
     admin = db.Column(db.Boolean, default=False)
-    last_login = db.Column(db.DateTime, default=datetime.utcnow)
+    last_login = db.Column(db.DateTime, default=None)
     date_joined = db.Column(db.DateTime, default=datetime.utcnow)
 
     player = db.relationship('Player', backref=db.backref('user', uselist=False))
