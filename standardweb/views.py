@@ -644,9 +644,60 @@ def forum_topic(topic_id):
     if not topic or topic.deleted:
         abort(404)
 
-    page_size = POSTS_PER_PAGE
+    user = g.user
+
+    form = PostForm()
+
+    if form.validate_on_submit():
+        if not user:
+            flash('You must log in before you can do that', 'warning')
+            return redirect(url_for('login', next=request.path))
+
+        if topic.deleted:
+            flash('That topic no longer exists', 'warning')
+            return redirect(url_for('forum', forum_id=topic.forum_id))
+
+        if topic.closed:
+            flash('That topic has been locked', 'warning')
+            return redirect(url_for('forum', forum_id=topic.forum_id))
+
+        if user.forum_ban:
+            abort(403)
+
+        body = form.body.data
+        image = form.image.data
+
+        last_post = topic.last_post
+        if last_post.body == body and last_post.user_id == user.id:
+            return redirect(last_post.url)
+
+        post = ForumPost(topic_id=topic.id, user=user, body=body, user_ip=request.remote_addr)
+
+        user.forum_profile.post_count += 1
+        user.forum_profile.save(commit=False)
+
+        topic.forum.last_post = post
+        topic.forum.post_count += 1
+        topic.forum.save(commit=False)
+
+        topic.updated = datetime.utcnow()
+        topic.last_post = post
+        topic.post_count += 1
+
+        post.save(commit=True)
+
+        if image:
+            if not ForumAttachment.create_attachment(post.id, image, commit=True):
+                flash('There was a problem with the upload', 'error')
+
+        api.forum_post(user.player.username if user.player else user.username,
+                       topic.forum.name, topic.name, post.url)
+
+        return redirect(post.url)
 
     page = request.args.get('p')
+
+    page_size = POSTS_PER_PAGE
 
     try:
         page = max(int(page), 1) if page else 1
@@ -685,55 +736,8 @@ def forum_topic(topic_id):
         for stats in player_stats
     }
 
-    user = g.user
-
     if user:
         topic.update_read(user)
-
-    form = PostForm()
-
-    if form.validate_on_submit():
-        if not user:
-            flash('You must log in before you can do that', 'warning')
-            return redirect(url_for('login', next=request.path))
-
-        if topic.deleted:
-            flash('That topic no longer exists', 'warning')
-            return redirect(url_for('forum', forum_id=topic.forum_id))
-
-        if topic.closed:
-            flash('That topic has been locked', 'warning')
-            return redirect(url_for('forum', forum_id=topic.forum_id))
-
-        if user.forum_ban:
-            abort(403)
-
-        body = form.body.data
-        image = form.image.data
-
-        post = ForumPost(topic_id=topic.id, user=user, body=body, user_ip=request.remote_addr)
-
-        user.forum_profile.post_count += 1
-        user.forum_profile.save(commit=False)
-
-        topic.forum.last_post = post
-        topic.forum.post_count += 1
-        topic.forum.save(commit=False)
-
-        topic.updated = datetime.utcnow()
-        topic.last_post = post
-        topic.post_count += 1
-
-        post.save(commit=True)
-
-        if image:
-            if not ForumAttachment.create_attachment(post.id, image, commit=True):
-                flash('There was a problem with the upload', 'error')
-
-        api.forum_post(user.player.username if user.player else user.username,
-                       topic.forum.name, topic.name, post.url)
-
-        return redirect(post.url)
 
     retval = {
         'topic': topic,
