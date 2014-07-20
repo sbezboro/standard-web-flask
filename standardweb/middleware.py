@@ -41,6 +41,18 @@ def csrf_protect():
                 abort(403)
 
 
+@app.before_request
+def first_login():
+    first_login = False
+
+    if request.endpoint and 'static' not in request.endpoint \
+            and request.endpoint != 'face' and session.get('user_id'):
+        if 'first_login' in session:
+            first_login = session.pop('first_login')
+
+    g.first_login = first_login
+
+
 @app.context_processor
 def inject_user():
     return dict(user=getattr(g, 'user', None))

@@ -60,6 +60,9 @@ def login():
             session['user_id'] = user.id
             session.permanent = True
 
+            if not user.last_login:
+                session['first_login'] = True
+
             user.last_login = datetime.utcnow()
             user.save(commit=True)
 
