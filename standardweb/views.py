@@ -798,6 +798,10 @@ def new_topic(forum_id):
         body = form.body.data
         image = form.image.data
 
+        last_post = forum.last_post
+        if last_post.body == body and last_post.user_id == user.id:
+            return redirect(last_post.url)
+
         topic = ForumTopic(forum=forum, user=user, name=title)
         topic.save(commit=True)
 
