@@ -36,9 +36,20 @@ TOPICS_PER_PAGE = 40
 POSTS_PER_PAGE = 20
 GROUPS_PER_PAGE = 10
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/guide')
+def guide():
+    return render_template('guides/index.html')
+
+
+@app.route('/guide/groups')
+def guide_groups():
+    return render_template('guides/groups.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])

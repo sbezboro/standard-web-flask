@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Guide - Standard Survival Minecraft Server{% endblock %}
+
+{% block description %}Guide and useful info to help you get started on the Standard Survival Minecraft server{% endblock %}
+
+{% block select_guide %}selected{% endblock %}
+
+{% block content %}
+    <div id="main">
+        <h2>Standard Survival Guide</h2>
+        <p>
+            Welcome to Standard Survival! This is a server that tries to be as close to the vanilla experience as possible, within reason. Know that all players will always be equal and that fairness is a key value of the server; there is no way for players to have special privileges over other players. This has been true since the server was founded on May 10, 2012.
+        </p>
+        <h3>Getting started</h3>
+        <p>
+            In Minecraft multiplayer, enter the following address to connect to the server:
+        </p>
+        <p>
+            <b id="address" data-clipboard-target="address">standardsurvival.com</b>
+        </p>
+        <p>
+            After joining, you will appear at the main spawn. You can immediately start travelling in any direction to begin surviving. You can also use one of four wilderness portals around the spawn to travel to a distant alternate starting area.
+        </p>
+        <h3>Groups</h3>
+        <p>
+            The server has a custom plugin called "Groups" for land protection. It is similar to "Factions" for those familiar with it, but contains some unique differences which will be outlined later.
+        </p>
+        <p>
+            The starting zones are contained in a "safe area", which is a fairly wide 5 chunk radius area. You will not be able to hurt other players or be hurt in this area. The area around the safe area is going to most likely be claimed by other players. Continue walking further out and you will see less and less claimed land. Here are some commands to help you get started with groups:
+        </p>
+        <h4>Creating a group</h4>
+        <p>
+            Simply type <code>/g create &lt;name&gt;</code> to create a new group.
+        </p>
+        <h4>Invite a friend</h4>
+        <p>
+            Type <code>/g invite &lt;player name&gt;</code> to invite someone.
+        </p>
+        <h4>Claim some land</h4>
+        <p>
+            Type <code>/g claim</code> to claim the 16x16 block chunk you are standing on.
+        </p>
+        <h4>Show info</h4>
+        <p>
+            Type <code>/g info</code> to show your group's info. Type <code>/g show &lt;other roup&gt;</code> to see info about another group.
+        </p>
+        <p>
+            Claiming land is a good way to protect your builds. Only group members will be able to place and break blocks in a group's claimed land. You start with 10 possible claims, and your max amount of claims grows by 2 every week as long as your group is active.
+        </p>
+        <p>
+            Click <a href="{{ url_for('guide_groups')}}">here</a> for more detailed info about groups, claims and locks.
+        </p>
+        <h3>Gameplay and Rules</h3>
+        <p>
+            The server is focused on a pure survival experience. There are absolution <b>NO</b> teleportation commands (/tp, /tpa, /back, /spawn). As in single player, you must know your bearings at all times. Sleeping in a bed will set your spawn to that location, in case you are far away from spawn.
+        </p>
+        <p>
+            There are no rules against griefing/raiding. You can simply play the survival game mode as you want on the server. Explore, build, craft, mine, kill, and do anything else. However, the following will <b>not</b> be tolerated:
+            <ul>
+                <li>Using hacked clients or similar to gain advantage over other players</li>
+                <li>Racism and racist remarks of any sort</li>
+                <li>Abuse that gets way beyond the point of friendly banter</li>
+                <li>Excessive spawn-killing</li>
+            </ul>
+            Players breaking the above will be subject to removal, either by being kicked, banned temporarily or banned permanently, depending on the severity of the offense.
+        </p>
+        <p>
+            The server is administered by a select few individuals. No applications are being accepted for any special positions.
+        </p>
+        <p>
+            Due to the multiplayer nature of the survival experience. The end world resets every week with a randomly generated end portal room somewhere in the world. A new ender dragon will  This usually happens on Saturdays.
+        </p>
+        <h3>Help</h3>
+        <o>
+            If you need help or have a question not answered in this guide, create a topic on the <a href="{{ url_for('forums') }}">forums</a> or send an email to
+            <script>
+                document.write('<'+'a'+' '+'h'+'r'+'e'+'f'+'='+"'"+'m'+'a'+'i'+'l'+'t'+'o'+'&'+'#'+'5'+'8'+';'+'s'+'e'+'r'+'%'+'7'+
+                    '6'+'e'+'r'+'&'+'#'+'6'+'4'+';'+'s'+'t'+'a'+'n'+'d'+'&'+'#'+'3'+'7'+';'+'6'+'1'+'&'+'#'+'1'+'1'+'4'+
+                    ';'+'d'+'s'+'&'+'#'+'1'+'1'+'7'+';'+'r'+'v'+'%'+'&'+'#'+'5'+'4'+';'+'9'+'&'+'#'+'1'+'1'+'8'+';'+'a'+
+                    '&'+'#'+'1'+'0'+'8'+';'+'&'+'#'+'4'+'6'+';'+'%'+'6'+'&'+'#'+'5'+'1'+';'+'o'+'m'+"'"+'>'+'s'+'e'+'r'+
+                    'v'+'e'+'r'+'&'+'#'+'6'+'4'+';'+'s'+'&'+'#'+'1'+'1'+'6'+';'+'a'+'n'+'&'+'#'+'1'+'0'+'0'+';'+'&'+'#'+
+                    '9'+'7'+';'+'r'+'&'+'#'+'1'+'0'+'0'+';'+'&'+'#'+'1'+'1'+'5'+';'+'u'+'r'+'v'+'i'+'v'+'a'+'l'+'&'+'#'+
+                    '4'+'6'+';'+'c'+'o'+'m'+'<'+'/'+'a'+'>');
+            </script>.
+        </o>
+        <p>
+            Good luck on your Standard Survival journey and hope you enjoy the experience!
+        </p>
+        <p>
+            - <a href="https://twitter.com/sbezboro">Sergei</a>
+        </p>
+    </div>
+{% endblock %}

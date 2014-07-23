@@ -53,6 +53,7 @@
         <div id="inner">
             <div class="desktop">
                 <a href="/" class="strong {% block select_index %}{% endblock %}">Standard Survival</a>
+                <a class="{% block select_guide %}{% endblock %}" href="{{ url_for('guide') }}">Guide</a>
                 <a class="{% block select_ranking %}{% endblock %}" href="{{ url_for('ranking', server_id=server.id if server else None) }}">Ranking</a>
                 <a class="{% block select_groups %}{% endblock %}" href="{{ url_for('groups', server_id=server.id if server else None) }}">Groups</a>
                 <a class="{% block select_leaderboards %}{% endblock %}" href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a>
@@ -85,6 +86,7 @@
                 </div>
                 <ul id="mobile-nav-menu" style="display:none;">
                     <li><a href="/">Home</a></li>
+                    <li><a href="{{ url_for('guide') }}">Guide</a></li>
                     <li><a href="{{ url_for('ranking', server_id=server.id if server else None) }}">Ranking</a></li>
                     <li><a href="{{ url_for('groups', server_id=server.id if server else None) }}">Groups</a></li>
                     <li><a href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a></li>
@@ -111,5 +113,38 @@
     <div id="container">
         {% block content %}{% endblock %}
     </div>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var $address = $('#address');
+            $address.tipsy({
+                trigger: 'manual',
+                gravity: 'w',
+                offset: 10
+            });
+
+            var clipboard = new ZeroClipboard($address, {
+                moviePath: "{{ url_for('static', filename='flash/ZeroClipboard.swf') }}"
+            });
+
+            clipboard.on('complete', function(client, args) {
+                $address.tipsy('hide');
+                $address.attr('original-title', 'Copied!');
+                $address.tipsy('show');
+                _gaq.push(['_trackPageview', '/address/copied']);
+            });
+
+            clipboard.on('mouseover', function(client) {
+                $address.attr('original-title', 'Click to copy to clipboard');
+                $address.tipsy('show');
+            });
+
+            clipboard.on('mouseout', function(client) {
+                $address.tipsy('hide');
+            });
+
+            loadPlayerList();
+            loadPlayerGraph($("#graph"));
+        });
+    </script>
 </body>
 </html>
