@@ -41,6 +41,8 @@ $(document).ready(function() {
         $section.removeClass('active');
       }
     });
+
+    return false;
   });
 
   var activePill = $('.nav-pills li.active').length > 0;
