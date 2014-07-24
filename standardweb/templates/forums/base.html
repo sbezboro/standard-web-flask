@@ -62,8 +62,10 @@
                         ':wassat:': 'wassat.png'
                     }
                 }
-           }).sceditor('instance');
-           window.sceditor.sourceMode(true);
+            }).sceditor('instance');
+            if (window.sceditor) {
+                window.sceditor.sourceMode(true);
+            }
         });
     </script>
 {% endblock %}
