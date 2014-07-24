@@ -230,7 +230,7 @@ span.stat {
 
 h1 {
     font-size: 3.8em;
-    margin-bottom: 0px;
+    margin-bottom: 0;
     text-shadow: 1px 1px #bfbfbf;
 }
 
@@ -240,11 +240,7 @@ h2 {
 }
 
 h3 {
-    font-size: 1.65em;
-}
-
-h4 {
-    margin-bottom: 0;
+    font-size: 23px;
 }
 
 a {
@@ -296,9 +292,9 @@ fieldset {
 
 #caption {
     color: #A8A8A8;
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-style: italic;
-    margin-bottom: 30px;
+    margin-bottom: 5px;
 }
 
 #splash img {
@@ -751,7 +747,7 @@ fieldset {
     border-collapse: collapse;
 }
 
-.group-table h3 {
+.group-table h4 {
     margin: 0;
 }
 

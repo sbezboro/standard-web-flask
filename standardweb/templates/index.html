@@ -7,19 +7,18 @@
         {% include 'includes/messages.html' %}
         <div id="splash">
             <h1>Standard Survival</h1>
-            <img src="{{ url_for('static', filename='images/standard-survival.jpg') }}" width="958px" height="331px" alt="Standard Survival Minecraft Server">
-            <div id="caption">A vanilla-inspired Minecraft survival server</div>
+            <img src="{{ url_for('static', filename='images/standard-survival.jpg') }}" width="958px" height="201px" alt="Standard Survival Minecraft Server">
         </div>
         <div id="left-section">
-            <h2>Connect To</h2>
+            <h3>Connect To</h3>
             <p><b id="address" data-clipboard-target="address">standardsurvival.com</b></p>
         
-            <h2>Description</h2>
+            <h3>Description</h3>
             <p><b>Standard Survival</b> is a Minecraft survival server that tries to be as close to the vanilla experience as possible. It's where you can simply play the original game without any of the drastically game-changing plugins or features that you would usually find elsewhere on most servers. This means <b>the server does not have teleport commands (/tp, /home, /spawn), economy, skill systems, ranks, etc</b>. Every player will always be equal.</p>
             <p>There is a custom plugin written for the server for a basic level of protection called Groups, but otherwise gameplay is as close to vanilla as possible. You can build, craft, mine, explore, kill, grief and do anything else you want that's possible in Minecraft; there are no gameplay-related rules. The usual no-hacking, no-racism and no-abuse rules are in place to make sure the server provides a fun and friendly experience for everyone.</p>
-            <p>Click <a href="{{ url_for('guide') }}">here</a> for a guide for more details about the server, gameplay and rules.</p>
+            <p>Click <a href="{{ url_for('guide') }}">here</a> for a guide explaining more details about the server, gameplay and rules.</p>
             
-            <h2>Player Graph</h2>
+            <h3>Player Graph</h3>
             <div id="graph" class="graph progress"></div>
             <br/>
             <p>Hosting this Minecraft server is a lot of fun, but it does need time and especially money to run. Please consider helping me cover the cost of running the server by clicking the donate button below. Thanks.</p>
@@ -31,7 +30,7 @@
             </form>
         </div>
         <div id="sidebar">
-            <h2>Server Status <span id="refreshButton" class="button" onclick="_gaq.push(['_trackPageview', '/refresh/player-list']); loadPlayerList();"><img id="refreshImage"/></span></h2>
+            <h3>Server Status <span id="refreshButton" class="button" onclick="_gaq.push(['_trackPageview', '/refresh/player-list']); loadPlayerList();"><img id="refreshImage"/></span></h3>
             <div id="player-list">
             </div>
         </div>
@@ -56,5 +55,8 @@
                 });
             }
         }
+
+        loadPlayerList();
+        loadPlayerGraph($("#graph"));
     </script>
 {% endblock %}
