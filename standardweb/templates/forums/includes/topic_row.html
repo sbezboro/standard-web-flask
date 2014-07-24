@@ -1,4 +1,4 @@
-{% macro topic_row(topic, active=False, query=None) -%}
+{% macro topic_row(topic, topic_page_size, active=False, query=None) -%}
     <tr class="{% if topic.sticky %}sticky{% else %}{% if topic.user.admin %}admin{% endif %} {% if topic.closed %}closed{% endif %}{% endif %}">
         <td>
             {% if topic.closed %}
@@ -21,10 +21,10 @@
                     {{ topic.user.username }}
                 {% endif %} -
                 <abbr class="timeago" title="{{ topic.created | iso_date }}">{{ topic.created }}</abbr>
-                {% if topic.post_count > 20 %}
+                {% if topic.post_count > topic_page_size %}
                     -
                     <span class="pages">
-                    {% for page in range(1, (topic.post_count // 20) + 2) %}
+                    {% for page in range(1, (topic.replies // topic_page_size) + 2) %}
                         {% if page > 1 %}
                             <a href="{{ url_for('forum_topic', topic_id=topic.id, p=page, query=query) }}">{{ page }}</a>
                         {% else %}

@@ -597,6 +597,7 @@ def forum(forum_id):
         abort(404)
 
     page_size = TOPICS_PER_PAGE
+    topic_page_size = POSTS_PER_PAGE
 
     page = request.args.get('p')
 
@@ -644,6 +645,7 @@ def forum(forum_id):
         'forum': forum,
         'topics': topics,
         'active_topic_ids': active_topic_ids,
+        'topic_page_size': topic_page_size,
         'page_size': page_size,
         'page': page
     }
@@ -776,9 +778,13 @@ def forum_post(post_id):
         abort(404)
 
     topic = post.topic
-    if topic.post_count > POSTS_PER_PAGE:
-        last_page = int(topic.post_count / POSTS_PER_PAGE) + 1
-        return redirect(url_for('forum_topic', topic_id=post.topic_id, p=last_page, _anchor=post.id))
+    posts = topic.posts
+    index = posts.index(post)
+
+    page = int(index / POSTS_PER_PAGE) + 1
+
+    if page:
+        return redirect(url_for('forum_topic', topic_id=post.topic_id, p=page, _anchor=post.id))
 
     return redirect(url_for('forum_topic', topic_id=post.topic_id, _anchor=post.id))
 

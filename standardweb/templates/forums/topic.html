@@ -202,7 +202,7 @@
     {% if topic.post_count > page_size %}
         <div class="pages">
             <b>Pages:</b>
-            {% with end_page = ((topic.post_count - 1) // page_size) + 1 %}
+            {% with end_page = ((topic.replies) // page_size) + 1 %}
             {% for p in range(1, end_page + 1) %}
                 {% if (p - page)|abs >= 3 and not p == end_page and not p == 1 %}
                     {% if (p - page)|abs == 3 %}
