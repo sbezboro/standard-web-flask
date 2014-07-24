@@ -69,7 +69,7 @@
             {% if num_topics %}
                 <table class="forum-topic-table">
                     {% for topic in topics %}
-                        {{ topic_row(topic, query=query) }}
+                        {{ topic_row(topic, page_size, query=query) }}
                     {% endfor %}
                 </table>
             {% else %}

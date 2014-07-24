@@ -525,13 +525,13 @@ def forum_search():
         # matching post in the same topic)
         result = ForumPost.query.with_entities(ForumPost.topic_id) \
             .join(ForumPost.topic).filter(ForumPost.deleted == False) \
-            .filter(ForumTopic.name.ilike('%%%s%%' % query)) \
             .order_by(order)
 
         if user_id:
             result = result.filter(ForumPost.user_id == user_id)
         else:
-            result = result.filter(ForumPost.body.ilike('%%%s%%' % query))
+            result = result.filter(or_(ForumPost.body.ilike('%%%s%%' % query),
+                                       ForumTopic.name.ilike('%%%s%%' % query)))
 
         if forum_id:
             result = result.filter(ForumTopic.forum_id == forum_id)
