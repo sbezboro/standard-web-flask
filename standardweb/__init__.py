@@ -22,7 +22,10 @@ import api
 import middleware
 import models
 import template_filters
-import views
+
+import views.auth
+import views.forums
+import views.main
 
 
 def set_up_rollbar():
