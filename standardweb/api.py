@@ -242,6 +242,7 @@ def rank_query():
         'time': time,
         'minutes': stats.time_spent,
         'username': player.username,
+        'uuid': player.uuid,
         'titles': titles
     }
 
