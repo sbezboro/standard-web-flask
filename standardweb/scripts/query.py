@@ -30,13 +30,13 @@ def _handle_groups(server, server_groups):
         land_count = group_info['land_count']
         land_limit = group_info['land_limit']
         lock_count = group_info['lock_count']
-        members = group_info['members']
-        leader = group_info['leader']
-        moderators = group_info['moderators']
+        member_uuids = group_info['member_uuids']
+        leader_uuid = group_info['leader_uuid']
+        moderator_uuids = group_info['moderator_uuids']
         invites = group_info['invites']
 
         established = datetime.utcfromtimestamp(established / 1000)
-        moderators = set(moderators)
+        moderator_uuids = set(moderator_uuids)
         invites = set(invites)
 
         group = group_map.get(uid)
@@ -52,22 +52,22 @@ def _handle_groups(server, server_groups):
         group.established = established
         group.land_count = land_count
         group.land_limit = land_limit
-        group.member_count = len(members)
+        group.member_count = len(member_uuids)
         group.lock_count = lock_count
         group.save(commit=False)
 
-        if members:
+        if member_uuids:
             stats = [p for p in PlayerStats.query.options(
                 joinedload(PlayerStats.player)
-            ).join(Player).filter(PlayerStats.server == server, Player.username.in_(members))]
+            ).join(Player).filter(PlayerStats.server == server, Player.uuid.in_(member_uuids))]
 
             for stat in stats:
                 group_playerstat_ids.append(stat.id)
 
-                if stat.player.username == leader:
+                if stat.player.uuid == leader_uuid:
                     stat.is_leader = True
                     stat.is_moderator = False
-                elif stat.player.username in moderators:
+                elif stat.player.uuid in moderator_uuids:
                     stat.is_leader = False
                     stat.is_moderator = True
                 else:

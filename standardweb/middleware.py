@@ -89,15 +89,17 @@ def rts_auth_data():
     if g.user:
         user_id = g.user.id
         username = g.user.player.username if g.user.player else g.user.username
+        uuid = g.user.player.uuid if g.user.player else ''
         admin = g.user.admin
 
-        content = '-'.join([str(user_id), username, str(int(admin))])
+        content = '-'.join([str(user_id), username, uuid, str(int(admin))])
 
         token = hashlib.sha256(content + app.config['RTS_SECRET']).hexdigest()
 
         data = {
             'user_id': user_id,
             'username': username,
+            'uuid': uuid,
             'is_superuser': int(admin),
             'token': token
         }

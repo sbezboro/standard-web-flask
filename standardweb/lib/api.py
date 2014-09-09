@@ -69,16 +69,23 @@ def send_stats(server, data):
     _api_call(server, 'stats', data=data)
 
 
-def forum_post(username, forum_name, topic_name, path):
+def forum_post(user, forum_name, topic_name, path, is_new_topic=False):
     base_url = url_for('index', _external=True).rstrip('/')
     
     for server in Server.query.filter_by(online=True):
         data = {
-            'username': username,
             'forum_name': forum_name,
             'topic_name': topic_name,
-            'path': '%s%s' % (base_url, path)
+            'path': '%s%s' % (base_url, path),
+            'is_new_topic': is_new_topic
         }
+
+        if user.player:
+            data['uuid'] = user.player.uuid
+            data['username'] = user.player.username
+        else:
+            data['username'] = user.username
+
         _api_call(server, 'forum_post', data=data)
 
 

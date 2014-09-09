@@ -299,8 +299,7 @@ def forum_topic(topic_id):
             if not ForumAttachment.create_attachment(post.id, image, commit=True):
                 flash('There was a problem with the upload', 'error')
 
-        api.forum_post(user.player.username if user.player else user.username,
-                       topic.forum.name, topic.name, post.url)
+        api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=False)
 
         return redirect(post.url)
 
@@ -431,8 +430,7 @@ def new_topic(forum_id):
             if not ForumAttachment.create_attachment(post.id, image, commit=True):
                 flash('There was a problem with the upload', 'error')
 
-        api.forum_post(user.player.username if user.player else user.username,
-                       topic.forum.name, topic.name, post.url)
+        api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=True)
 
         return redirect(topic.url)
 
