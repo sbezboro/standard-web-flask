@@ -335,15 +335,16 @@ function ConsoleStream(authToken, baseUrl, $outputArea, $textbox, serverId) {
                             '</div>'].join('');
                 } else if (username) {
                     html += ['<div class="user">',
-                                '<a href="/player/' + username + '" alt="' + address + '" title="' + address + '">',
+                                '<a href="/player/' + username + '">',
                                     '<span><img class="face-thumb" src="/face/16/' + username + '.png">' + username + '</span>',
                                     active ? '<img src="/static/images/online.png">': '',
-                                '</a>',
+                                '</a>- ' + address,
                             '</div>'].join('');
                 } else {
                     html += ['<div class="user">',
-                                'Anonymous - ' + address,
+                                'Anonymous',
                                 active ? '<img src="/static/images/online.png">': '',
+                                '- ' + address,
                             '</div>'].join('');
                 }
             }
