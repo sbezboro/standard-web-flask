@@ -335,7 +335,7 @@ function ConsoleStream(authToken, baseUrl, $outputArea, $textbox, serverId) {
                             '</div>'].join('');
                 } else if (username) {
                     html += ['<div class="user">',
-                                '<a href="/player/' + username + '">',
+                                '<a href="/player/' + username + '" alt="' + address + '" title="' + address + '">',
                                     '<span><img class="face-thumb" src="/face/16/' + username + '.png">' + username + '</span>',
                                     active ? '<img src="/static/images/online.png">': '',
                                 '</a>',
