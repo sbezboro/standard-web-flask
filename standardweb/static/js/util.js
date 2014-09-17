@@ -90,6 +90,6 @@ $(document).ready(function() {
   $(".tooltip").tipsy();
 });
 
-$.ajaxSetup ({
+$.ajaxSetup({
   cache: false
 });
