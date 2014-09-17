@@ -113,35 +113,5 @@
     <div id="container">
         {% block content %}{% endblock %}
     </div>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            var $address = $('#address');
-            $address.tipsy({
-                trigger: 'manual',
-                gravity: 'w',
-                offset: 10
-            });
-
-            var clipboard = new ZeroClipboard($address, {
-                moviePath: "{{ url_for('static', filename='flash/ZeroClipboard.swf') }}"
-            });
-
-            clipboard.on('complete', function(client, args) {
-                $address.tipsy('hide');
-                $address.attr('original-title', 'Copied!');
-                $address.tipsy('show');
-                _gaq.push(['_trackPageview', '/address/copied']);
-            });
-
-            clipboard.on('mouseover', function(client) {
-                $address.attr('original-title', 'Click to copy to clipboard');
-                $address.tipsy('show');
-            });
-
-            clipboard.on('mouseout', function(client) {
-                $address.tipsy('hide');
-            });
-        });
-    </script>
 </body>
 </html>

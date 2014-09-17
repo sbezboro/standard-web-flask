@@ -11,7 +11,7 @@
         </div>
         <div id="left-section">
             <h3>Connect To</h3>
-            <p><b id="address" data-clipboard-target="address">standardsurvival.com</b></p>
+            <p><b id="address" class="clipboard" data-clipboard-target="address">standardsurvival.com</b></p>
         
             <h3>Description</h3>
             <p><b>Standard Survival</b> is a Minecraft survival server that tries to be as close to the vanilla experience as possible. It's where you can simply play the original game without any of the drastically game-changing plugins or features that you would usually find elsewhere on most servers. This means <b>the server does not have teleport commands (/tp, /home, /spawn), economy, skill systems, ranks, etc</b>. Every player will always be equal.</p>
@@ -19,10 +19,10 @@
             <p>Click <a href="{{ url_for('guide') }}">here</a> for a guide explaining more details about the server, gameplay and rules.</p>
             
             <h3>Player Graph</h3>
-            <div id="graph" class="graph progress"></div>
+            <div class="graph player-graph progress"></div>
             <br/>
             <p>Hosting this Minecraft server is a lot of fun, but it does need time and especially money to run. Please consider helping me cover the cost of running the server by clicking the donate button below. Thanks.</p>
-            <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" onclick="donateClick()">
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
                 <input type="hidden" name="cmd" value="_s-xclick">
                 <input type="hidden" name="hosted_button_id" value="R4GTC8E7Z8Y84">
                 <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
@@ -30,33 +30,25 @@
             </form>
         </div>
         <div id="sidebar">
-            <h3>Server Status <span id="refreshButton" class="button" onclick="_gaq.push(['_trackPageview', '/refresh/player-list']); loadPlayerList();"><img id="refreshImage"/></span></h3>
-            <div id="player-list">
+            <div class="player-list">
+                <h3>
+                    Server Status
+                    <span class="refresh-button">
+                        <img class="refresh-image"/>
+                    </span>
+                </h3>
+                <div class="player-list-players">
+                </div>
             </div>
         </div>
         <div class="clear"></div>
     </div>
     <a class="github-banner" href="https://github.com/sbezboro/standard-web-flask"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" width="149" height="149"></a>
     <script type="text/javascript">
-        function donateClick() {
-            _rollbar.push({level: 'info', msg: 'Donate clicked'});
-            _gaq.push(['_trackPageview', '/donate/click']); 
-            return true; 
-        }
-        
-        function loadPlayerList() {
-            if ($("#refreshButton").hasClass("button")) {
-                $("#refreshButton").removeClass("button");
-                $("#refreshImage").attr("src", "{{url_for('static', filename='images/spinner.gif') }}");
-                $("#player-list").fadeTo(0, 0.25).load('player_list', function(response, status, xhr) {
-                    $("#refreshButton").addClass("button");
-                    $("#refreshImage").attr("src", "{{url_for('static', filename='images/refresh.png') }}");
-                    $("#player-list").fadeTo(100, 1);
-                });
-            }
-        }
-
-        loadPlayerList();
-        loadPlayerGraph($("#graph"));
+        $('#address').tipsy({
+            trigger: 'manual',
+            gravity: 'w',
+            offset: 10
+        });
     </script>
 {% endblock %}

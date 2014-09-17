@@ -39,12 +39,7 @@
               var $chatTextbox = $('#chat-textbox');
               var baseUrl = '{{ rts_address }}';
               var serverId = {{ server.id }};
-              
-              $(document).on("click", ".message-player", function(event) {
-                  $chatTextbox.val("/msg " + $(this).attr("player") + " ");
-                  $chatTextbox.focus();
-                  return false;
-              });
+
 
               var username;
               var nickname;
@@ -59,7 +54,7 @@
               var chatStream = new ChatStream({{ rts_auth_data|tojson|safe }}, baseUrl, $chat,
                                               $chatTextbox, serverId, username, nickname);
               chatStream.connect(function(error) {});
-              
+
               soundManager.setup({
                   url: '/static/flash/',
                   flashVersion: 9,
@@ -70,7 +65,7 @@
                           id: 'mention',
                           url: '/static/sound/mention.wav'
                       });
-                      
+
                       chatStream.setMentionSound(mentionSound);
                   }
               });

@@ -1,89 +1,91 @@
+(function(window, document, $) {
+  $(document).ready(function() {
+    var previousPoint = null;
+    var $graphTooltip = $('<div id="graph-tooltip"></div>').appendTo("body").css({
+      position: 'absolute',
+      border: '1px solid #666',
+      padding: '2px',
+      'background-color': '#111',
+      'color': '#fff'
+    }).hide();
 
-function loadPlayerGraph($elem, serverId, maxPlayers) {
-  var offset = new Date().getTimezoneOffset() * 1000 * 60;
-  serverId = serverId || 4;
-  maxPlayers = maxPlayers || 72;
+    $('.player-graph').each(function() {
+      var $graph = $(this);
 
-  var data = {};
+      var offset = new Date().getTimezoneOffset() * 1000 * 60;
+      var serverId = 4;
+      var maxPlayers = 72;
 
-  if ($elem.attr("weekindex")) {
-    data['weekIndex'] = $elem.attr("weekindex");
-  }
+      var data = {};
 
-  $.ajax({
-    url: "/" + serverId + "/player_graph",
-    data: data,
-    success: function(data) {
-      $elem.removeClass('progress');
+      $graph.bind("plothover", function (event, pos, item) {
+        if (item) {
+          if (previousPoint != item.dataIndex) {
+            previousPoint = item.dataIndex;
 
-      var points = data.points;
-      var startTime = data.start_time - offset;
-      var endTime = data.end_time - offset;
+            var count = item.datapoint[1];
 
-      var countGraph = [];
-      var newGraph = [];
-
-      points.map(function(point) {
-        var time = point.time - offset;
-        var playerCount = point.player_count;
-        var newPlayers = point.new_players;
-
-        countGraph.push([time, playerCount]);
-        if (newPlayers >= 0) {
-          newGraph.push([time, newPlayers]);
+            $graphTooltip.show();
+            $graphTooltip.text(count + (count == 1 ? ' player' : ' players'));
+            $graphTooltip.css({
+              top: item.pageY - 12,
+              left: item.pageX + 14
+            });
+          }
+        } else {
+          $graphTooltip.hide();
+          previousPoint = null;
         }
       });
 
-      data = [{data: countGraph}];
-
-      if (newGraph.length) {
-        data.push({data: newGraph, yaxis: 2});
+      if ($graph.attr("weekindex")) {
+        data['weekIndex'] = $graph.attr("weekindex");
       }
 
-      // Make sure the graph shows the start and end time boundaries
-      data.push({data: [[startTime], [endTime]]})
+      $.ajax({
+        url: "/" + serverId + "/player_graph",
+        data: data,
+        success: function(data) {
+          $graph.removeClass('progress');
 
-      $.plot($elem, data, {
-        grid: {hoverable: true, backgroundColor: "#ffffff"},
-        colors: ["#7E9BFF", "#F00"],
-        series: {lines: { fill: true }},
-        xaxes: [{mode: "time", minTickSize: [1, "day"], timeformat: "%b %d"}],
-        yaxes: [{min: 0, max: maxPlayers, tickSize: 20, position: "right"}, {min: 0, max: 40}]
+          var points = data.points;
+          var startTime = data.start_time - offset;
+          var endTime = data.end_time - offset;
+
+          var countGraph = [];
+          var newGraph = [];
+
+          points.map(function(point) {
+            var time = point.time - offset;
+            var playerCount = point.player_count;
+            var newPlayers = point.new_players;
+
+            countGraph.push([time, playerCount]);
+            if (newPlayers >= 0) {
+              newGraph.push([time, newPlayers]);
+            }
+          });
+
+          data = [{data: countGraph}];
+
+          if (newGraph.length) {
+            data.push({data: newGraph, yaxis: 2});
+          }
+
+          // Make sure the graph shows the start and end time boundaries
+          data.push({data: [[startTime], [endTime]]});
+
+          $.plot($graph, data, {
+            grid: {hoverable: true, backgroundColor: "#ffffff"},
+            colors: ["#7E9BFF", "#F00"],
+            series: {lines: { fill: true }},
+            xaxes: [{mode: "time", minTickSize: [1, "day"], timeformat: "%b %d"}],
+            yaxes: [{min: 0, max: maxPlayers, tickSize: 12, position: "right"}, {min: 0, max: 40}]
+          });
+        },
+        error: function(data) {
+        }
       });
-    },
-    error: function(data) {
-    }
+    });
   });
-}
-
-function showGraphTooltip(x, y, contents) {
-  $('<div id="graph-tooltip">' + contents + '</div>').css( {
-    position: 'absolute',
-    display: 'none',
-    top: y - 12,
-    left: x + 14,
-    border: '1px solid #666',
-    padding: '2px',
-    'background-color': '#111',
-    'color': '#fff'
-  }).appendTo("body").show();
-}
-
-$(document).ready(function() {
-  var previousPoint = null;
-  $(".graph").bind("plothover", function (event, pos, item) {
-    if (item) {
-      if (previousPoint != item.dataIndex) {
-        previousPoint = item.dataIndex;
-
-        $("#graph-tooltip").remove();
-        var count = item.datapoint[1];
-
-        showGraphTooltip(item.pageX, item.pageY, count + (count == 1 ? ' player' : ' players'));
-      }
-    } else {
-      $("#graph-tooltip").remove();
-      previousPoint = null;
-    }
-  });
-});
+})(window, document, $);

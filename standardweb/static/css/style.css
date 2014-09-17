@@ -302,15 +302,19 @@ fieldset {
     margin: 0 10px 10px 0;
 }
 
-#player-list span {
+.player-list span {
     display: inline-block;
 }
 
-#player-list a, .ranking-table a, .player-stat-section a, .leaderboard-table a, .group-table a, .search-list a {
+.player-list .refresh-button {
+    cursor: pointer;
+}
+
+.player-list a, .ranking-table a, .player-stat-section a, .leaderboard-table a, .group-table a, .search-list a {
     color: #545454;
 }
 
-#player-list a:hover, .ranking-table a:hover, .player-stat-section a:hover, .leaderboard-table a:hover, .group-table a:hover, .search-list a:hover {
+.player-list a:hover, .ranking-table a:hover, .player-stat-section a:hover, .leaderboard-table a:hover, .group-table a:hover, .search-list a:hover {
     color: #AAA;
 }
 
@@ -1217,10 +1221,6 @@ fieldset {
 
 .progress {
     background: url('../images/progress.gif') no-repeat center;
-}
-
-.button {
-    cursor: pointer;
 }
 
 .rank-star {
