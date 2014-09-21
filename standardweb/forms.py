@@ -149,6 +149,20 @@ class LoginForm(RedirectForm):
     password = PasswordField('Password', validators=[DataRequired()])
 
 
+class VerifyEmailForm(BaseForm):
+    password = PasswordField('Choose a password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm password', validators=[DataRequired()])
+
+
+class ForgotPasswordForm(BaseForm):
+    email = TextField('Email', validators=[DataRequired()])
+
+
+class ResetPasswordForm(BaseForm):
+    password = PasswordField('New password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm password', validators=[DataRequired()])
+
+
 class NewTopicForm(ImageUploadForm):
     title = TextField('Title', validators=[DataRequired()])
     body = TextAreaField('Body', validators=[DataRequired()])

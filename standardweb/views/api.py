@@ -6,8 +6,9 @@ from flask import request
 from functools import wraps
 
 from standardweb.models import *
-from standardweb.lib.csrf import exempt_funcs
 from standardweb.lib import helpers as h
+from standardweb.lib.csrf import exempt_funcs
+from standardweb.lib.email import send_creation_email, send_verify_email
 
 from sqlalchemy import or_
 from sqlalchemy.sql.expression import func
@@ -147,34 +148,49 @@ def log_ore_discovery():
 @server_api
 def register():
     uuid = request.form.get('uuid')
-    password = request.form.get('password')
+    email = request.form.get('email')
+    username = request.form.get('username')
 
     player = Player.query.filter_by(uuid=uuid).first()
-
     if not player:
         return jsonify({
             'err': 1,
-            'message': 'Please try again later.'
+            'message': 'Please try again later'
         })
 
     user = User.query.filter_by(player=player).first()
-
-    if user:
-        user.set_password(password)
-        user.save(commit=True)
-
+    if user and user.email:
         return jsonify({
-            'err': 0,
-            'message': 'Your website password has been changed!'
+            'err': 1,
+            'message': 'You are already registered!'
         })
 
-    User.create(player, password, commit=True)
+    if not h.is_valid_email(email):
+        return jsonify({
+            'err': 1,
+            'message': 'Not a valid email address'
+        })
 
-    rollbar.report_message('Website account created', level='info', request=request)
+    other_user = User.query.filter_by(email=email).first()
+    if other_user:
+        return jsonify({
+            'err': 1,
+            'message': 'Email already in use'
+        })
+
+    email_tokens = EmailToken.query.filter_by(uuid=uuid)
+    for email_token in email_tokens:
+        db.session.delete(email_token)
+
+    # old-style user without an email, just let them verify an email
+    if user:
+        send_verify_email(email, user)
+    else:
+        send_creation_email(email, uuid, username)
 
     return jsonify({
         'err': 0,
-        'message': 'Your username has been linked to a website account!'
+        'message': 'Email sent! Check your inbox for further instructions'
     })
 
 

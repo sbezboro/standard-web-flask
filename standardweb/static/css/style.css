@@ -363,13 +363,13 @@ fieldset {
     margin: 20px 0 20px;
 }
 
-.control-label {
+.control-group label {
     display: inline;
     text-align: right;
     float: left;
     width: 210px;
     font-size: smaller;
-    padding-top: 4px;
+    font-weight: bold;
 }
 
 .control-errors {
@@ -380,11 +380,13 @@ fieldset {
 .control {
     display: block;
     margin-left: 230px;
+    font-size: small;
 }
 
 .control input[type="text"], input[type="password"] {
     width: 160px;
     height: 17px;
+    margin-top: -4px;
 }
 
 .error {
@@ -1176,9 +1178,8 @@ fieldset {
     margin: 0 0 14px;
 }
 
-.forum-form-section .control-label {
+.forum-form-section label {
     font-size: 14px;
-    font-weight: bold;
     width: 100px;
     float: none;
 }
@@ -1189,6 +1190,7 @@ fieldset {
 }
 
 .forum-form-section input[type='text'] {
+    margin-top: 0;
     width: 30%;
 }
 

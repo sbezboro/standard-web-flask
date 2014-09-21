@@ -21,7 +21,7 @@
                     {% if by_user %}
                         <input type="hidden" name="user_id" value="{{ form.user_id.data }}" />
                         <div class="control-group">
-                            <label class="control-label">{{ form.user_id.label }}</label>
+                            {{ form.user_id.label }}
                             <span class="control-errors">{% if form.user_id.errors %}{{ form.user_id.errors[0] }}{% endif %}</span>
                             <div class="control">
                                 {% if by_user.player %}
@@ -33,20 +33,20 @@
                         </div>
                     {% else %}
                         <div class="control-group">
-                            <label class="control-label">{{ form.query.label }}</label>
+                            {{ form.query.label }}
                             <span class="control-errors">{% if form.query.errors %}{{ form.query.errors[0] }}{% endif %}</span>
                             <div class="control">{{ form.query() }}</div>
                         </div>
                     {% endif %}
 
                     <div class="control-group">
-                        <label class="control-label">{{ form.forum_id.label }}</label>
+                        {{ form.forum_id.label }}
                         <span class="control-errors">{% if form.forum_id.errors %}{{ form.forum_id.errors[0] }}{% endif %}</span>
                         <div class="control">{{ form.forum_id() }}</div>
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label">{{ form.sort_by.label }}</label>
+                        {{ form.sort_by.label }}
                         <span class="control-errors">{% if form.sort_by.errors %}{{ form.sort_by.errors[0] }}{% endif %}</span>
                         <div class="control">{{ form.sort_by() }}</div>
                     </div>

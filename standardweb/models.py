@@ -70,7 +70,7 @@ class User(db.Model, Base):
     player = db.relationship('Player', backref=db.backref('user', uselist=False))
 
     @classmethod
-    def create(cls, player, plaintext_password, commit=True):
+    def create(cls, player, plaintext_password, email, commit=True):
         user = cls(player=player, uuid=player.uuid)
         user.set_password(plaintext_password)
 
@@ -103,6 +103,55 @@ class User(db.Model, Base):
         hash_val = pbkdf2_bin(bytes(password), bytes(salt), iterations, keylen=32, hashfunc=hashlib.sha256)
         hash_val = hash_val.encode('base64').strip()
         return '%s$%s$%s$%s' % ('pbkdf2_sha256', iterations, salt, hash_val)
+
+
+class EmailToken(db.Model, Base):
+    __tablename__ = 'emailtoken'
+
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(32))
+    type = db.Column(db.String(16))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    email = db.Column(db.String(75))
+    uuid = db.Column(db.String(32))
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    date_redeemed = db.Column(db.DateTime, default=None)
+
+    user = db.relationship('User')
+
+    @classmethod
+    def create_creation_token(cls, email, uuid, commit=True):
+        et = cls(token=cls._generate_token(),
+                 type='creation',
+                 email=email,
+                 uuid=uuid)
+        et.save(commit=commit)
+
+        return et
+
+    @classmethod
+    def create_verify_token(cls, email, user_id, commit=True):
+        et = cls(token=cls._generate_token(),
+                 type='verify',
+                 email=email,
+                 user_id=user_id)
+        et.save(commit=commit)
+
+        return et
+
+    @classmethod
+    def create_reset_password_token(cls, user_id, commit=True):
+        et = cls(token=cls._generate_token(),
+                 type='reset_password',
+                 user_id=user_id)
+        et.save(commit=commit)
+
+        return et
+
+    @classmethod
+    def _generate_token(cls):
+        import uuid
+        return uuid.uuid4().hex
 
 
 class Player(db.Model, Base):

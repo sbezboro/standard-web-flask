@@ -1,0 +1,10 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    <h3>Hi {{ username }}!</h3>
+    <p>Please click the link below to verify this email address:</p>
+    <p><a href="{{ verify_url }}">{{ verify_url }}</a></p>
+    <p>The above link will expire in two days.</p>
+    <p>Questions? Just reply to this email.</p>
+    <p>Thanks!</p>
+{% endblock %}

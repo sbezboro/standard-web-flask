@@ -2,8 +2,9 @@ from ansi2html import Ansi2HTMLConverter
 
 import re
 
-ansi_converter = Ansi2HTMLConverter()
-ansi_pat = re.compile(r'\x1b[^m]*m')
+_ansi_converter = Ansi2HTMLConverter()
+_ansi_pat = re.compile(r'\x1b[^m]*m')
+_email_pat = re.compile(r'.+@.+\..+')
 
 def iso_date(date):
     return date.strftime("%Y-%m-%d %H:%M:%SZ")
@@ -31,10 +32,14 @@ def safe_str_cmp(a, b):
 
 
 def ansi_to_html(ansi):
-    html = ansi_converter.convert(ansi, full=False)
+    html = _ansi_converter.convert(ansi, full=False)
     count = html.count('<span') - html.count('</span')
     return '<span class="ansi-container">' + html + ('</span>' * count) + '</span>'
 
 
 def strip_ansi(text):
-    return ansi_pat.sub('', text) if text else None
+    return _ansi_pat.sub('', text) if text else None
+
+
+def is_valid_email(email):
+    return _email_pat.match(email)

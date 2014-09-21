@@ -4,9 +4,9 @@ from flask import got_request_exception
 from flask import Request
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.contrib.cache import MemcachedCache
-
 import rollbar
 from rollbar.contrib.flask import report_exception
+
 
 app = Flask(__name__)
 
@@ -18,11 +18,11 @@ db = SQLAlchemy(app)
 
 cache = MemcachedCache(['127.0.0.1:11211'])
 
-import api
 import middleware
 import models
 import template_filters
 
+import views.api
 import views.auth
 import views.forums
 import views.main
