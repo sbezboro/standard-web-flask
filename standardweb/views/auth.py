@@ -83,6 +83,8 @@ def verify_email(token):
     g.user.email = email_token.email
     g.user.save(commit=True)
 
+    rollbar.report_message('Email verified', level='info', request=request)
+
     flash('%s verified!' % email_token.email, 'success')
 
     return redirect(url_for('index'))
@@ -127,6 +129,8 @@ def create_account(token):
             session.permanent = True
 
             flash('Account created! You are now logged in', 'success')
+
+            rollbar.report_message('Account created', level='info', request=request)
 
             return redirect(url_for('index'))
 
@@ -190,6 +194,8 @@ def reset_password(token):
             session.permanent = True
 
             flash('Password reset', 'success')
+
+            rollbar.report_message('Password reset', level='info', request=request)
 
             return redirect(url_for('index'))
 
