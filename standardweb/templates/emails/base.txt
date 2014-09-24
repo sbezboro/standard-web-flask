@@ -1,0 +1,4 @@
+{% block content %}
+{% endblock %}
+--
+Standard Survival Minecraft Server - standardsurvival.com

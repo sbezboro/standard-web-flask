@@ -18,16 +18,14 @@ def send_creation_email(to_email, uuid, username):
 
     verify_url = url_for('create_account', token=email_token.token, _external=True)
 
-    tvars = {
+    text_body, html_body = _render_email('create_account', {
         'username': username,
         'verify_url': verify_url
-    }
-
-    body = render_template('emails/create_account.html', **tvars)
+    })
 
     email_token.save(commit=True)
 
-    send_email(to_email, '[Standard Survival] Please verify your email', body)
+    return send_email(to_email, '[Standard Survival] Please verify your email', text_body, html_body)
 
 
 
@@ -36,16 +34,14 @@ def send_verify_email(to_email, user):
 
     verify_url = url_for('verify_email', token=email_token.token, _external=True)
 
-    tvars = {
+    text_body, html_body = _render_email('verify_email', {
         'username': user.player.username,
         'verify_url': verify_url
-    }
-
-    body = render_template('emails/verify_email.html', **tvars)
+    })
 
     email_token.save(commit=True)
 
-    send_email(to_email, '[Standard Survival] Please verify your email', body)
+    return send_email(to_email, '[Standard Survival] Please verify your email', text_body, html_body)
 
 
 def send_reset_password(user):
@@ -53,37 +49,53 @@ def send_reset_password(user):
 
     verify_url = url_for('reset_password', token=email_token.token, _external=True)
 
-    tvars = {
+    text_body, html_body = _render_email('reset_password', {
         'verify_url': verify_url
-    }
-
-    body = render_template('emails/reset_password.html', **tvars)
+    })
 
     email_token.save(commit=True)
 
-    send_email(user.email, '[Standard Survival] Reset password', body)
+    return send_email(user.email, '[Standard Survival] Reset password', text_body, html_body)
 
 
-def send_email(to_email, subject, body_html, from_email=None):
-    return _send_email(from_email or DEFAULT_FROM_EMAIL, to_email, subject, body_html)
+def send_email(to_email, subject, text_body, html_body, from_email=None):
+    return _send_email(from_email or DEFAULT_FROM_EMAIL, to_email, subject, text_body, html_body)
 
 
-def _send_email(from_email, to_emails, subject, body_html):
+def _send_email(from_email, to_emails, subject, text_body, html_body):
     auth = ('api', app.config['MAILGUN_API_KEY'])
 
     data = {
         'from': from_email,
         'to': to_emails,
         'subject': subject,
-        'html': body_html
+        'text': text_body,
+        'html': html_body
     }
+
+    result = None
 
     try:
         result = requests.post(EMAIL_URL, auth=auth, data=data)
     except:
         rollbar.report_exc_info(request=request)
     else:
-        rollbar.report_message('Email sent', level='info', request=request, extra_data={
-            'data': data,
-            'result': result.json()
-        })
+        if result.status_code == 200:
+            rollbar.report_message('Email sent', level='info', request=request, extra_data={
+                'data': data,
+                'result': result.json()
+            })
+        else:
+            rollbar.report_message('Problem sending email', level='error', request=result, extra_data={
+                'data': data,
+                'result': result
+            })
+
+    return result
+
+
+def _render_email(template_name, tvars):
+    text_body = render_template('emails/%s.txt' % template_name, **tvars)
+    html_body = render_template('emails/%s.html' % template_name, **tvars)
+
+    return text_body, html_body

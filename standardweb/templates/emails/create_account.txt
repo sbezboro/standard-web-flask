@@ -1,0 +1,10 @@
+{% extends 'emails/base.txt' %}
+
+{% block content %}
+Hi {{ username }}!
+Welcome to Standard Survival! Please visit the link below to verify your email address and create an account on the Standard Survival website:
+{{ verify_url }}
+The above link will expire in two days.
+Questions? Just reply to this email.
+Thanks!
+{% endblock %}
