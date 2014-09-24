@@ -63,6 +63,11 @@ def inject_h():
     return dict(h=h)
 
 
+@app.context_processor
+def inject_debug():
+    return dict(is_debug=app.config['DEBUG'])
+
+
 def _dated_url_for(endpoint, **values):
     if endpoint == 'static':
         filename = values.get('filename', None)

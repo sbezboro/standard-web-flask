@@ -28,7 +28,6 @@ def send_creation_email(to_email, uuid, username):
     return send_email(to_email, '[Standard Survival] Please verify your email', text_body, html_body)
 
 
-
 def send_verify_email(to_email, user):
     email_token = EmailToken.create_verify_token(to_email, user.id, commit=False)
 

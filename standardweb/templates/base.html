@@ -11,7 +11,8 @@
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tipsy.css') }}">
-    
+
+    <!-- start Google Analytics -->
     <script type="text/javascript">
         var _gaq = _gaq || [];
         _gaq.push(['_setAccount', 'UA-32372174-1']);
@@ -23,25 +24,52 @@
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
         })();
     </script>
+    <!-- end Google Analytics -->
+
+    <!-- start Mixpanel -->
+    <script type="text/javascript">
+        (function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
+        for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="//cdn.mxpnl.com/libs/mixpanel-2.2.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);
+        mixpanel.init("d083272fecc0ee934ee53c649adc06e4");
+        {% if is_debug %}
+            mixpanel.disable();
+        {% endif %}
+    </script>
+    <!-- end Mixpanel -->
     
     <script type="text/javascript" src="{{ url_for('static', filename='js/all.min.js') }}"></script>
 
     {% if g.first_login %}
-        <script>(function() {
-          var _fbq = window._fbq || (window._fbq = []);
-          if (!_fbq.loaded) {
-            var fbds = document.createElement('script');
-            fbds.async = true;
-            fbds.src = '//connect.facebook.net/en_US/fbds.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(fbds, s);
-            _fbq.loaded = true;
-          }
-        })();
-        window._fbq = window._fbq || [];
-        window._fbq.push(['track', '6018722527894', {'value':'0.00','currency':'CAD'}]);
+        <script type="application/javascript">
+            mixpanel.alias({{ user.id }});
+            mixpanel.track('account created');
+        </script>
+
+        <script type="text/javascript">
+            (function() {
+              var _fbq = window._fbq || (window._fbq = []);
+              if (!_fbq.loaded) {
+                var fbds = document.createElement('script');
+                fbds.async = true;
+                fbds.src = '//connect.facebook.net/en_US/fbds.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(fbds, s);
+                _fbq.loaded = true;
+              }
+            })();
+            window._fbq = window._fbq || [];
+            window._fbq.push(['track', '6018722527894', {'value':'0.00','currency':'CAD'}]);
         </script>
         <noscript><img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?ev=6018722527894&amp;cd[value]=0.00&amp;cd[currency]=CAD&amp;noscript=1" /></noscript>
+    {% elif user %}
+        <script type="application/javascript">
+            mixpanel.people.set({
+                {% if user.email %}
+                email: '{{ user.email }}',
+                {% endif %}
+                username: '{{ user.player.username if user.player else user.username }}'
+            });
+        </script>
     {% endif %}
     
     <!--[if lte IE 8]><script type="text/javascript" src="{{ url_for('static', filename='js/excanvas.min.js') }}"></script><![endif]-->
