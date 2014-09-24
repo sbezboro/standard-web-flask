@@ -39,6 +39,18 @@
     
     <script type="text/javascript" src="{{ url_for('static', filename='js/all.min.js') }}"></script>
 
+    {% if user %}
+        <script type="application/javascript">
+            mixpanel.identify({{ user.id }});
+            mixpanel.people.set({
+                {% if user.email %}
+                email: '{{ user.email }}',
+                {% endif %}
+                username: '{{ user.player.username if user.player else user.username }}'
+            });
+        </script>
+    {% endif %}
+
     {% if g.first_login %}
         <script type="application/javascript">
             mixpanel.alias({{ user.id }});
@@ -61,15 +73,6 @@
             window._fbq.push(['track', '6018722527894', {'value':'0.00','currency':'CAD'}]);
         </script>
         <noscript><img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?ev=6018722527894&amp;cd[value]=0.00&amp;cd[currency]=CAD&amp;noscript=1" /></noscript>
-    {% elif user %}
-        <script type="application/javascript">
-            mixpanel.people.set({
-                {% if user.email %}
-                email: '{{ user.email }}',
-                {% endif %}
-                username: '{{ user.player.username if user.player else user.username }}'
-            });
-        </script>
     {% endif %}
     
     <!--[if lte IE 8]><script type="text/javascript" src="{{ url_for('static', filename='js/excanvas.min.js') }}"></script><![endif]-->
