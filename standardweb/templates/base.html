@@ -50,10 +50,10 @@
             mixpanel.identify({{ user.id }});
             mixpanel.people.set({
                 id: {{ user.id }},
-                username: '{{ user.player.username if user.player else user.username }}'
-                {% if user.email %}
-                ,'$email': '{{ user.email }}',
-                {% endif %}
+                {% if user.email %}'$email': '{{ user.email }}',{% endif %}
+                '$name': '{{ user.player.username if user.player else user.username }}',
+                username: '{{ user.player.username if user.player else user.username }}',
+                '$created': '{{ user.date_joined.isoformat() }}'
             });
         </script>
     {% endif %}
