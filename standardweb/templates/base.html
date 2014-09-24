@@ -15,14 +15,17 @@
     <!-- start Google Analytics -->
     <script type="text/javascript">
         var _gaq = _gaq || [];
+
         _gaq.push(['_setAccount', 'UA-32372174-1']);
         _gaq.push(['_trackPageview']);
-        
+
+        {% if not is_debug %}
         (function() {
             var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
             ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
         })();
+        {% endif %}
     </script>
     <!-- end Google Analytics -->
 
@@ -41,12 +44,16 @@
 
     {% if user %}
         <script type="application/javascript">
+            mixpanel.register({
+                user_id: {{ user.id }}
+            });
             mixpanel.identify({{ user.id }});
             mixpanel.people.set({
-                {% if user.email %}
-                email: '{{ user.email }}',
-                {% endif %}
+                id: {{ user.id }},
                 username: '{{ user.player.username if user.player else user.username }}'
+                {% if user.email %}
+                ,'$email': '{{ user.email }}',
+                {% endif %}
             });
         </script>
     {% endif %}
