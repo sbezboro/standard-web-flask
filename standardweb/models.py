@@ -8,6 +8,7 @@ from standardweb.lib import helpers as h
 from pbkdf2 import pbkdf2_bin
 
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql import func
 
 from datetime import datetime, timedelta
 
@@ -216,6 +217,11 @@ class Server(db.Model, Base):
     address = db.Column(db.String(50))
     online = db.Column(db.Boolean())
     secret_key = db.Column(db.String(10))
+    type = db.Column(db.String(20))
+
+    @classmethod
+    def get_survival_servers(cls):
+        return cls.query.filter_by(type='survival')
 
 
 class ServerStatus(db.Model, Base):
@@ -342,6 +348,16 @@ class MaterialType(db.Model, Base):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(32), unique=True)
     displayname = db.Column(db.String(64))
+
+    ORES = (
+        'DIAMOND_ORE', 'EMERALD_ORE', 'LAPIS_ORE', 'REDSTONE_ORE', 'QUARTZ_ORE', 'COAL_ORE'
+    )
+
+    @classmethod
+    def get_ores(cls):
+        return cls.query.filter(
+            cls.type.in_(cls.ORES)
+        ).order_by(func.field(cls.type, *cls.ORES))
 
 
 class OreDiscoveryEvent(db.Model, Base):

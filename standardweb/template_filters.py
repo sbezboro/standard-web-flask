@@ -4,15 +4,17 @@ from standardweb import app
 from standardweb.lib import helpers as h
 
 
-def _face_image(username, size):
+def _face_image(username, size, scaled_size=None):
+    scaled_size = scaled_size or size
+
     cls = 'face-thumb' if size == 16 else 'face-large'
-    return '<img src="/face/%(size)d/%(username)s.png" class="%(cls)s" width="%(size)d" height="%(size)d" alt="%(username)s">' \
-           % {'size': size, 'cls': cls, 'username': username}
+    return '<img src="/face/%(size)d/%(username)s.png" class="%(cls)s" width="%(scaled_size)d" height="%(scaled_size)d" alt="%(username)s">' \
+           % {'size': size, 'scaled_size': scaled_size, 'cls': cls, 'username': username}
 
 
 @app.template_filter('face_thumb')
-def face_thumb(username):
-    return Markup(_face_image(username, 16))
+def face_thumb(username, scaled_size=16):
+    return Markup(_face_image(username, 16, scaled_size=scaled_size))
 
 
 @app.template_filter('face_large')

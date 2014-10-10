@@ -1,10 +1,8 @@
-from datetime import datetime
-from datetime import timedelta
-
 from standardweb.lib import cache
 from standardweb.models import *
 
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql import func
 
 
 def extract_face(image, size):
@@ -21,19 +19,7 @@ def extract_face(image, size):
     return image.crop((8, 8, 16, 16)).resize((size, size))
 
 
-@cache.CachedResult('player', time=30)
-def get_server_data(server, player):
-    """
-    Returns a dict of all the data for a particular player on
-    a particular server, or None if the player hasn't played on
-    the given server yet.
-    """
-    stats = PlayerStats.query.options(
-        joinedload(PlayerStats.group)
-    ).filter_by(server_id=server.id, player_id=player.id).first()
-    if not stats:
-        return stats
-
+def get_combat_data(player, server):
     pvp_kills = []
     pvp_deaths = []
     other_kills = []
@@ -44,7 +30,7 @@ def get_server_data(server, player):
     other_kill_count = 0
     other_death_count = 0
 
-    deaths = DeathCount.query.filter_by(server_id=server.id, victim_id=player.id) \
+    deaths = DeathCount.query.filter_by(server=server, victim_id=player.id) \
         .options(joinedload('killer')).options(joinedload('death_type'))
 
     for death in deaths:
@@ -61,7 +47,7 @@ def get_server_data(server, player):
             })
             other_death_count += death.count
 
-    kills = KillCount.query.filter_by(server_id=server.id, killer_id=player.id) \
+    kills = KillCount.query.filter_by(server=server, killer_id=player.id) \
         .options(joinedload('kill_type'))
 
     for kill in kills:
@@ -71,7 +57,7 @@ def get_server_data(server, player):
         })
         other_kill_count += kill.count
 
-    kills = DeathCount.query.filter_by(server_id=server.id, killer_id=player.id) \
+    kills = DeathCount.query.filter_by(server=server, killer_id=player.id) \
         .options(joinedload('victim')).options(joinedload('death_type'))
 
     for kill in kills:
@@ -87,20 +73,80 @@ def get_server_data(server, player):
     other_kills = sorted(other_kills, key=lambda k: (-k['count'], k['type']))
 
     return {
-        'rank': stats.rank,
-        'banned': stats.banned,
-        'online_now': stats.is_online,
-        'first_seen': h.iso_date(stats.first_seen),
-        'last_seen': h.iso_date(stats.last_seen),
-        'time_spent': h.elapsed_time_string(stats.time_spent),
-        'pvp_kills': pvp_kills,
-        'pvp_deaths': pvp_deaths,
-        'other_kills': other_kills,
-        'other_deaths': other_deaths,
         'pvp_kill_count': pvp_kill_count,
         'pvp_death_count': pvp_death_count,
+        'pvp_kills': pvp_kills,
+        'pvp_deaths': pvp_deaths,
         'other_kill_count': other_kill_count,
         'other_death_count': other_death_count,
-        'pvp_logs': stats.pvp_logs,
-        'group': stats.group
+        'other_deaths': other_deaths,
+        'other_kills': other_kills
+    }
+
+
+@cache.CachedResult('player', time=30)
+def get_data_on_server(player, server):
+    """
+    Returns a dict of all the data for a particular player which
+    consists of their global gameplay stats and the stats for the
+    given server.
+    """
+    first_ever_seen = db.session.query(
+        func.min(PlayerStats.first_seen)
+    ).filter_by(player_id=player.id).scalar()
+
+    last_seen = db.session.query(
+        func.max(PlayerStats.last_seen)
+    ).join(Server).filter(
+        PlayerStats.player_id == player.id,
+        Server.type == 'survival'
+    ).scalar()
+
+    total_time = db.session.query(
+        func.sum(PlayerStats.time_spent)
+    ).join(Server).filter(
+        PlayerStats.player_id == player.id,
+        Server.type == 'survival'
+    ).scalar()
+
+    ore_discoveries = OreDiscoveryCount.query.options(
+        joinedload(OreDiscoveryCount.material_type)
+    ).filter_by(
+        player=player,
+        server=server
+    )
+
+    ore_counts = {type: 0 for type in MaterialType.ORES}
+
+    for ore in ore_discoveries:
+        ore_counts[ore.material_type.type] += ore.count
+
+    ore_counts = [(ore.displayname, ore_counts[ore.type]) for ore in MaterialType.get_ores()]
+
+    stats = PlayerStats.query.filter_by(
+        server=server,
+        player=player
+    ).first()
+
+    server_stats = None
+    if stats:
+        server_stats = {
+            'rank': stats.rank,
+            'time_spent': h.elapsed_time_string(stats.time_spent),
+            'pvp_logs': stats.pvp_logs,
+            'group': stats.group,
+            'is_leader': stats.is_leader,
+            'is_moderator': stats.is_moderator,
+            'ore_counts': ore_counts
+        }
+
+    online_now = datetime.utcnow() - last_seen < timedelta(minutes=1)
+
+    return {
+        'first_ever_seen': h.iso_date(first_ever_seen),
+        'last_seen': h.iso_date(last_seen),
+        'online_now': online_now,
+        'total_time': h.elapsed_time_string(total_time),
+        'combat_stats': get_combat_data(player, server),
+        'server_stats': server_stats
     }

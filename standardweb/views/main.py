@@ -126,10 +126,17 @@ def player(username, server_id=None):
     if not server:
         abort(404)
 
+    if server.type != 'survival':
+        abort(404)
+
     template = 'player.html'
     retval = {
         'server': server,
-        'servers': Server.query.all()
+        'servers': Server.query.filter_by(
+            type='survival'
+        ).order_by(
+            Server.id.desc()
+        )
     }
 
     if len(username) == 32:
@@ -148,13 +155,17 @@ def player(username, server_id=None):
         # the username doesn't belong to any player seen on any server
         return render_template(template, **retval), 404
 
+    if player.username != username:
+        return redirect(url_for('player', username=player.username,
+                                server_id=app.config['MAIN_SERVER_ID']))
+
     # the player has played on at least one server
     retval.update({
         'player': player
     })
 
     # grab all data for this player on the selected server
-    data = libplayer.get_server_data(server, player)
+    data = libplayer.get_data_on_server(player, server)
 
     if not data:
         # the player has not played on the selected server
@@ -183,7 +194,7 @@ def ranking(server_id=None):
 
     retval = {
         'server': server,
-        'servers': Server.query.all(),
+        'servers': Server.get_survival_servers(),
         'ranking': ranking
     }
 
@@ -211,7 +222,7 @@ def leaderboards(server_id=None):
 
     retval = {
         'server': server,
-        'servers': Server.query.all(),
+        'servers': Server.get_survival_servers(),
         'leaderboard_sections': leaderboard_sections
     }
 
@@ -257,7 +268,7 @@ def groups(server_id=None, mode=None):
 
     retval = {
         'server': server,
-        'servers': Server.query.all(),
+        'servers': Server.get_survival_servers(),
         'groups': groups,
         'group_count': group_count,
         'page': page,
