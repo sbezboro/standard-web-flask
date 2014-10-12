@@ -3,10 +3,10 @@ cd standardweb
 uglifyjs static/js/jquery-1.8.3.min.js\
     static/js/jquery.flot.min.js\
     static/js/jquery.placeholder.min.js\
-    static/js/jquery.timeago.min.js\
     static/js/jquery.tipsy.min.js\
     static/js/jquery.sceditor.min.js\
     static/js/jquery.sceditor.bbcode.min.js\
+    static/js/moment.min.js\
     static/js/soundmanager2.min.js\
     static/js/ZeroClipboard.min.js\
     static/js/site.js\

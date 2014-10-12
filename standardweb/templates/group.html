@@ -24,7 +24,7 @@
             </div>
             <div class="player-stat-section">
                 <h2>Established</h2>
-                <abbr class="timeago" title="{{ group.established|iso_date }}">{{ group.established|iso_date }}</abbr>
+                {{ group.established|from_now }}
             </div>
             <div class="player-stat-section">
                 <h2>Land count</h2>

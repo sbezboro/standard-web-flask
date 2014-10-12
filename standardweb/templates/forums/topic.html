@@ -17,7 +17,7 @@
             <div class="forum-post {% if post.user.forum_ban %}banned{% endif %}">
                 <h4>
                     <a href="{{ url_for('forum_post', post_id=post.id) }}">
-                        <abbr class="timeago" title="{{ post.created | iso_date }}">{{ post.created }}</abbr>
+                       {{ post.created|from_now }}
                     </a>
                 </h4>
                 <div class="post-author {% if post.user.admin %}admin{% endif %}"
@@ -48,7 +48,7 @@
                                     {% if stats.is_online %}
                                         Now
                                     {% else %}
-                                        <abbr class="timeago" title="{{ stats.last_seen | iso_date }}"></abbr>
+                                        {{ stats.last_seen|from_now }}
                                     {% endif %}
                                 {% endif %}
                             </div>
@@ -101,7 +101,7 @@
                             {% else %}
                                 <b>{{ post.updated_by.username }}</b>
                             {% endif %}
-                            <abbr class="timeago" title="{{ post.updated | iso_date }}">{{ post.updated }}</abbr>
+                            {{ post.updated|from_now }}
                         </span>
                     {% endif %}
                     {% if user %}

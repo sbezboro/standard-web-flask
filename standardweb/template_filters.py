@@ -22,9 +22,9 @@ def face_large(username):
     return Markup(_face_image(username, 64))
 
 
-@app.template_filter('iso_date')
-def iso_date(date):
-    return h.iso_date(date)
+@app.template_filter('from_now')
+def from_now(date):
+    return Markup('<span class="fromnow">%sZ</span>' % date.isoformat())
 
 
 @app.template_filter('attachment_link')

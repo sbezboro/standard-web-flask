@@ -7,10 +7,6 @@ _ansi_pat = re.compile(r'\x1b[^m]*m')
 _email_pat = re.compile(r'.+@.+\..+')
 
 
-def iso_date(date):
-    return date.strftime("%Y-%m-%d %H:%M:%SZ")
-
-
 def elapsed_time_string(total_minutes):
     hours = int(total_minutes / 60)
 

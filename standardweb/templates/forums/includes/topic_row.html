@@ -20,7 +20,7 @@
                 {% else %}
                     {{ topic.user.username }}
                 {% endif %} -
-                <abbr class="timeago" title="{{ topic.created | iso_date }}">{{ topic.created }}</abbr>
+                {{ topic.created|from_now }}
                 {% if topic.post_count > topic_page_size %}
                     -
                     <span class="pages">
@@ -46,7 +46,7 @@
         <td class="last-post-cell">
             {% with last_post = topic.last_post, last_post_user = last_post.user %}
             <div>
-                <b>Last post:</b> <a href="{{ last_post.url }}"><abbr class="timeago" title="{{ last_post.created | iso_date }}">{{ last_post.created }}</abbr></a>
+                <b>Last post:</b> <a href="{{ last_post.url }}">{{ last_post.created|from_now }}</a>
             </div>
             <div>
                 {% if last_post_user.player %}

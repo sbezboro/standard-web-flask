@@ -93,7 +93,13 @@ def get_data_on_server(player, server):
     """
     first_ever_seen = db.session.query(
         func.min(PlayerStats.first_seen)
-    ).filter_by(player_id=player.id).scalar()
+    ).join(Server).filter(
+        PlayerStats.player_id == player.id,
+        Server.type == 'survival'
+    ).scalar()
+
+    if not first_ever_seen:
+        return None
 
     last_seen = db.session.query(
         func.max(PlayerStats.last_seen)
@@ -143,8 +149,8 @@ def get_data_on_server(player, server):
     online_now = datetime.utcnow() - last_seen < timedelta(minutes=1)
 
     return {
-        'first_ever_seen': h.iso_date(first_ever_seen),
-        'last_seen': h.iso_date(last_seen),
+        'first_ever_seen': first_ever_seen,
+        'last_seen': last_seen,
         'online_now': online_now,
         'total_time': h.elapsed_time_string(total_time),
         'combat_stats': get_combat_data(player, server),

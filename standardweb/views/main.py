@@ -159,21 +159,16 @@ def player(username, server_id=None):
         return redirect(url_for('player', username=player.username,
                                 server_id=app.config['MAIN_SERVER_ID']))
 
-    # the player has played on at least one server
+    # grab all data for this player including the current server data
+    data = libplayer.get_data_on_server(player, server)
+
+    # make sure the player has played on at least one survival server
+    if not data:
+        return render_template(template, **retval), 404
+
     retval.update({
         'player': player
     })
-
-    # grab all data for this player on the selected server
-    data = libplayer.get_data_on_server(player, server)
-
-    if not data:
-        # the player has not played on the selected server
-        retval.update({
-            'noindex': True
-        })
-
-        return render_template(template, **retval)
 
     retval.update(data)
 

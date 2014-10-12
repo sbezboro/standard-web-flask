@@ -43,9 +43,7 @@
                 <div class="stat">
                     <div class="stat-name">First seen</div>
                     <div class="stat-value">
-                        <abbr class="timeago" title="{{ first_ever_seen }}">
-                            {{ first_ever_seen }}
-                        </abbr>
+                        {{ first_ever_seen|from_now }}
                     </div>
                 </div>
                 <div class="stat">
@@ -54,7 +52,7 @@
                         {% if online_now %}
                             Now
                         {% else %}
-                            <abbr class="timeago" title="{{ last_seen }}">{{ last_seen }}</abbr>
+                            {{ last_seen|from_now }}
                         {% endif %}
                     </div>
                 </div>
@@ -74,7 +72,7 @@
                                 <div class="stat-name">Last post</div>
                                 <div class="stat-value">
                                     <a href="{{ last_post.url }}">
-                                        <abbr class="timeago" title="{{ last_post.created | iso_date }}">{{ last_post.created | iso_date }}</abbr>
+                                        {{ last_post.created|from_now }}
                                     </a>
                                 </div>
                             </div>

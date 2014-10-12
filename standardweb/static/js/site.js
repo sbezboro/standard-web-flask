@@ -129,8 +129,24 @@
       });
     });
 
-    $("abbr.timeago").timeago();
-    $(".placeholder").placeholder();
-    $(".tooltip").tipsy();
+    $('.fromnow').each(function() {
+      var val;
+      var now = moment();
+      var date = moment($.trim($(this).text()));
+
+      if (date.isValid()) {
+        if (now.diff(date, 'days') > 365) {
+          val = date.format('MMMM D, YYYY');
+        } else {
+          val = date.fromNow();
+        }
+
+        $(this).text(val);
+        $(this).attr('title', date.format('LLL'));
+      }
+    });
+
+    $('.placeholder').placeholder();
+    $('.tooltip').tipsy();
   });
 })(window, document, $);

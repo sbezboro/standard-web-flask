@@ -534,7 +534,7 @@ fieldset {
 #chat-container {
     -webkit-box-shadow: 10px 10px 10px 10px rgba(0,0,0,1);
     -moz-box-shadow: 0 1px 10px rgba(0,0,0,1);
-    box-shadow: 0 0px 14px rgba(0,0,0,1);
+    box-shadow: 0 0 14px rgba(0,0,0,1);
 }
 
 #chat-container #chat {
