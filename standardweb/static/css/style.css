@@ -55,23 +55,41 @@ code {
     width: 960px;
 }
 
-#header #right {
-    float: right;
-    margin-top: -3px;
+#nav-menu {
+    display: inline-block;
+    text-align: left;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
 }
 
-#header a {
+#nav-menu li {
+    display: inline-block;
+}
+
+#nav-menu li a {
     color: #bbb;
-    text-decoration: none;
     margin-right: 10px;
 }
 
-#header a:hover, #header .selected {
+#nav-menu li a:hover, #nav-menu li a.selected {
     color: #fff;
 }
 
-#header .face-thumb {
-    border: 0px !important;
+#header #account {
+    float: right;
+}
+
+#header #account a {
+    color: #bbb;
+}
+
+#header #account a:hover {
+    color: #fff;
+}
+
+#header #account .face-thumb {
+    border: 0 !important;
     margin-right: 4px;
 }
 
@@ -288,6 +306,75 @@ fieldset {
     -webkit-box-shadow: none !important;
     -moz-box-shadow: none !important;
     box-shadow: none !important;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown.open a {
+    color: #fff !important;
+}
+
+.dropdown .options {
+    display: none;
+    list-style: none;
+    position: absolute;
+    background: #fff;
+    border: 1px solid #b9b9b9;
+    border-radius: 6px;
+    padding: 6px 0;
+    right: 0;
+    min-width: 140px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.dropdown .options:before {
+    content: '';
+    display: inline-block;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid #ccc;
+    border-bottom-color: rgba(0,0,0,0.1);
+    position: absolute;
+    top: -7px;
+    right: 24px;
+}
+
+.dropdown .options:after {
+    content: '';
+    display: inline-block;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid #fff;
+    position: absolute;
+    top: -6px;
+    right: 25px;
+}
+
+.dropdown .options li {
+    display: block;
+    padding: 4px 8px;
+}
+
+.dropdown .options li:hover {
+    background: #3f3f3f;
+}
+
+.dropdown .options a {
+    color: #1f1f1f !important;
+}
+
+.dropdown .options a li:hover {
+    color: #fff !important;
+}
+
+.caret {
+    display: inline-block;
+    vertical-align: middle;
+    border-top: 4px solid;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
 }
 
 #caption {
@@ -630,6 +717,7 @@ fieldset {
 .player-header {
     background: #eaeaea;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 .player-header .player-detail {
@@ -1643,10 +1731,20 @@ a:hover .ansi-container {
         list-style-type: none;
         margin: 0;
         padding: 10px;
+        display: none;
     }
     
     #mobile-nav-menu li {
         padding-top: 10px;
+    }
+
+    #mobile-nav-menu li a {
+        color: #bbb;
+    }
+
+    #mobile-nav-menu img {
+        border: 0 !important;
+        margin-right: 4px;
     }
     
     #chat-container #chat {

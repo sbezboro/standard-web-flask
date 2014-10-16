@@ -51,32 +51,42 @@ def guide_groups():
 @app.route('/search')
 def player_search():
     query = request.args.get('q')
-    page = request.args.get('p')
 
-    try:
-        page = max(int(page), 0) if page else 0
-    except:
-        page = 0
+    retval = {}
 
-    page_size = 20
+    if query:
+        page = request.args.get('p')
 
-    results = Player.query.filter(or_(Player.username.ilike('%%%s%%' % query),
-                                      Player.nickname.ilike('%%%s%%' % query))) \
-        .order_by(func.ifnull(Player.nickname, Player.username)) \
-        .limit(page_size + 1) \
-        .offset(page * page_size)
+        try:
+            page = max(int(page), 0) if page else 0
+        except:
+            page = 0
 
-    results = list(results)
+        page_size = 20
 
-    if len(results) > page_size:
-        show_next = True
-        results = results[:page_size]
-    else:
-        show_next = False
+        results = Player.query.filter(or_(Player.username.ilike('%%%s%%' % query),
+                                          Player.nickname.ilike('%%%s%%' % query))) \
+            .order_by(func.ifnull(Player.nickname, Player.username)) \
+            .limit(page_size + 1) \
+            .offset(page * page_size)
 
-    return render_template('search.html', results=results,
-                           query=query, page=page,
-                           show_next=show_next)
+        results = list(results)
+
+        if len(results) > page_size:
+            show_next = True
+            results = results[:page_size]
+        else:
+            show_next = False
+
+        retval.update({
+            'query': query,
+            'show_next': show_next,
+            'results': results,
+            'page': page,
+            'page_size': page_size
+        })
+
+    return render_template('search.html', **retval)
 
 
 @app.route('/player_list')

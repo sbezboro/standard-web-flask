@@ -15,31 +15,33 @@
             <input type="submit" value="Search" />
         </form>
 
-        <ul class="search-list">
-        {% for player in results %}
-            <li>
-                <a href="{{ url_for('player', username=player.username) }}">
-                    {{ player.username|face_thumb }}
-                    {{ player.displayname_html|safe }}
-                    {% if player.nickname %}
-                        ({{ player.username }})
-                    {% endif %}
-                </a><br />
-            </li>
-        {% else %}
-            No results found
-        {% endfor %}
-        </ul>
+        {% if query %}
+            <ul class="search-list">
+            {% for player in results %}
+                <li>
+                    <a href="{{ url_for('player', username=player.username) }}">
+                        {{ player.username|face_thumb }}
+                        {{ player.displayname_html|safe }}
+                        {% if player.nickname %}
+                            ({{ player.username }})
+                        {% endif %}
+                    </a><br />
+                </li>
+            {% else %}
+                No results found
+            {% endfor %}
+            </ul>
 
-        <div class="search-pager">
-        {% if page > 0 %}
-            <a href="{{ url_for('player_search', q=query, p=page - 1) }}">Previous</a>
-        {% endif %}
-        {% if page > 0 and show_next %}
-            |
-        {% endif %}
-        {% if show_next %}
-            <a href="{{ url_for('player_search', q=query, p=page + 1) }}">Next</a>
+            <div class="search-pager">
+            {% if page > 0 %}
+                <a href="{{ url_for('player_search', q=query, p=page - 1) }}">Previous</a>
+            {% endif %}
+            {% if page > 0 and show_next %}
+                |
+            {% endif %}
+            {% if show_next %}
+                <a href="{{ url_for('player_search', q=query, p=page + 1) }}">Next</a>
+            {% endif %}
         {% endif %}
         </div>
     </div>

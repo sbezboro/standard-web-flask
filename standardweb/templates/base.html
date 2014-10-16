@@ -90,29 +90,48 @@
     <div id="header">
         <div id="inner">
             <div class="desktop">
-                <a href="/" class="strong {% block select_index %}{% endblock %}">Standard Survival</a>
-                <a class="{% block select_guide %}{% endblock %}" href="{{ url_for('guide') }}">Guide</a>
-                <a class="{% block select_ranking %}{% endblock %}" href="{{ url_for('ranking', server_id=server.id if server else None) }}">Ranking</a>
-                <a class="{% block select_groups %}{% endblock %}" href="{{ url_for('groups', server_id=server.id if server else None) }}">Groups</a>
-                <a class="{% block select_leaderboards %}{% endblock %}" href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a>
-                <a class="{% block select_forum %}{% endblock %}" href="{{ url_for('forums') }}">Forums</a>
-                <a class="{% block select_chat %}{% endblock %}" href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a>
-                {% if user and user.admin %}
-                    <a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a>
-                {% endif %}
-                <div id="right">
+                <ul id="nav-menu">
+                    <li><a href="/" class="strong {% block select_index %}{% endblock %}">Standard Survival</a></li>
+                    <li><a class="{% block select_guide %}{% endblock %}" href="{{ url_for('guide') }}">Guide</a></li>
+                    <li><a class="{% block select_ranking %}{% endblock %}" href="{{ url_for('ranking', server_id=server.id if server else None) }}">Ranking</a></li>
+                    <li><a class="{% block select_groups %}{% endblock %}" href="{{ url_for('groups', server_id=server.id if server else None) }}">Groups</a></li>
+                    <li><a class="{% block select_leaderboards %}{% endblock %}" href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a></li>
+                    <li><a class="{% block select_forum %}{% endblock %}" href="{{ url_for('forums') }}">Forums</a></li>
+                    <li><a class="{% block select_chat %}{% endblock %}" href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a></li>
+                    <li><a class="{% block select_search %}{% endblock %}" href="{{ url_for('player_search') }}">Player Search</a></li>
+                    {% if user and user.admin %}
+                        <li><a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a></li>
+                    {% endif %}
+                </ul>
+                <div id="account">
                     {% if user %}
-                        {% if not user.admin %}
-                            <a class="{% block select_player %}{% endblock %}" href="{{ url_for('player', username=user.player.username) }}">{{ user.player.username|face_thumb }}{{ user.player.username }}</a>
-                        {% endif %}
-                        <a href="{{ url_for('logout') }}">Log out</a>
+                        <div class="dropdown">
+                            {% if user.admin %}
+                                <a class=""></a>
+                            {% else %}
+                                <a class="{% block select_player %}{% endblock %} toggle" href="#">{{ user.player.username|face_thumb }}{{ user.player.username }}
+                                    <span class="caret"></span>
+                                </a>
+                            {% endif %}
+                            <ul class="options">
+                                {% if not user.admin %}
+                                    <a href="{{ url_for('player', username=user.player.username) }}">
+                                        <li>
+                                            Profile
+                                        </li>
+                                    </a>
+                                {% endif %}
+                                <a href="{{ url_for('logout') }}">
+                                    <li>
+                                    Log out
+                                    </li>
+                                </a>
+                            </ul>
+                        </div>
                     {% else %}
-                        <a class="{% block select_signup %}{% endblock %}" href="{{ url_for('signup') }}">Sign up</a>
+                        <a class="{% block select_signup %}{% endblock %}" href="{{ url_for('signup') }}">Sign up</a>&nbsp;
                         <a class="{% block select_login %}{% endblock %}" href="{{ url_for('login', next=request.path) }}">Log in</a>
                     {% endif %}
-                    <form class="form-inline" method="GET" action="{{ url_for('player_search') }}">
-                        <input class="placeholder" type="text" name="q" placeholder="Player search" value="{{ query }}"/>
-                    </form>
                 </div>
             </div>
             <div class="mobile">
@@ -120,9 +139,9 @@
                     Standard Survival
                 </div>
                 <div class="mobile-nav">
-                    <a href="#" class="btn extender" data-target="mobile-nav-menu">=</a>
+                    <a href="#" class="btn extender" data-target="mobile-nav-menu">☰</a>
                 </div>
-                <ul id="mobile-nav-menu" style="display:none;">
+                <ul id="mobile-nav-menu">
                     <li><a href="/">Home</a></li>
                     <li><a href="{{ url_for('guide') }}">Guide</a></li>
                     <li><a href="{{ url_for('ranking', server_id=server.id if server else None) }}">Ranking</a></li>
@@ -130,6 +149,7 @@
                     <li><a href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a></li>
                     <li><a href="{{ url_for('forums') }}">Forums</a></li>
                     <li><a href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a></li>
+                    <li><a href="{{ url_for('player_search') }}">Player Search</a></li>
                     {% if user and user.admin %}<li><a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a></li>{% endif %}
                         <li>&nbsp;</li>
                     {% if user %}
@@ -141,9 +161,6 @@
                         <li><a href="{{ url_for('signup') }}">Sign up</a></li>
                         <li><a href="{{ url_for('login', next=request.path) }}">Log in</a></li>
                     {% endif %}
-                    <li><form class="form-inline" method="GET" action="{{ url_for('player_search') }}">
-                        <input class="placeholder" type="text" name="q" placeholder="Player search" value="{{ query }}"/>
-                    </form></li>
                 </ul>
             </div>
         </div>

@@ -2,6 +2,30 @@
   $(document).ready(function () {
     var hash = window.location.hash ? window.location.hash.substring(1) : null;
 
+    $('.dropdown .toggle').on('click', function() {
+      var $this = $(this);
+      var $dropdown = $this.closest('.dropdown');
+      var $options = $('.options', $dropdown);
+
+      $dropdown.toggleClass('open');
+      $options.toggle();
+
+      return false;
+    });
+
+    $(document).on('mouseup', function(e) {
+      var $dropdownOptions = $('.dropdown .options');
+
+      if ($dropdownOptions.attr('display') !== 'none') {
+        var $dropdown = $dropdownOptions.closest('.dropdown');
+
+        if (!$dropdownOptions.is(e.target) && $dropdownOptions.has(e.target).length === 0) {
+          $dropdown.removeClass('open');
+          $dropdownOptions.hide();
+        }
+      }
+    });
+
     $('.extender').on('click', function () {
       var target = '#' + $(this).attr('data-target');
       $(target).toggle();
