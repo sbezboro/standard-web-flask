@@ -106,15 +106,19 @@
                 <div id="account">
                     {% if user %}
                         <div class="dropdown">
-                            {% if user.admin %}
-                                <a class=""></a>
+                            {% if user.player %}
+                                <a class="{% block select_player %}{% endblock %} toggle" href="#">
+                                    {{ user.player.username|face_thumb }}{{ user.player.username }}
+                                    <span class="caret"></span>
+                                </a>
                             {% else %}
-                                <a class="{% block select_player %}{% endblock %} toggle" href="#">{{ user.player.username|face_thumb }}{{ user.player.username }}
+                                <a class="toggle" href="#">
+                                    {{ user.username }}
                                     <span class="caret"></span>
                                 </a>
                             {% endif %}
                             <ul class="options">
-                                {% if not user.admin %}
+                                {% if user.player %}
                                     <a href="{{ url_for('player', username=user.player.username) }}">
                                         <li>
                                             Profile
