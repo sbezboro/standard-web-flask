@@ -24,8 +24,10 @@ import template_filters
 
 import views.api
 import views.auth
+import views.base
 import views.forums
-import views.main
+import views.groups
+import views.profile
 
 
 def set_up_rollbar():
