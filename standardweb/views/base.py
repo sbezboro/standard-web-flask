@@ -136,7 +136,8 @@ def player(username, server_id=None):
         abort(404)
 
     if server.type != 'survival':
-        abort(404)
+        return redirect(url_for('player', username=username,
+                                server_id=app.config['MAIN_SERVER_ID']))
 
     template = 'player.html'
     retval = {
