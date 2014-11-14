@@ -71,14 +71,25 @@ class User(db.Model, Base):
     player = db.relationship('Player', backref=db.backref('user', uselist=False))
 
     @classmethod
-    def create(cls, player, plaintext_password, email, commit=True):
+    def create(cls, player, plaintext_password, email):
         user = cls(player=player, uuid=player.uuid)
         user.set_password(plaintext_password)
+        user.last_login = datetime.utcnow()
+        user.email = email
 
         user.save(commit=False)
 
+        # make sure messages received to this player are properly associated
+        # with the newly created user
+        Message.query.filter_by(
+            to_player=player,
+            to_user=None
+        ).update({
+            'to_user_id': user.id
+        })
+
         forum_profile = ForumProfile(user=user)
-        forum_profile.save(commit=commit)
+        forum_profile.save(commit=True)
 
         return user
 
@@ -92,6 +103,12 @@ class User(db.Model, Base):
         password = User._make_password(plaintext_password)
         self.password = password
         self.save(commit=commit)
+
+    def get_username(self):
+        if self.player_id:
+            return self.player.username
+
+        return self.username
 
     @staticmethod
     def _make_password(password, salt=None, iterations=None):
@@ -205,9 +222,15 @@ class PlayerStats(db.Model, Base):
 
     @property
     def rank(self):
-        return PlayerStats.query.filter(PlayerStats.server_id == self.server_id,
-                                        PlayerStats.time_spent > self.time_spent,
-                                        PlayerStats.player_id != self.player_id).count() + 1
+        return len(
+            PlayerStats.query.with_entities(
+                PlayerStats.id
+            ).filter(
+                PlayerStats.server_id == self.server_id,
+                PlayerStats.time_spent > self.time_spent,
+                PlayerStats.player_id != self.player_id
+            ).all()
+        ) + 1
 
 class Server(db.Model, Base):
     __tablename__ = 'server'
@@ -480,6 +503,38 @@ class VeteranStatus(db.Model, Base):
     rank = db.Column(db.Integer)
 
     player = db.relationship('Player')
+
+
+class Message(db.Model, Base):
+    __tablename__ = 'message'
+
+    id = db.Column(db.Integer, primary_key=True)
+    from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    to_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    # optional column to identify messages sent to players that don't have users created yet
+    to_player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    seen_at = db.Column(db.DateTime)
+    body = db.Column(db.Text())
+    body_html = db.Column(db.Text())
+    user_ip = db.Column(db.String(15))
+    deleted = db.Column(db.Boolean, default=False)
+
+    from_user = db.relationship('User', foreign_keys='Message.from_user_id',
+                                backref=db.backref('messages_sent'))
+    to_user = db.relationship('User', foreign_keys='Message.to_user_id',
+                              backref=db.backref('messages_received'))
+    to_player = db.relationship('Player', foreign_keys='Message.to_player_id',
+                                backref=db.backref('messages_received'))
+
+    def save(self, commit=True):
+        from standardweb.lib import forums
+        self.body_html = forums.convert_bbcode(self.body)
+
+        for pat, path in forums.emoticon_map:
+            self.body_html = pat.sub(path, self.body_html)
+
+        return super(Message, self).save(commit)
 
 
 class ForumProfile(db.Model, Base):

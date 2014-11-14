@@ -119,10 +119,7 @@ def create_account(token):
         else:
             email_token.date_redeemed = datetime.utcnow()
 
-            user = User.create(player, password, email, commit=False)
-            user.last_login = datetime.utcnow()
-            user.email = email
-            user.save(commit=True)
+            user = User.create(player, password, email)
 
             session['user_id'] = user.id
             session['first_login'] = True

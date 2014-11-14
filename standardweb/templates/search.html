@@ -12,7 +12,7 @@
 
         <form class="form-inline search-form" method="GET" action="{{ url_for('player_search') }}">
             <input class="placeholder" type="text" name="q" placeholder="Username or Nickname" value="{{ query }}"/>
-            <input type="submit" value="Search" />
+            <input class="btn btn-lite" type="submit" value="Search" />
         </form>
 
         {% if query %}
@@ -33,16 +33,17 @@
             </ul>
 
             <div class="search-pager">
-            {% if page > 0 %}
-                <a href="{{ url_for('player_search', q=query, p=page - 1) }}">Previous</a>
-            {% endif %}
-            {% if page > 0 and show_next %}
-                |
-            {% endif %}
-            {% if show_next %}
-                <a href="{{ url_for('player_search', q=query, p=page + 1) }}">Next</a>
-            {% endif %}
+                {% set show_next = results|length == page_size %}
+                {% if page > 0 %}
+                    <a href="{{ url_for('player_search', q=query, p=page - 1) }}">Previous</a>
+                {% endif %}
+                {% if page > 0 and show_next %}
+                    |
+                {% endif %}
+                {% if show_next %}
+                    <a href="{{ url_for('player_search', q=query, p=page + 1) }}">Next</a>
+                {% endif %}
+            </div>
         {% endif %}
-        </div>
     </div>
 {% endblock %}

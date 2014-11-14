@@ -57,7 +57,37 @@ def send_reset_password(user):
     return send_email(user.email, '[Standard Survival] Reset password', text_body, html_body)
 
 
+def send_new_message_email(user, message):
+    from_user = message.from_user
+    from_username = message.from_user.get_username()
+
+    from_email = None
+    if from_user.email:
+        from_email = '%s <%s>' % (from_username, from_user.email)
+
+    conversation_url = url_for('messages', username=from_username, _external=True)
+
+    from_player_url = None
+    if from_user.player:
+        from_player_url = url_for('player', username=from_username, _external=True)
+
+    text_body, html_body = _render_email('messages/new_message', {
+        'username': user.get_username(),
+        'from_username': from_username,
+        'message_body': message.body,
+        'message_body_html': message.body_html,
+        'conversation_url': conversation_url,
+        'from_player_url': from_player_url
+    })
+
+    return send_email(user.email, '[Standard Survival] New message from %s' % from_username, text_body, html_body,
+                      from_email=from_email)
+
+
 def send_email(to_email, subject, text_body, html_body, from_email=None):
+    if not to_email:
+        return None
+
     return _send_email(from_email or DEFAULT_FROM_EMAIL, to_email, subject, text_body, html_body)
 
 

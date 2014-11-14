@@ -17,6 +17,7 @@
 {% block select_player %}{% if user.username == username %}selected{% endif %}{% endblock %}
 {% block content %}
     <div id="main">
+        {% include 'includes/flash_messages.html' %}
         {% if player %}
         <div class="player-section">
             <div class="player-header">
@@ -29,6 +30,11 @@
                         <h3>
                             ({{ player.username }})
                         </h3>
+                    {% endif %}
+                </div>
+                <div class="messaging">
+                    {% if user and player.user != user %}
+                        <a class="btn btn-lite" href="{{ url_for('messages', username=player.username) }}">Send Message</a>
                     {% endif %}
                 </div>
             </div>

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Messages - Standard Survival Minecraft Server{% endblock %}
+
+{% from 'messages/includes/message_row.html' import message_row %}
+
+{% block content %}
+    <div id="main">
+        {% include 'includes/flash_messages.html' %}
+        <h2>Messages</h2>
+        <div class="messages-section">
+            <div class="messages-contacts">
+                {% for contact in contacts %}
+                    <a href="{{ url_for('messages', username=contact.username) }}">
+                        {% set active = (username and username == contact.username) %}
+                        {% set new = (username != contact.username and contact.new_message) %}
+                        <div class="contact {% if active %}active{% endif %} {% if new %}new{% endif %}">
+                            <div class="name">
+                                {% if contact.player %}
+                                    {{ contact.player.displayname_html|safe }}
+                                    {% if contact.player.nickname %}
+                                        ({{ contact.player.username }})
+                                    {% endif %}
+                                {% else %}
+                                    {{ contact.username }}
+                                {% endif %}
+                            </div>
+                            {% if contact.last_message_date %}
+                                <div class="time">
+                                    {{ contact.last_message_date|from_now }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </a>
+                {% endfor %}
+                <a href="{{ url_for('new_message') }}">
+                    <div class="contact {% if new_message %}active{% endif %}">
+                        <i class="fa fa-plus"></i> New message
+                    </div>
+                </a>
+            </div>
+            <div class="messages-content">
+                {% if new_message %}
+                    <div class="contact-chooser">
+                        New message to: <input type="text" autofocus/>
+                    </div>
+                    <div class="search-results"></div>
+                {% else %}
+                    {% if username %}
+                        <div class="message-list">
+                            {% if messages %}
+                                {% for message in messages %}
+                                    {{ message_row(message, user) }}
+                                {% endfor %}
+                            {% else %}
+                                <div class="help">
+                                    No messages yet, say hi!
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="reply">
+                            <form method="POST" action="{{ url_for('messages', username=username) }}">
+                                {{ form.hidden_tag() }}
+                                <button class="btn btn-lite">Send</button>
+                                <div class="textwrapper">
+                                    {{ form.text(placeholder='Enter message', autofocus='autofocus') }}
+                                </div>
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="message-list">
+                            <div class="help">
+                                Select a contact from the left or hit "New message"
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

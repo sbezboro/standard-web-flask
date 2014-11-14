@@ -9,7 +9,7 @@
 {% block content %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bbcode.css') }}">
     <div id="main">
-        {% include 'includes/messages.html' %}
+        {% include 'includes/flash_messages.html' %}
         <h2>Standard Survival Forums</h2>
         <div class="forum-content">
             {% block forum_content %}{% endblock %}

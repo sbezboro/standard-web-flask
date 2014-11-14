@@ -181,3 +181,7 @@ class ForumSearchForm(BaseForm):
     user_id = TextField('User', validators=[Optional()])
     forum_id = ExtendedSelectField('Forum', validators=[Optional()], default='')
     sort_by = SelectField('Sort by', validators=[Optional()], default='')
+
+
+class MessageForm(BaseForm):
+    text = TextAreaField('Text', validators=[DataRequired()])

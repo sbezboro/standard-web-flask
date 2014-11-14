@@ -27,7 +27,7 @@ import views.auth
 import views.base
 import views.forums
 import views.groups
-import views.profile
+import views.messages
 
 
 def set_up_rollbar():

@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tipsy.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
 
     <!-- start Google Analytics -->
     <script type="text/javascript">
@@ -105,6 +106,12 @@
                 </ul>
                 <div id="account">
                     {% if user %}
+                        <a class="messages {% if new_messages %}new{% endif %}" href="{{ url_for('messages') }}" title="Messages">
+                            <i class="fa fa-envelope"></i>
+                            {% if new_messages %}
+                                <span class="new-count">{{ new_messages }}</span>
+                            {% endif %}
+                        </a>
                         <div class="dropdown">
                             {% if user.player %}
                                 <a class="{% block select_player %}{% endblock %} toggle" href="#">
@@ -117,20 +124,16 @@
                                     <span class="caret"></span>
                                 </a>
                             {% endif %}
-                            <ul class="options">
+                            <div class="options">
                                 {% if user.player %}
                                     <a href="{{ url_for('player', username=user.player.username) }}">
-                                        <li>
-                                            Profile
-                                        </li>
+                                        <i class="fa fa-user"></i><span>Profile</span>
                                     </a>
                                 {% endif %}
                                 <a href="{{ url_for('logout') }}">
-                                    <li>
-                                    Log out
-                                    </li>
+                                    <i class="fa fa-sign-out"></i><span>Log out</span>
                                 </a>
-                            </ul>
+                            </div>
                         </div>
                     {% else %}
                         <a class="{% block select_signup %}{% endblock %}" href="{{ url_for('signup') }}">Sign up</a>&nbsp;
@@ -143,7 +146,7 @@
                     Standard Survival
                 </div>
                 <div class="mobile-nav">
-                    <a href="#" class="btn extender" data-target="mobile-nav-menu">☰</a>
+                    <a href="#" class="btn extender" data-target="mobile-nav-menu"><i class="fa fa-bars"></i></a>
                 </div>
                 <ul id="mobile-nav-menu">
                     <li><a href="/">Home</a></li>
@@ -157,6 +160,14 @@
                     {% if user and user.admin %}<li><a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a></li>{% endif %}
                         <li>&nbsp;</li>
                     {% if user %}
+                        <li>
+                            <a class="messages {% if new_messages %}new{% endif %}" href="{{ url_for('messages') }}">
+                            <i class="fa fa-envelope"></i>
+                            {% if new_messages %}
+                                <span class="new-count">{{ new_messages }}</span>
+                            {% endif %}
+                        </a>
+                        </li>
                         {% if not user.admin %}
                             <li><a href="{{ url_for('player', username=user.player.username) }}">{{ user.player.username|face_thumb }}{{ user.player.username }}</a></li>
                         {% endif %}

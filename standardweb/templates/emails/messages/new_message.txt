@@ -1,0 +1,14 @@
+{% extends 'emails/base.txt' %}
+
+{% block content %}
+Hi {{ username }},
+
+You just received a new message from {{ from_username }}:
+
+
+{{ message_body }}
+
+
+See the full conversation at: {{ conversation_url }}
+
+{% endblock %}

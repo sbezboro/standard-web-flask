@@ -63,23 +63,10 @@ def player_search():
 
         page_size = 20
 
-        results = Player.query.filter(or_(Player.username.ilike('%%%s%%' % query),
-                                          Player.nickname.ilike('%%%s%%' % query))) \
-            .order_by(func.ifnull(Player.nickname, Player.username)) \
-            .limit(page_size + 1) \
-            .offset(page * page_size)
-
-        results = list(results)
-
-        if len(results) > page_size:
-            show_next = True
-            results = results[:page_size]
-        else:
-            show_next = False
+        results = libplayer.filter_players(query, page_size=page_size, page=page)
 
         retval.update({
             'query': query,
-            'show_next': show_next,
             'results': results,
             'page': page,
             'page_size': page_size
@@ -249,7 +236,7 @@ def _face_last_modified(username, size=16):
 def face(username, size=16):
     size = int(size)
 
-    if size != 16 and size != 64:
+    if size not in (16, 64):
         abort(404)
 
     path = '%s/standardweb/faces/%s/%s.png' % (PROJECT_PATH, size, username)

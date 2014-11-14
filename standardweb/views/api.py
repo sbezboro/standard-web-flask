@@ -7,6 +7,7 @@ from functools import wraps
 
 from standardweb.models import *
 from standardweb.lib import helpers as h
+from standardweb.lib import player as libplayer
 from standardweb.lib.csrf import exempt_funcs
 from standardweb.lib.email import send_creation_email, send_verify_email
 
@@ -267,9 +268,38 @@ def rank_query():
 
 @server_api
 def join_server():
-    # do nothing for now
+    url = url_for('messages', _external=True)
+    uuid = request.form.get('uuid')
+
+    player = Player.query.filter_by(uuid=uuid).first()
+
+    num_new_messages = 0
+    from_uuids = set()
+
+    if player:
+        messages = Message.query.options(
+            joinedload(Message.from_user)
+            .joinedload(User.player)
+        ).filter_by(
+            to_player=player,
+            seen_at=None
+        )
+
+        for message in messages:
+            player = message.from_user.player
+            if player:
+                from_uuids.add(player.uuid)
+
+            num_new_messages += 1
+
     return jsonify({
-        'err': 0
+        'err': 0,
+        'player_messages': {
+            'num_new_messages': num_new_messages,
+            'from_uuids': list(from_uuids),
+            'url': url,
+            'no_user': True
+        }
     })
 
 
@@ -291,7 +321,6 @@ def leave_server():
     })
 
 
-
 @api_func
 def servers():
     servers = [{
@@ -303,4 +332,40 @@ def servers():
     return jsonify({
         'err': 0,
         'servers': servers
+    })
+
+
+@api_func
+def contact_query():
+    query = request.args.get('query')
+
+    contacts = []
+
+    if query:
+        players = libplayer.filter_players(query, page_size=10)
+
+        contacts = [{
+            'player_id': player.id,
+            'username': player.username,
+            'nickname': player.nickname,
+            'displayname_html': player.displayname_html
+        } for player in players]
+
+        users = User.query.filter(
+            User.username.ilike('%%%s%%' % query)
+        ).order_by(
+            User.username.desc()
+        )
+
+        for user in users:
+            contacts.insert(0, {
+                'user_id': user.id,
+                'username': user.username,
+                'nickname': None,
+                'displayname_html': user.username
+            })
+
+    return jsonify({
+        'err': 0,
+        'contacts': contacts
     })

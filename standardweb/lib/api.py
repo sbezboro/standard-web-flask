@@ -46,11 +46,13 @@ def _api_call(server, type, data=None):
 
 def get_api(host):
     if host not in apis:
-        apis[host] = MinecraftJsonApi(host=host,
-                                      port=app.config['MC_API_PORT'],
-                                      username=app.config['MC_API_USERNAME'],
-                                      password=app.config['MC_API_PASSWORD'],
-                                      salt=app.config['MC_API_SALT'])
+        apis[host] = MinecraftJsonApi(
+            host=host,
+            port=app.config['MC_API_PORT'],
+            username=app.config['MC_API_USERNAME'],
+            password=app.config['MC_API_PASSWORD'],
+            salt=app.config['MC_API_SALT']
+        )
     
     return apis[host]
 
@@ -87,6 +89,24 @@ def forum_post(user, forum_name, topic_name, path, is_new_topic=False):
             data['username'] = user.username
 
         _api_call(server, 'forum_post', data=data)
+
+
+def new_message(to_player, from_user):
+    from_username = from_user.get_username()
+    from_uuid = from_user.player.uuid if from_user.player else None
+
+    url = url_for('messages', username=from_username, _external=True)
+
+    for server in Server.query.filter_by(online=True):
+        data = {
+            'from_username': from_username,
+            'from_uuid': from_uuid,
+            'to_uuid': to_player.uuid,
+            'no_user': not to_player.user,
+            'url': url
+        }
+
+        _api_call(server, 'new_message', data=data)
 
 
 def set_donator(username):

@@ -1,0 +1,14 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    <h3>Hi {{ username }},</h3>
+    <p>You just received a new message from
+        {% if from_player_url %}
+            <a href="{{ from_player_url }}">{{ from_username }}</a>:
+        {% else %}
+            {{ from_username }}:
+        {% endif %}
+    </p>
+    <p style="margin-left: 20px">{{ message_body_html|safe }}</p>
+    <p>See the full conversation here: <a href="{{ conversation_url }}">{{ conversation_url }}</a></p>
+{% endblock %}

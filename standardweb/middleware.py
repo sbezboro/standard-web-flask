@@ -7,7 +7,7 @@ from flask import url_for
 from standardweb import app
 from standardweb.lib import csrf
 from standardweb.lib import helpers as h
-from standardweb.models import User
+from standardweb.models import Message, User
 from sqlalchemy.orm import joinedload
 
 import hashlib
@@ -55,7 +55,7 @@ def first_login():
 
 @app.context_processor
 def inject_user():
-    return dict(user=getattr(g, 'user', None))
+    return dict(user=g.user)
 
 
 @app.context_processor
@@ -66,6 +66,21 @@ def inject_h():
 @app.context_processor
 def inject_debug():
     return dict(is_debug=app.config['DEBUG'])
+
+
+@app.context_processor
+def inject_new_messages():
+    new_messages = 0
+
+    if g.user:
+        new_messages = len(
+            Message.query.with_entities(Message.id).filter_by(
+                to_user=g.user,
+                seen_at=None
+            ).all()
+        )
+
+    return dict(new_messages=new_messages)
 
 
 def _dated_url_for(endpoint, **values):

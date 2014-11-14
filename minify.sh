@@ -5,4 +5,6 @@ uglifyjs static/js/thirdparty/*.js\
     --source-map static/js/all.min.map\
     --source-map-url all.min.map\
     --output static/js/all.min.js\
-    --mangle
+    --mangle\
+    -p 2
+

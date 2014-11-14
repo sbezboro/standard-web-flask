@@ -1,0 +1,27 @@
+{% macro message_row(message, user) -%}
+    <div class="message {% if message.to_user == user and not message.seen_at %}new{% endif %}">
+        <div class="time">
+            {{ message.sent_at|from_now }}
+        </div>
+        <h4>
+            {% if message.from_user == user %}
+                You
+            {% else %}
+                {% if message.from_user.player %}
+                    <a href="{{ url_for('player', username=message.from_user.player.username) }}">
+                        {{ message.from_user.player.username|face_thumb }}
+                        {{ message.from_user.player.displayname_html|safe }}
+                    </a>
+                        {% if message.from_user.player.nickname %}
+                            ({{ message.from_user.player.username }})
+                        {% endif %}
+                {% else %}
+                    {{ message.from_user.username }}
+                {% endif %}
+            {% endif %}
+        </h4>
+        <div class="message-body">
+            {{ message.body_html|safe }}
+        </div>
+    </div>
+{%- endmacro %}

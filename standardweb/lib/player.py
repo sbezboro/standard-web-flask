@@ -2,7 +2,7 @@ from standardweb.lib import cache
 from standardweb.models import *
 
 from sqlalchemy.orm import joinedload
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, or_
 
 
 def extract_face(image, size):
@@ -17,6 +17,30 @@ def extract_face(image, size):
         pass
 
     return image.crop((8, 8, 16, 16)).resize((size, size))
+
+
+def filter_players(query, page_size=None, page=None):
+    if page_size is None:
+        page_size = 20
+    if page is None:
+        page = 0
+
+    results = Player.query.filter(
+        or_(
+            Player.username.ilike('%%%s%%' % query),
+            Player.nickname.ilike('%%%s%%' % query)
+        )
+    ).options(
+        joinedload(Player.user)
+    ).order_by(
+        func.ifnull(Player.nickname, Player.username)
+    ).limit(
+        page_size
+    ).offset(
+        page * page_size
+    )
+
+    return list(results)
 
 
 def get_combat_data(player, server):
