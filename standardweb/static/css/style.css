@@ -131,12 +131,12 @@ code {
 #sub-header {
     background-color: #dfdfdf;
     text-align: left;
-    margin-top: 0px;
+    margin-top: 0;
     border-bottom: 1px solid #ccc;
 }
 
 #sub-header h1 {
-    margin-top: 0px;
+    margin-top: 0;
     padding-top: 20px;
     padding-bottom: 8px;
 }

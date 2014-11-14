@@ -1,6 +1,14 @@
 #!/bin/sh
 cd standardweb
-uglifyjs static/js/thirdparty/*.js\
+uglifyjs static/js/thirdparty/jquery-1.8.3.min.js\
+    static/js/thirdparty/jquery.flot.min.js\
+    static/js/thirdparty/jquery.placeholder.min.js\
+    static/js/thirdparty/jquery.tipsy.min.js\
+    static/js/thirdparty/jquery.sceditor.min.js\
+    static/js/thirdparty/jquery.sceditor.bbcode.min.js\
+    static/js/thirdparty/moment.min.js\
+    static/js/thirdparty/soundmanager2.min.js\
+    static/js/thirdparty/ZeroClipboard.min.js\
     static/js/local/*.js\
     --source-map static/js/all.min.map\
     --source-map-url all.min.map\
