@@ -125,6 +125,9 @@ def messages(username=None):
 
     contacts = get_contact_list(user)
 
+    if not contacts:
+        return redirect(url_for('new_message'))
+
     if username and not messages:
         # show new contact at the top that will be messaged
         contacts.insert(0, {
