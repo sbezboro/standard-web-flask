@@ -125,7 +125,7 @@ def messages(username=None):
 
     contacts = get_contact_list(user)
 
-    if not contacts:
+    if not username and not contacts:
         return redirect(url_for('new_message'))
 
     if username and not messages:
