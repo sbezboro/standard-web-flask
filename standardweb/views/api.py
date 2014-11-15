@@ -278,6 +278,8 @@ def join_server():
     no_user = True
 
     if player:
+        no_user = not player.user
+
         messages = Message.query.options(
             joinedload(Message.from_user)
             .joinedload(User.player)
@@ -292,8 +294,6 @@ def join_server():
                 from_uuids.add(player.uuid)
 
             num_new_messages += 1
-
-        no_user = not player.user
 
     return jsonify({
         'err': 0,
