@@ -324,6 +324,40 @@ def leave_server():
     })
 
 
+@server_api
+def audit_log():
+    body = request.json
+
+    type = body.get('type')
+    data = body.get('data')
+    uuid = body.get('uuid')
+
+    if not type:
+        return jsonify({
+            'err': 1,
+            'message': 'Missing type'
+        }), 400
+
+    player_id = None
+
+    if uuid:
+        player = Player.query.filter_by(uuid=uuid).first()
+        if player:
+            player_id = player.id
+
+    AuditLog.create(
+        type,
+        data=data,
+        server_id=g.server.id,
+        player_id=player_id,
+        commit=True
+    )
+
+    return jsonify({
+        'err': 0
+    })
+
+
 @api_func
 def servers():
     servers = [{

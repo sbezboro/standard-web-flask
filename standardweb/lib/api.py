@@ -32,7 +32,7 @@ def _api_call(server, type, data=None):
                 'data': data
             }
         )
-        
+
         return None
     
     if not result or result.get('result') == API_CALL_RESULTS['exception']:
