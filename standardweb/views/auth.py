@@ -99,11 +99,11 @@ def create_account(token):
         return result
 
     if g.user:
-        session.pop('user_id', None)
-        g.user = None
-
         rollbar.report_message('User already logged in when verifying creation email',
                                level='warning', request=request)
+
+        session.pop('user_id', None)
+        g.user = None
 
     form = VerifyEmailForm()
 
@@ -164,11 +164,11 @@ def reset_password(token):
         return result
 
     if g.user:
-        session.pop('user_id', None)
-        g.user = None
-
         rollbar.report_message('User already logged in when resetting password',
                                level='warning', request=request)
+
+        session.pop('user_id', None)
+        g.user = None
 
     form = ResetPasswordForm()
 
