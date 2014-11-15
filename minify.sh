@@ -7,6 +7,7 @@ uglifyjs static/js/thirdparty/jquery-1.8.3.min.js\
     static/js/thirdparty/jquery.sceditor.min.js\
     static/js/thirdparty/jquery.sceditor.bbcode.min.js\
     static/js/thirdparty/moment.min.js\
+    static/js/thirdparty/socket.io.min.js\
     static/js/thirdparty/soundmanager2.min.js\
     static/js/thirdparty/ZeroClipboard.min.js\
     static/js/local/*.js\
