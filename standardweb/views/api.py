@@ -298,7 +298,7 @@ def join_server():
             'num_new_messages': num_new_messages,
             'from_uuids': list(from_uuids),
             'url': url,
-            'no_user': True
+            'no_user': not player.user
         }
     })
 
