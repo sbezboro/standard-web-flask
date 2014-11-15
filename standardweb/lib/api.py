@@ -24,18 +24,27 @@ def _api_call(server, type, data=None):
             })
         else:
             result = api.call(type)
-    except:
-        rollbar.report_exc_info(extra_data={'server_id': server.id,
-                                            'type': type,
-                                            'data': data})
+    except Exception:
+        rollbar.report_exc_info(
+            extra_data={
+                'server_id': server.id,
+                'type': type,
+                'data': data
+            }
+        )
+        
         return None
     
-    if result.get('result') == API_CALL_RESULTS['exception']:
+    if not result or result.get('result') == API_CALL_RESULTS['exception']:
         extra_data = {
             'server_id': server.id,
-            'message': result.get('message'),
             'data': data
         }
+
+        if result:
+            extra_data['message'] = result.get('message')
+        else:
+            extra_data['message'] = 'No result!'
 
         rollbar.report_message('Exception while calling server API', level='error',
                                extra_data=extra_data)
