@@ -7,6 +7,7 @@ from standardweb.lib import helpers as h
 
 from pbkdf2 import pbkdf2_bin
 
+from sqlalchemy.ext import mutable
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
 
@@ -39,6 +40,18 @@ def _get_or_create(cls, **kwargs):
             instance = query.one()
 
             return instance, False
+
+
+class JsonEncodedDict(db.TypeDecorator):
+    impl = db.String
+
+    def process_bind_param(self, value, dialect):
+        return json.dumps(value)
+
+    def process_result_value(self, value, dialect):
+        return json.loads(value)
+
+mutable.MutableDict.associate_with(JsonEncodedDict)
 
 
 class Base(object):
@@ -415,9 +428,11 @@ class OreDiscoveryCount(db.Model, Base):
 
     @classmethod
     def increment(cls, server, material_type, player, commit=True):
-        ore_count = cls.factory(server=server,
-                                material_type=material_type,
-                                player=player)
+        ore_count = cls.factory(
+            server=server,
+            material_type=material_type,
+            player=player
+        )
         ore_count.count = (ore_count.count or 0) + 1
         ore_count.save(commit=commit)
 
@@ -462,10 +477,12 @@ class Group(db.Model, Base):
     lock_count = db.Column(db.Integer)
 
     server = db.relationship('Server')
-    members = db.relationship('Player',
-                              secondary='join(PlayerStats, Player, PlayerStats.player_id == Player.id)',
-                              primaryjoin='Group.id == PlayerStats.group_id',
-                              secondaryjoin='PlayerStats.player_id == Player.id')
+    members = db.relationship(
+        'Player',
+        secondary='join(PlayerStats, Player, PlayerStats.player_id == Player.id)',
+        primaryjoin='Group.id == PlayerStats.group_id',
+        secondaryjoin='PlayerStats.player_id == Player.id'
+    )
 
 
 class GroupInvite(db.Model, Base):
@@ -475,6 +492,7 @@ class GroupInvite(db.Model, Base):
     invite = db.Column(db.String(30), primary_key=True)
 
     group = db.relationship('Group', backref=db.backref('invites'))
+
 
 player_title = db.Table('player_title',
     db.Column('player_id', db.Integer, db.ForeignKey('player.id')),
@@ -511,7 +529,6 @@ class Message(db.Model, Base):
     id = db.Column(db.Integer, primary_key=True)
     from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     to_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    # optional column to identify messages sent to players that don't have users created yet
     to_player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     seen_at = db.Column(db.DateTime)
@@ -537,6 +554,42 @@ class Message(db.Model, Base):
         return super(Message, self).save(commit)
 
 
+class AuditLog(db.Model, Base):
+    __tablename__ = 'audit_log'
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    type = db.Column(db.String(32))
+    data = db.Column(JsonEncodedDict, default={})
+
+    server = db.relationship('Server')
+    user = db.relationship('User')
+    player = db.relationship('Player')
+
+    PLAYER_RENAME = 'player_rename'
+
+    @classmethod
+    def create(cls, type, data=None, server_id=None, user_id=None, player_id=None, commit=True, **kw):
+        if data is None:
+            data = {}
+
+        data.update(**kw)
+
+        audit_log = AuditLog(
+            type=type,
+            server_id=server_id,
+            user_id=user_id,
+            player_id=player_id,
+            data=data
+        )
+
+        audit_log.save(commit=commit)
+        return audit_log
+
+
 class ForumProfile(db.Model, Base):
     __tablename__ = 'forum_profile'
 
@@ -550,11 +603,12 @@ class ForumProfile(db.Model, Base):
 
     @property
     def last_post(self):
-        post = ForumPost.query.filter(ForumPost.deleted == False,
-                                      ForumPost.user_id == self.user_id) \
-            .order_by(ForumPost.created.desc()) \
-            .limit(1) \
-            .first()
+        post = ForumPost.query.filter(
+            ForumPost.deleted == False,
+            ForumPost.user_id == self.user_id
+        ).order_by(
+            ForumPost.created.desc()
+        ).limit(1).first()
 
         return post
 

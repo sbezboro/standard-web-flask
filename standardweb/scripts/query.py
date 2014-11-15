@@ -135,6 +135,14 @@ def _query_server(server, mojang_status):
 
         if player:
             if player.username != username:
+                AuditLog.create(
+                    AuditLog.PLAYER_RENAME,
+                    player_id=player.id,
+                    old_name=player.username,
+                    new_name=username,
+                    commit=False
+                )
+
                 player.username = username
                 player.save(commit=False)
         else:
