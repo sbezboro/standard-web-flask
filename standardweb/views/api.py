@@ -275,6 +275,7 @@ def join_server():
 
     num_new_messages = 0
     from_uuids = set()
+    no_user = True
 
     if player:
         messages = Message.query.options(
@@ -292,14 +293,16 @@ def join_server():
 
             num_new_messages += 1
 
+        no_user = not player.user
+
     return jsonify({
         'err': 0,
         'player_messages': {
             'num_new_messages': num_new_messages,
             'from_uuids': list(from_uuids),
-            'url': url,
-            'no_user': not player.user
-        }
+            'url': url
+        },
+        'no_user': no_user
     })
 
 
