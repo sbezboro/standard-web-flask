@@ -2,9 +2,14 @@
 
 {% block content %}
 Hi {{ username }}!
+
 Please click the link below to verify this email address:
+
 {{ verify_url }}
+
 The above link will expire in two days.
 Questions? Just reply to this email.
+
 Thanks!
+
 {% endblock %}
