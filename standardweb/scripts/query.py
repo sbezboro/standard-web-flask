@@ -18,10 +18,42 @@ import rollbar
 
 def _handle_groups(server, server_groups):
     group_uids = [x['uid'] for x in server_groups]
-    groups = Group.query.filter(Group.server == server, Group.uid.in_(group_uids))
-    group_map = {x.uid: x for x in groups}
 
-    group_playerstat_ids = []
+    # find all groups that cease to exist on the server, but still exist in db
+    deleted_groups = Group.query.filter(
+        Group.server == server,
+        Group.uid.notin_(group_uids)
+    )
+
+    deleted_group_ids = [x.id for x in deleted_groups]
+
+    if deleted_group_ids:
+        # remove association between players and these about to be deleted groups
+        for groupless_player_stat in PlayerStats.query.filter(PlayerStats.group_id.in_(deleted_group_ids)):
+            groupless_player_stat.group = None
+            groupless_player_stat.is_leader = False
+            groupless_player_stat.is_moderator = False
+            groupless_player_stat.save(commit=False)
+
+        # remove any pending invites for deleted groups
+        for deleted_invite in GroupInvite.query.filter(GroupInvite.group_id.in_(deleted_group_ids)):
+            db.session.delete(deleted_invite)
+
+        db.session.flush()
+
+        # delete groups themselves
+        for deleted_group in deleted_groups:
+            db.session.delete(deleted_group)
+
+    db.session.flush()
+
+    existing_groups = Group.query.filter(
+        Group.server == server,
+        Group.uid.in_(group_uids)
+    )
+
+    existing_group_map = {x.uid: x for x in existing_groups}
+    group_playerstat_ids = set()
 
     for group_info in server_groups:
         uid = group_info['uid']
@@ -39,11 +71,7 @@ def _handle_groups(server, server_groups):
         moderator_uuids = set(moderator_uuids)
         invites = set(invites)
 
-        group = group_map.get(uid)
-
-        # group could have been destroyed and recreated with the same name
-        if not group:
-            group = Group.query.filter_by(name=name).first()
+        group = existing_group_map.get(uid)
 
         if not group:
             group = Group(uid=uid, server=server)
@@ -62,7 +90,7 @@ def _handle_groups(server, server_groups):
             ).join(Player).filter(PlayerStats.server == server, Player.uuid.in_(member_uuids))]
 
             for stat in stats:
-                group_playerstat_ids.append(stat.id)
+                group_playerstat_ids.add(stat.id)
 
                 if stat.player.uuid == leader_uuid:
                     stat.is_leader = True
@@ -90,31 +118,17 @@ def _handle_groups(server, server_groups):
                     group_invite = GroupInvite(group=group, invite=invite)
                     group_invite.save(commit=False)
 
-    for groupless in PlayerStats.query.filter(PlayerStats.server == server,
-                                              PlayerStats.group_id.isnot(None),
-                                              not_(PlayerStats.id.in_(group_playerstat_ids))):
-        groupless.group = None
-        groupless.is_leader = False
-        groupless.is_moderator = False
-        groupless.save(commit=False)
+    groupless_player_stats = PlayerStats.query.filter(
+        PlayerStats.server == server,
+        PlayerStats.group_id.isnot(None),
+        not_(PlayerStats.id.in_(group_playerstat_ids))
+    )
 
-    db.session.flush()
-
-    removed_group_ids = []
-    removed_groups = Group.query.filter(Group.server == server, not_(Group.uid.in_(group_uids)))
-    for group in removed_groups:
-        removed_group_ids.append(group.id)
-
-    if removed_group_ids:
-        removed_invites = GroupInvite.query.filter(GroupInvite.group_id.in_(removed_group_ids))
-
-        for group_invite in removed_invites:
-            db.session.delete(group_invite)
-
-        db.session.flush()
-
-        for group in removed_groups:
-            db.session.delete(group)
+    for groupless_player_stat in groupless_player_stats:
+        groupless_player_stat.group = None
+        groupless_player_stat.is_leader = False
+        groupless_player_stat.is_moderator = False
+        groupless_player_stat.save(commit=False)
 
     db.session.commit()
 
