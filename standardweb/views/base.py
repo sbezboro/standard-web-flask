@@ -7,15 +7,14 @@ from flask import request
 from flask import render_template
 from flask import send_file
 
-from standardweb.lib import cache as libcache
 from standardweb.lib import leaderboards as libleaderboards
 from standardweb.lib import player as libplayer
 from standardweb.lib import server as libserver
 from standardweb.models import *
 from standardweb.views import redirect_old_url
+from standardweb.views.decorators.auth import login_required
+from standardweb.views.decorators.cache import last_modified
 
-from sqlalchemy import or_
-from sqlalchemy.sql.expression import func
 from sqlalchemy.orm import joinedload
 
 from datetime import datetime
@@ -28,6 +27,7 @@ from PIL import Image
 import requests
 
 import rollbar
+
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
 
@@ -232,7 +232,7 @@ def _face_last_modified(username, size=16):
 
 @app.route('/face/<username>.png')
 @app.route('/face/<int:size>/<username>.png')
-@libcache.last_modified(_face_last_modified)
+@last_modified(_face_last_modified)
 def face(username, size=16):
     size = int(size)
 
@@ -314,11 +314,8 @@ def chat(server_id=None):
 
 @app.route('/admin')
 @app.route('/<int:server_id>/admin')
+@login_required()
 def admin(server_id=None):
-    if not g.user:
-        flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login', next=request.path))
-
     if not g.user.admin:
         abort(403)
 

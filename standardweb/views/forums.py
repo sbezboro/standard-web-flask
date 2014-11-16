@@ -10,6 +10,7 @@ from standardweb.forms import MoveTopicForm, PostForm, NewTopicForm, ForumSearch
 from standardweb.lib import api
 from standardweb.models import *
 from standardweb.views import redirect_old_url
+from standardweb.views.decorators.auth import login_required
 
 from sqlalchemy import or_
 from sqlalchemy.sql.expression import func
@@ -17,10 +18,11 @@ from sqlalchemy.orm import joinedload
 
 from datetime import datetime
 
+import rollbar
+
+
 TOPICS_PER_PAGE = 40
 POSTS_PER_PAGE = 20
-
-import rollbar
 
 
 @app.route('/forums')
@@ -259,7 +261,7 @@ def forum_topic(topic_id):
 
     if form.validate_on_submit():
         if not user:
-            flash('You must log in before you can do that', 'warning')
+            flash('You must log in first', 'warning')
             return redirect(url_for('login', next=request.path))
 
         if topic.deleted:
@@ -379,15 +381,12 @@ def forum_post(post_id):
 
 
 @app.route('/forum/<int:forum_id>/new_topic', methods=['GET', 'POST'])
+@login_required()
 def new_topic(forum_id):
     forum = Forum.query.get(forum_id)
 
     if not forum:
         abort(404)
-
-    if not g.user:
-        flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login', next=request.path))
 
     user = g.user
 
@@ -443,6 +442,7 @@ def new_topic(forum_id):
 
 
 @app.route('/forums/post/<int:post_id>/edit', methods=['GET', 'POST'])
+@login_required()
 def edit_post(post_id):
     post = ForumPost.query.options(
         joinedload(ForumPost.topic)
@@ -455,10 +455,6 @@ def edit_post(post_id):
 
     if not post or post.deleted:
         abort(404)
-
-    if not g.user:
-        flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login', next=request.path))
 
     user = g.user
 
@@ -491,6 +487,7 @@ def edit_post(post_id):
 
 
 @app.route('/forums/topic/<int:topic_id>/status')
+@login_required()
 def forum_topic_status(topic_id):
     topic = ForumTopic.query.options(
         joinedload(ForumTopic.forum)
@@ -499,10 +496,6 @@ def forum_topic_status(topic_id):
 
     if not topic:
         abort(404)
-
-    if not g.user:
-        flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login', next=request.path))
 
     user = g.user
 
@@ -535,6 +528,7 @@ def forum_topic_status(topic_id):
 
 
 @app.route('/forums/post/<int:post_id>/delete')
+@login_required()
 def forum_post_delete(post_id):
     post = ForumPost.query.options(
         joinedload(ForumPost.topic)
@@ -547,10 +541,6 @@ def forum_post_delete(post_id):
 
     if not post:
         abort(404)
-
-    if not g.user:
-        flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login', next=request.path))
 
     user = g.user
 
@@ -634,6 +624,7 @@ def forum_post_delete(post_id):
 
 
 @app.route('/forums/topic/<int:topic_id>/move', methods=['GET', 'POST'])
+@login_required()
 def move_topic(topic_id):
     topic = ForumTopic.query.options(
         joinedload(ForumTopic.forum)
@@ -641,10 +632,6 @@ def move_topic(topic_id):
 
     if not topic or topic.deleted:
         abort(404)
-
-    if not g.user:
-        flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login', next=request.path))
 
     user = g.user
 
@@ -703,11 +690,8 @@ def move_topic(topic_id):
 
 
 @app.route('/forums/all_read')
+@login_required()
 def all_topics_read():
-    if not g.user:
-        flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login', next=request.path))
-
     user = g.user
 
     user.posttracking.last_read = datetime.utcnow()
@@ -719,11 +703,8 @@ def all_topics_read():
 
 
 @app.route('/forums/ban')
+@login_required()
 def forum_ban():
-    if not g.user:
-        flash('You must log in before you can do that', 'warning')
-        return redirect(url_for('login', next=request.path))
-
     user = g.user
 
     if not user.admin and not user.moderated_forums:

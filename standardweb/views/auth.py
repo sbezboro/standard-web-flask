@@ -8,6 +8,7 @@ from flask import session
 from standardweb.forms import LoginForm, VerifyEmailForm, ForgotPasswordForm, ResetPasswordForm
 from standardweb.lib.email import send_reset_password
 from standardweb.models import *
+from standardweb.views.decorators.auth import login_required
 
 from datetime import datetime
 
@@ -63,16 +64,13 @@ def signup():
 
 
 @app.route('/verify/<token>')
+@login_required()
 def verify_email(token):
     email_token = EmailToken.query.filter_by(token=token).first()
 
     result = _check_email_token(email_token, 'verify')
     if result:
         return result
-
-    if not g.user:
-        flash('You must sign in before verifying an email', 'warning')
-        return redirect(url_for('login', next=url_for('verify_email', token=token)))
 
     if g.user.id != email_token.user_id:
         flash('Link intended for another user', 'warning')
@@ -127,7 +125,12 @@ def create_account(token):
 
             flash('Account created! You are now logged in', 'success')
 
-            rollbar.report_message('Account created', level='info', request=request)
+            rollbar.report_message('Account created', level='info', request=request,
+                                   extra_data={
+                                       'user_id': user.id,
+                                       'player_id': player.id,
+                                       'username': player.username
+                                   })
 
             return redirect(url_for('index'))
 

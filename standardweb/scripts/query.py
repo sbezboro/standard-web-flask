@@ -17,12 +17,12 @@ import rollbar
 
 
 def _handle_groups(server, server_groups):
-    group_uids = [x['uid'] for x in server_groups]
+    server_group_uids = [x['uid'] for x in server_groups]
 
     # find all groups that cease to exist on the server, but still exist in db
     deleted_groups = Group.query.filter(
         Group.server == server,
-        Group.uid.notin_(group_uids)
+        Group.uid.notin_(server_group_uids)
     )
 
     deleted_group_ids = [x.id for x in deleted_groups]
@@ -45,11 +45,11 @@ def _handle_groups(server, server_groups):
         for deleted_group in deleted_groups:
             db.session.delete(deleted_group)
 
-    db.session.flush()
+        db.session.flush()
 
     existing_groups = Group.query.filter(
         Group.server == server,
-        Group.uid.in_(group_uids)
+        Group.uid.in_(server_group_uids)
     )
 
     existing_group_map = {x.uid: x for x in existing_groups}

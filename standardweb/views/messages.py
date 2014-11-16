@@ -8,10 +8,11 @@ from flask import request
 
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
+
 from standardweb.forms import MessageForm
 from standardweb.lib.notifier import notify_new_message
-
 from standardweb.models import *
+from standardweb.views.decorators.auth import login_required
 
 
 MESSAGE_THROTTLE_COUNT = 5
@@ -20,11 +21,9 @@ MESSAGE_THROTTLE_PERIOD = 10  # minutes
 
 @app.route('/messages')
 @app.route('/messages/<username>', methods=['GET', 'POST'])
+@login_required()
 def messages(username=None):
     user = g.user
-
-    if not user:
-        return redirect(url_for('login', next=request.path))
 
     messages = []
 
@@ -144,11 +143,9 @@ def messages(username=None):
 
 
 @app.route('/messages/new')
+@login_required()
 def new_message():
     user = g.user
-
-    if not user:
-        return redirect(url_for('login', next=request.path))
 
     contacts = get_contact_list(user)
 
