@@ -2,6 +2,8 @@ from standardweb.models import *
 from standardweb.lib.constants import *
 from standardweb.vendor.minecraft_api import MinecraftJsonApi
 
+from sqlalchemy.orm import joinedload
+
 import rollbar
 
 
@@ -106,7 +108,17 @@ def new_message(to_player, from_user):
 
     url = url_for('messages', username=from_username, _external=True)
 
-    for server in Server.query.filter_by(online=True):
+    player_stats = PlayerStats.query.options(
+        joinedload(PlayerStats.server)
+    ).filter(
+        PlayerStats.player == to_player,
+        Server.online == True
+    )
+
+    # send the message only if the player is currently on the server
+    servers = [player_stat.server for player_stat in player_stats if player_stat.is_online]
+
+    for server in servers:
         data = {
             'from_username': from_username,
             'from_uuid': from_uuid,
