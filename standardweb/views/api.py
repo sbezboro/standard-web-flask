@@ -15,10 +15,6 @@ from sqlalchemy import or_
 from sqlalchemy.sql.expression import func
 from sqlalchemy.orm import joinedload
 
-import rollbar
-
-
-_server_cache = {}
 
 # Base API function decorator that builds a list of view functions for use in urls.py. 
 def api_func(function):

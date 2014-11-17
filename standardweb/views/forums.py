@@ -42,9 +42,9 @@ def forums():
 
     active_forum_ids = set()
 
-    if g.user:
-        user = g.user
+    user = g.user
 
+    if user:
         if not user.posttracking:
             user.posttracking = ForumPostTracking(user=user)
             user.posttracking.save(commit=True)
@@ -54,6 +54,7 @@ def forums():
 
         if read_topics:
             topics = ForumTopic.query.filter(ForumTopic.id.in_(read_topics.keys()))
+
             for topic in topics:
                 if not last_read or topic.updated > last_read:
                     if topic.last_post_id > read_topics.get(str(topic.id)):
@@ -468,6 +469,15 @@ def edit_post(post_id):
 
     if form.validate_on_submit():
         body = request.form['body']
+
+        AuditLog.create(
+            'forum_post_edit',
+            user_id=user.id,
+            post_id=post_id,
+            old_text=post.body,
+            new_text=body,
+            commit=False
+        )
 
         post.body = body
 
