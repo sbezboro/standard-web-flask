@@ -80,8 +80,7 @@ def send_new_message_email(user, message):
         'from_player_url': from_player_url
     })
 
-    return send_email(user.email, '[Standard Survival] New message from %s' % from_username, text_body, html_body,
-                      from_email=from_email)
+    return send_email(user.email, '[Standard Survival] New message from %s' % from_username, text_body, html_body)
 
 
 def send_email(to_email, subject, text_body, html_body, from_email=None):
