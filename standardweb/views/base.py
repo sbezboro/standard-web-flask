@@ -241,30 +241,26 @@ def face(username, size=16):
 
     path = '%s/standardweb/faces/%s/%s.png' % (PROJECT_PATH, size, username)
 
-    url = 'http://s3.amazonaws.com/MinecraftSkins/%s.png' % username
+    url = 'http://skins.minecraft.net/MinecraftSkins/%s.png' % username
 
     image = None
 
     try:
-        resp = requests.get(url, timeout=1)
-    except:
-        pass
+        file_date = datetime.utcfromtimestamp(os.path.getmtime(path))
+    except Exception:
+        file_date = None
+
+    if file_date and datetime.utcnow() - file_date < timedelta(hours=12):
+        image = Image.open(path)
     else:
-        if resp.status_code == 200:
-            last_modified = resp.headers['Last-Modified']
-            last_modified_date = datetime.strptime(last_modified, '%a, %d %b %Y %H:%M:%S %Z')
-
-            try:
-                file_date = datetime.utcfromtimestamp(os.path.getmtime(path))
-            except:
-                file_date = None
-
-            if not file_date or last_modified_date > file_date \
-                or datetime.utcnow() - file_date > timedelta(days=1):
+        try:
+            resp = requests.get(url, timeout=1)
+        except Exception:
+            pass
+        else:
+            if resp.status_code == 200:
                 image = libplayer.extract_face(Image.open(StringIO.StringIO(resp.content)), size)
                 image.save(path)
-            else:
-                image = Image.open(path)
 
     if not image:
         try:
