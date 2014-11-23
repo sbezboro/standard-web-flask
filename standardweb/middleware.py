@@ -120,6 +120,7 @@ def rts_auth_data():
         }
 
     return {
-        'rts_address': app.config['RTS_ADDRESS'],
+        'rts_base_url': app.config['RTS_BASE_URL'],
+        'rts_prefix': app.config['RTS_PREFIX'],
         'rts_auth_data': data
     }

@@ -2,11 +2,13 @@
   StandardWeb.realtime = {
     rtsAuthData: null,
     rtsBaseUrl: null,
+    rtsPrefix: null,
     rtsSockets: {},
 
-    init: function (rtsAuthData, rtsBaseUrl) {
+    init: function (rtsAuthData, rtsBaseUrl, rtsPrefix) {
       this.rtsAuthData = rtsAuthData;
       this.rtsBaseUrl = rtsBaseUrl;
+      this.rtsPrefix = rtsPrefix;
     },
     subscribe: function (channel, extra, callback) {
       if (!callback) {
@@ -22,7 +24,9 @@
 
         callback = null;
       } else {
-        socket = io(this.rtsBaseUrl + '/' + channel);
+        socket = io(this.rtsBaseUrl + '/' + channel, {
+          path: rtsPrefix + '/socket.io'
+        });
 
         socket.on('connect', function () {
           var data = {

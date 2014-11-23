@@ -33,7 +33,7 @@ def unread_message_count(user):
 
 
 def send_rts_data(user_id, channel, action, payload):
-    url = '%s/%s' % (app.config['RTS_ADDRESS'], channel)
+    url = '%s%s/%s' % (app.config['RTS_BASE_URL'], app.config['RTS_PREFIX'], channel)
 
     headers = {
         'X-Standard-Secret': app.config['RTS_SECRET'],

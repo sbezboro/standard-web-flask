@@ -196,9 +196,10 @@
 
     <script type="application/javascript">
         var rtsAuthData = {{ rts_auth_data|tojson|safe }};
-        var rtsBaseUrl = '{{ rts_address }}';
+        var rtsBaseUrl = '{{ rts_base_url }}';
+        var rtsPrefix = '{{ rts_prefix }}';
 
-        StandardWeb.realtime.init(rtsAuthData, rtsBaseUrl);
+        StandardWeb.realtime.init(rtsAuthData, rtsBaseUrl, rtsPrefix);
     </script>
 </body>
 </html>
