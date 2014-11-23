@@ -153,22 +153,29 @@
       });
     });
 
-    $('.fromnow').each(function() {
-      var val;
-      var now = moment();
-      var date = moment($.trim($(this).text()));
+    StandardWeb.realtime.subscribe('messages', function(error, socket) {
+      if (error) {
+        return;
+      }
 
-      if (date.isValid()) {
-        if (now.diff(date, 'days') > 365) {
-          val = date.format('MMMM D, YYYY');
-        } else {
-          val = date.fromNow();
+      socket.on('unread-count', function(data) {
+        var count = data.count;
+
+        var $account = $('#account');
+        var $messages = $account.find('.messages');
+        var $messagesCount = $account.find('.messages .new-count');
+
+        if (count && !$messages.hasClass('new')) {
+          $messages.addClass('new');
+        } else if (!count && $messages.hasClass('new')) {
+          $messages.removeClass('new');
         }
 
-        $(this).text(val);
-        $(this).attr('title', date.format('LLL'));
-      }
+        $messagesCount.html(count);
+      }.bind(this));
     });
+
+    StandardWeb.refreshFromnow();
 
     $('.placeholder').placeholder();
     $('.tooltip').tipsy();

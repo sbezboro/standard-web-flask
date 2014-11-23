@@ -33,6 +33,8 @@ def messages(username=None):
         'form': form
     }
 
+    other_user_id = None
+
     if username:
         to_user = User.query.outerjoin(Player).options(
             joinedload(User.player)
@@ -45,6 +47,7 @@ def messages(username=None):
             return redirect(url_for('messages'))
 
         if to_user:
+            other_user_id = to_user.id
             to_player = to_user.player
         else:
             # for cases of messages sent to players with no users created yet
@@ -62,7 +65,7 @@ def messages(username=None):
                 Message.sent_at > datetime.utcnow() - timedelta(minutes=MESSAGE_THROTTLE_PERIOD)
             ).all()
 
-            if len(recent_messages) > MESSAGE_THROTTLE_COUNT:
+            if not app.config['DEBUG'] and len(recent_messages) > MESSAGE_THROTTLE_COUNT:
                 flash('Whoa there, you sent too many messages recently! Try sending a bit later.', 'error')
             else:
                 message = Message(from_user=user, to_user=to_user, to_player=to_player,
@@ -136,7 +139,8 @@ def messages(username=None):
     template_vars.update({
         'contacts': contacts,
         'messages': messages,
-        'username': username
+        'username': username,
+        'other_user_id': other_user_id
     })
 
     return render_template('messages/index.html', **template_vars)

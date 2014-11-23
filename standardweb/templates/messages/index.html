@@ -14,7 +14,7 @@
                     <a href="{{ url_for('messages', username=contact.username) }}">
                         {% set active = (username and username == contact.username) %}
                         {% set new = (username != contact.username and contact.new_message) %}
-                        <div class="contact {% if active %}active{% endif %} {% if new %}new{% endif %}">
+                        <div class="contact {% if active %}active{% endif %} {% if new %}new{% endif %}" data-user-id="{% if contact.user %}{{ contact.user.id }}{% endif %}">
                             <div class="name">
                                 {% if contact.player %}
                                     {{ contact.player.displayname_html|safe }}
@@ -79,4 +79,11 @@
             </div>
         </div>
     </div>
+
+    <script type="application/javascript">
+        StandardWeb.messages.active = true;
+        {% if other_user_id %}
+            StandardWeb.messages.otherUserId = {{ other_user_id }};
+        {% endif %}
+    </script>
 {% endblock %}

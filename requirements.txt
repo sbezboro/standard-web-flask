@@ -21,6 +21,7 @@ itsdangerous==0.23
 paramiko==1.12.3
 pycrypto==2.6.1
 python-memcached==1.53
+pytz==2014.9
 requests==2.3.0
 rollbar==0.9.0
 simple-pbkdf2==1.0

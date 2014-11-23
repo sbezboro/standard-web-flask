@@ -123,8 +123,16 @@ class User(db.Model, Base):
 
         return self.username
 
-    @staticmethod
-    def _make_password(password, salt=None, iterations=None):
+    def get_unread_message_count(self):
+        return len(
+            Message.query.with_entities(Message.id).filter_by(
+                to_user=self,
+                seen_at=None
+            ).all()
+        )
+
+    @classmethod
+    def _make_password(cls, password, salt=None, iterations=None):
         if not salt:
             salt = binascii.b2a_hex(os.urandom(15))
 

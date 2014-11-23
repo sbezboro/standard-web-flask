@@ -34,42 +34,7 @@
       </table>
       
       <script type="text/javascript">
-          $(document).ready(function() {
-              var $chat = $('#chat');
-              var $chatTextbox = $('#chat-textbox');
-              var baseUrl = '{{ rts_address }}';
-              var serverId = {{ server.id }};
-
-
-              var username;
-              var nickname;
-
-              {% if player %}
-                  username = '{{ player.username }}';
-                  {% if player.nickname %}
-                    nickname = '{{ player.nickname }}';
-                  {% endif %}
-              {% endif %}
-
-              var chatStream = new ChatStream({{ rts_auth_data|tojson|safe }}, baseUrl, $chat,
-                                              $chatTextbox, serverId, username, nickname);
-              chatStream.connect(function(error) {});
-
-              soundManager.setup({
-                  url: '/static/flash/',
-                  flashVersion: 9,
-                  debugMode: false,
-                  preferFlash: false,
-                  onready: function() {
-                      var mentionSound = soundManager.createSound({
-                          id: 'mention',
-                          url: '/static/sound/mention.wav'
-                      });
-
-                      chatStream.setMentionSound(mentionSound);
-                  }
-              });
-          });
+          StandardWeb.chat.serverId = {{ server.id }};
       </script>
     </div>
 {% endblock %}

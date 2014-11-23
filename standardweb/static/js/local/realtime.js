@@ -1,20 +1,91 @@
-var ConsoleStream = null;
-var ChatStream = null;
-
 (function(window, document, $) {
-  var commandHistory = [];
-  var commandIndex = -1;
+  StandardWeb.realtime = {
+    rtsAuthData: null,
+    rtsBaseUrl: null,
+    rtsSockets: {},
 
-  var mentionPat = '(&gt;.*|Server\].*|Web\ Chat\].*\: .*|To group.*|command:.*)(MENTION_PART)';
+    init: function (rtsAuthData, rtsBaseUrl) {
+      this.rtsAuthData = rtsAuthData;
+      this.rtsBaseUrl = rtsBaseUrl;
+    },
+    subscribe: function (channel, extra, callback) {
+      if (!callback) {
+        callback = extra;
+        extra = undefined;
+      }
 
-  function Stream(authData, baseUrl, $outputArea, $textbox, serverId, source) {
-    var _this = this;
+      var socket = this.rtsSockets[channel];
+      if (socket) {
+        if (callback) {
+          callback(null, socket);
+        }
 
-    this.authData = authData;
-    this.baseUrl = baseUrl;
+        callback = null;
+      } else {
+        socket = io(this.rtsBaseUrl + '/' + channel);
+
+        socket.on('connect', function () {
+          var data = {
+            authData: this.rtsAuthData
+          };
+
+          var k;
+          for (k in extra) {
+            if (extra.hasOwnProperty(k)) {
+              data[k] = extra[k];
+            }
+          }
+
+          socket.emit('auth', data);
+
+          socket.on('authorized', function (data) {
+            this.rtsSockets[channel] = socket;
+
+            if (callback) {
+              callback(null, socket);
+            }
+
+            callback = null;
+          }.bind(this));
+
+          socket.on('unauthorized', function (data) {
+            if (callback) {
+              callback('unauthorized', socket);
+            }
+
+            callback = null;
+          }.bind(this));
+        }.bind(this));
+
+        socket.on('connect_failed', function () {
+          if (callback) {
+            callback('connect_failed', socket);
+          }
+
+          callback = null;
+        }.bind(this));
+
+        socket.on('error', function () {
+          if (callback) {
+            callback('error', socket);
+          }
+
+          callback = null;
+        }.bind(this));
+      }
+    }
+  };
+
+  var ServerStream = function($outputArea, $textbox, serverId, source) {
+    this.socket = null;
+
+    this.commandHistory = [];
+    this.commandIndex = -1;
+
+    this.mentionPat = '(&gt;.*|Server<.*?><.*?>]\ .*|Web\ Chat\].*\: .*|To group.*|command:.*)(MENTION_PART)';
+
     this.$outputArea = $outputArea;
     this.$textbox = $textbox;
-    this.serverId = serverId;
     this.source = source;
     this.socket = null;
     this.numLines = 0;
@@ -50,12 +121,12 @@ var ChatStream = null;
     };
 
     this.addOutputLines = function(batch) {
-      var shouldScroll = _this.isAtBottom();
+      var shouldScroll = this.isAtBottom();
 
       var html = "";
       batch.map(function(line) {
-        html += '<li>' + _this.postProcessLine(line) + '</li>';
-      });
+        html += '<li>' + this.postProcessLine(line) + '</li>';
+      }.bind(this));
 
       this.$outputArea.append(html);
 
@@ -68,7 +139,7 @@ var ChatStream = null;
 
       // Scroll to see the new line of text if the bottom was already visible
       if (shouldScroll) {
-        _this.scrollToBottom();
+        this.scrollToBottom();
       }
     };
 
@@ -111,7 +182,7 @@ var ChatStream = null;
     };
 
     this.addChatMention = function(string, style) {
-      var replacedPat = mentionPat.replace('MENTION_PART', string);
+      var replacedPat = this.mentionPat.replace('MENTION_PART', string);
       var regex = new RegExp(replacedPat, 'gi');
 
       this.addRegexMention(regex, style);
@@ -129,123 +200,110 @@ var ChatStream = null;
       throw "Method should be implemented by inherited objects!";
     };
 
-    this.connect = function(callback) {
+    this.connect = function() {
       this.addOutputLine("Connecting...");
 
-      var socket = io.connect(this.baseUrl + '/' + this.source);
-      this.socket = socket;
-
-      _this.socketInitialized();
-
-      socket.on('connect_failed', function() {
-        _this.addOutputLine("ERROR: failed to connect!");
-      });
-
-      socket.on('error', function() {
-        _this.addOutputLine("ERROR: failed to connect!");
-      });
-
-      socket.on('connect', function() {
-        _this.$outputArea.empty();
-        _this.numLines = 0;
-
-        socket.emit('auth', {
-          server_id: _this.serverId,
-          auth_data: _this.authData
-        });
-      });
-
-      socket.on('disconnect', function() {
-        _this.addOutputLine("ERROR: socket connection lost!");
-      });
-
-      socket.on('mc-connection-lost', function() {
-        _this.addOutputLine("Connection to Minecraft server lost, retrying...");
-      });
-
-      socket.on('mc-connection-restored', function() {
-        _this.addOutputLine("Connection restored!");
-      });
-
-      $(document).keypress(function() {
-        var focused = $(':focus');
-        if (_this.$textbox != focused
-          && (!focused[0] || focused[0].type == false)) {
-          _this.$textbox.focus();
-        }
-      });
-
-      this.$textbox.keydown(function(e) {
-        switch (e.which) {
-          case 38: //Up
-            if (commandIndex < commandHistory.length - 1) {
-              commandIndex++;
-              _this.$textbox.val(commandHistory[commandIndex]);
-            }
-            return false;
-          case 40: //Down
-            if (commandIndex > -1) {
-              commandIndex--;
-              _this.$textbox.val(commandHistory[commandIndex]);
-            }
-            return false;
+      StandardWeb.realtime.subscribe(this.source, {serverId: serverId}, function(error, socket) {
+        if (error) {
+          this.addOutputLine("ERROR: connection failure!");
+          return;
         }
 
-        return true;
-      });
+        this.socket = socket;
 
-      this.$textbox.keyup(function(e) {
-        switch (e.which) {
-          case 13: //Enter
-            var input = _this.$textbox.val();
+        this.$outputArea.empty();
+        this.numLines = 0;
 
-            if (input) {
-              _this.messageEntered(input);
+        this.socketInitialized();
 
-              _this.$textbox.val("");
-              _this.scrollToBottom();
+        socket.on('disconnect', function() {
+          this.addOutputLine("ERROR: socket connection lost!");
+        }.bind(this));
 
-              commandHistory.unshift(input);
-              commandIndex = -1;
-            }
-            break;
-        }
-      });
+        socket.on('mc-connection-lost', function() {
+          this.addOutputLine("Connection to Minecraft server lost, retrying...");
+        }.bind(this));
 
-      var sendActivity = function(active) {
-        socket.emit('user-activity', {
-          active: active
-        });
-      };
+        socket.on('mc-connection-restored', function() {
+          this.addOutputLine("Connection restored!");
+        }.bind(this));
 
-      $(window).focus(function() {
-        if (!_this.focused) {
-          sendActivity(true);
-        }
+        $(document).keypress(function() {
+          var focused = $(':focus');
+          if (this.$textbox != focused
+            && (!focused[0] || focused[0].type == false)) {
+            this.$textbox.focus();
+          }
+        }.bind(this));
 
-        _this.focused = true;
-      });
+        this.$textbox.keydown(function(e) {
+          switch (e.which) {
+            case 38: //Up
+              if (this.commandIndex < this.commandHistory.length - 1) {
+                this.commandIndex++;
+                this.$textbox.val(this.commandHistory[this.commandIndex]);
+              }
+              return false;
+            case 40: //Down
+              if (this.commandIndex > -1) {
+                this.commandIndex--;
+                this.$textbox.val(this.commandHistory[this.commandIndex]);
+              }
+              return false;
+          }
 
-      $(window).blur(function() {
-        if (_this.focused) {
-          sendActivity(false);
-        }
+          return true;
+        }.bind(this));
 
-        _this.focused = false;
-      });
+        this.$textbox.keyup(function(e) {
+          switch (e.which) {
+            case 13: //Enter
+              var input = this.$textbox.val();
 
-      return callback();
+              if (input) {
+                this.messageEntered(socket, input);
+
+                this.$textbox.val('');
+                this.scrollToBottom();
+
+                this.commandHistory.unshift(input);
+                this.commandIndex = -1;
+              }
+              break;
+          }
+        }.bind(this));
+
+        var sendActivity = function(active) {
+          socket.emit('user-activity', {
+            active: active
+          });
+        };
+
+        $(window).focus(function() {
+          if (!this.focused) {
+            sendActivity(true);
+          }
+
+          this.focused = true;
+        }.bind(this));
+
+        $(window).blur(function() {
+          if (this.focused) {
+            sendActivity(false);
+          }
+
+          this.focused = false;
+        }.bind(this));
+      }.bind(this));
     }
-  }
+  };
 
-  ConsoleStream = function(authToken, baseUrl, $outputArea, $textbox, serverId) {
-    Stream.call(this, authToken, baseUrl, $outputArea, $textbox, serverId, 'console');
+  var ConsoleStream = function($outputArea, $textbox, serverId) {
+    ServerStream.call(this, $outputArea, $textbox, serverId, 'console');
+
     this.allPlayers = {};
 
-    this.maxLines = 2000;
-
-    var _this = this;
-    var socket;
+    this.maxLines = 4000;
 
     this.addChatMention('server', 'background:#A0A');
     // A player messaging console
@@ -260,26 +318,18 @@ var ChatStream = null;
     });
 
     this.socketInitialized = function() {
-      socket = _this.socket;
-
       var html;
 
-      // This event is received when the session key is either invalid or doesn't
-      // belong to a superuser
-      socket.on('unauthorized', function() {
-        _this.addOutputLine("ERROR: you are not authorized to access the admin panel!");
-      });
-
-      socket.on('console', function(data) {
+      this.socket.on('console', function(data) {
         if (data.line) {
-          _this.addOutputLine(data.line);
+          this.addOutputLine(data.line);
         } else if (data.batch) {
-          _this.addOutputLines(data.batch);
+          this.addOutputLines(data.batch);
         }
-      });
+      }.bind(this));
 
       // Update server status display
-      socket.on('server-status', function(data) {
+      this.socket.on('server-status', function(data) {
         var players = data.players;
         var numPlayers = data.numPlayers;
         var maxPlayers = data.maxPlayers;
@@ -298,7 +348,7 @@ var ChatStream = null;
         var playersHtml = '';
         for (var i = 0; i < players.length; ++i) {
           var username = players[i].username;
-          _this.allPlayers[username] = players[i];
+          this.allPlayers[username] = players[i];
 
           var nicknameAnsi = players[i].nicknameAnsi;
 
@@ -322,12 +372,12 @@ var ChatStream = null;
         $('.load').text(load);
         $('.tps').text(tps);
 
-        if (_this.onUpdate && typeof _this.onUpdate === 'function') {
-          _this.onUpdate();
+        if (this.onUpdate && typeof this.onUpdate === 'function') {
+          this.onUpdate();
         }
-      });
+      }.bind(this));
 
-      socket.on('chat-users', function(data) {
+      this.socket.on('chat-users', function(data) {
         var users = data.users;
 
         html = '<b>Chat user count: ' + users.length + '</b>';
@@ -367,9 +417,9 @@ var ChatStream = null;
 
         $('.users').html(html);
       });
-    };
+    }.bind(this);
 
-    this.messageEntered = function(input) {
+    this.messageEntered = function(socket, input) {
       var data = {};
 
       if (input[0] == "/") {
@@ -387,24 +437,20 @@ var ChatStream = null;
     };
 
     this.setDonator = function(username) {
-      socket.emit('set-donator', {
+      this.socket.emit('set-donator', {
         username: username
       });
     }
   };
 
-  ConsoleStream.prototype = Object.create(Stream.prototype);
+  var ChatStream = function($outputArea, $textbox, serverId) {
+    ServerStream.call(this, $outputArea, $textbox, serverId, 'chat');
 
-  ChatStream = function(authData, baseUrl, $outputArea, $textbox, serverId, username, nickname) {
-    Stream.call(this, authData, baseUrl, $outputArea, $textbox, serverId, 'chat');
-    var _this = this;
-    var socket;
-
-    if (username) {
-      this.addChatMention(username, 'background:#00ACC4');
+    if (StandardWeb.username) {
+      this.addChatMention(StandardWeb.username, 'background:#00ACC4');
     }
-    if (nickname) {
-      this.addChatMention(nickname, 'background:#00ACC4');
+    if (StandardWeb.nickname) {
+      this.addChatMention(StandardWeb.nickname, 'background:#00ACC4');
     }
 
     this.renderPlayerTable = function(players, maxPlayers) {
@@ -439,31 +485,29 @@ var ChatStream = null;
     };
 
     this.socketInitialized = function() {
-      socket = _this.socket;
+      this.socket.on('unauthorized', function() {
+        this.addOutputLine("ERROR: you are not authorized!");
+      }.bind(this));
 
-      socket.on('unauthorized', function() {
-        _this.addOutputLine("ERROR: you are not authorized!");
-      });
+      this.socket.on('connection-spam', function() {
+        this.addOutputLine("Stop trying to connect so much!");
+        this.addOutputLine("Try again in a few minutes...");
+      }.bind(this));
 
-      socket.on('connection-spam', function() {
-        _this.addOutputLine("Stop trying to connect so much!");
-        _this.addOutputLine("Try again in a few minutes...");
-      });
+      this.socket.on('chat-spam', function() {
+        this.addOutputLine("Stop typing so fast!");
+      }.bind(this));
 
-      socket.on('chat-spam', function() {
-        _this.addOutputLine("Stop typing so fast!");
-      });
-
-      socket.on('chat', function(data) {
+      this.socket.on('chat', function(data) {
         if (data.line) {
-          _this.addOutputLine(data.line);
+          this.addOutputLine(data.line);
         } else if (data.batch) {
-          _this.addOutputLines(data.batch);
+          this.addOutputLines(data.batch);
         }
-      });
+      }.bind(this));
 
       // Renders a table almost identical looking to the tab player table ingame
-      socket.on('server-status', function(data) {
+      this.socket.on('server-status', function(data) {
         var players = data.players;
         var maxPlayers = data.maxPlayers;
 
@@ -476,18 +520,22 @@ var ChatStream = null;
           return 0;
         });
 
-        _this.renderPlayerTable(players, maxPlayers);
-      });
-    };
+        this.renderPlayerTable(players, maxPlayers);
+      }.bind(this));
+    }.bind(this);
 
-    this.messageEntered = function(input) {
+    this.messageEntered = function(socket, input) {
       socket.emit('chat-input', {
         message: input
       });
     };
 
-    _this.renderPlayerTable([], 90);
+    this.renderPlayerTable([], 90);
   };
 
-  ChatStream.prototype = Object.create(Stream.prototype);
+  ConsoleStream.prototype = Object.create(ServerStream.prototype);
+  ChatStream.prototype = Object.create(ServerStream.prototype);
+
+  StandardWeb.realtime.ConsoleStream = ConsoleStream;
+  StandardWeb.realtime.ChatStream = ChatStream;
 })(window, document, $);

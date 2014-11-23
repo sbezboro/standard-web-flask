@@ -108,9 +108,7 @@
                     {% if user %}
                         <a class="messages {% if new_messages %}new{% endif %}" href="{{ url_for('messages') }}" title="Messages">
                             <i class="fa fa-envelope"></i>
-                            {% if new_messages %}
-                                <span class="new-count">{{ new_messages }}</span>
-                            {% endif %}
+                            <span class="new-count">{{ new_messages }}</span>
                         </a>
                         <div class="dropdown">
                             {% if user.player %}
@@ -183,5 +181,24 @@
     <div id="container">
         {% block content %}{% endblock %}
     </div>
+    {% if user %}
+        <script type="application/javascript">
+            StandardWeb.userId = {{ user.id }};
+            StandardWeb.username = '{{ user.get_username() }}';
+        </script>
+        {% if user.player %}
+            <script type="application/javascript">
+                StandardWeb.playerId = {{ user.player_id }};
+                StandardWeb.nickname = '{{ user.player.nickname }}';
+            </script>
+        {% endif %}
+    {% endif %}
+
+    <script type="application/javascript">
+        var rtsAuthData = {{ rts_auth_data|tojson|safe }};
+        var rtsBaseUrl = '{{ rts_address }}';
+
+        StandardWeb.realtime.init(rtsAuthData, rtsBaseUrl);
+    </script>
 </body>
 </html>

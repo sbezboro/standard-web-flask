@@ -73,12 +73,7 @@ def inject_new_messages():
     new_messages = 0
 
     if g.user:
-        new_messages = len(
-            Message.query.with_entities(Message.id).filter_by(
-                to_user=g.user,
-                seen_at=None
-            ).all()
-        )
+        new_messages = g.user.get_unread_message_count()
 
     return dict(new_messages=new_messages)
 

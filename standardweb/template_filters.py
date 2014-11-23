@@ -1,7 +1,8 @@
+import pytz
+
 from jinja2.nodes import Markup
 
 from standardweb import app
-from standardweb.lib import helpers as h
 
 
 def _face_image(username, size, scaled_size=None):
@@ -24,7 +25,7 @@ def face_large(username):
 
 @app.template_filter('from_now')
 def from_now(date):
-    return Markup('<span class="fromnow">%sZ</span>' % date.isoformat())
+    return Markup('<span class="fromnow">%s</span>' % date.replace(tzinfo=pytz.UTC).isoformat())
 
 
 @app.template_filter('attachment_link')

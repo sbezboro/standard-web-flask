@@ -25,3 +25,7 @@
         </div>
     </div>
 {%- endmacro %}
+
+{% if message and user %}
+    {{ message_row(message, user) }}
+{% endif %}
