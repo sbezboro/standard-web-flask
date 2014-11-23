@@ -61,10 +61,6 @@ def send_new_message_email(user, message):
     from_user = message.from_user
     from_username = message.from_user.get_username()
 
-    from_email = None
-    if from_user.email:
-        from_email = '%s <%s>' % (from_username, from_user.email)
-
     conversation_url = url_for('messages', username=from_username, _external=True)
 
     from_player_url = None
