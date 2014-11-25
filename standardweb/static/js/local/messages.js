@@ -3,6 +3,9 @@
 
   var $contactList;
   var $messageList;
+  var $replyForm;
+  var $replyTextarea;
+  var $replyButton;
   var $newMessageInput;
   var $searchResults;
   var searchTimeout;
@@ -50,10 +53,27 @@
 
     $contactList = $('.messages-contacts');
     $messageList = $('.message-list');
+    $replyForm = $('.reply form');
+    $replyTextarea = $('.reply textarea');
+    $replyButton = $('.reply button');
     $newMessageInput = $('.contact-chooser input[type="text"]');
     $searchResults = $('.search-results');
 
     $messageList.scrollTop($messageList.prop("scrollHeight"));
+
+    $replyTextarea.on('keydown', function(e) {
+      if (e.which == 13 && !e.shiftKey) {
+        $replyForm.submit();
+        $replyTextarea.attr('disabled', 'disabled');
+        $replyButton.attr('disabled', 'disabled');
+        return false;
+      }
+    });
+
+    $replyButton.on('click', function() {
+      $replyTextarea.attr('disabled', 'disabled');
+      $replyButton.attr('disabled', 'disabled');
+    });
 
     $newMessageInput.on('keyup', function() {
       if (searchTimeout) {

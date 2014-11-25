@@ -74,8 +74,6 @@ def messages(username=None):
 
                 notify_new_message(message)
 
-                flash('Message sent!', 'success')
-
                 return redirect(url_for('messages', username=username))
 
         if to_user:
