@@ -47,6 +47,9 @@ def _handle_groups(server, server_groups):
 
         db.session.flush()
 
+    if not server_group_uids:
+        return
+
     existing_groups = Group.query.filter(
         Group.server == server,
         Group.uid.in_(server_group_uids)

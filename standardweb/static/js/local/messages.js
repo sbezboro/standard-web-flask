@@ -63,6 +63,7 @@
 
     $replyTextarea.on('keydown', function(e) {
       if (e.which == 13 && !e.shiftKey) {
+        mixpanel.track('message sent');
         $replyForm.submit();
         $replyTextarea.attr('disabled', 'disabled');
         $replyButton.attr('disabled', 'disabled');
@@ -71,6 +72,7 @@
     });
 
     $replyButton.on('click', function() {
+      mixpanel.track('message sent');
       $replyTextarea.attr('disabled', 'disabled');
       $replyButton.attr('disabled', 'disabled');
     });
