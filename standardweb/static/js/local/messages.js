@@ -73,8 +73,10 @@
 
     $replyButton.on('click', function() {
       mixpanel.track('message sent');
+      $replyForm.submit();
       $replyTextarea.attr('disabled', 'disabled');
       $replyButton.attr('disabled', 'disabled');
+      return false;
     });
 
     $newMessageInput.on('keyup', function() {
