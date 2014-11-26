@@ -38,6 +38,9 @@ def make_celery(app):
                 with app.app_context():
                     return TaskBase.__call__(self, *args, **kwargs)
 
+            def on_failure(self, exc, task_id, args, kwargs, einfo):
+                rollbar.report_exc_info()
+
         celery.Task = ContextTask
 
     return celery

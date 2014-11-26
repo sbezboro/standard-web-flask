@@ -6,7 +6,6 @@ import rollbar
 from sqlalchemy.orm import joinedload
 
 from standardweb import app
-from standardweb import db
 from standardweb import celery
 from standardweb.models import Player, PlayerStats, Server, User
 

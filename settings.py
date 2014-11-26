@@ -6,7 +6,8 @@ MEMCACHED_URLS = ['127.0.0.1:11211']
 
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['application/json']
 
 try:
     from local_settings import *
