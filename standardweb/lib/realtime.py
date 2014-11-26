@@ -1,11 +1,8 @@
 import pytz
 
-from flask import json, render_template, request
+from flask import render_template
 
-import requests
-import rollbar
-
-from standardweb import app
+from standardweb.tasks import send_rts_data as send_rts_data_task
 
 
 def new_message(user, message):
@@ -33,21 +30,9 @@ def unread_message_count(user):
 
 
 def send_rts_data(user_id, channel, action, payload):
-    url = '%s%s/%s' % (app.config['RTS_BASE_URL'], app.config['RTS_PREFIX'], channel)
-
-    headers = {
-        'X-Standard-Secret': app.config['RTS_SECRET'],
-        'Content-Type': 'application/json'
-    }
-
-    data = {
-        'user_id': user_id,
-        'action': action,
-        'payload': payload
-    }
-
-    try:
-        return requests.post(url, data=json.dumps(data), headers=headers, timeout=2)
-    except Exception:
-        rollbar.report_exc_info(request=request)
-        return None
+    send_rts_data_task.apply_async((
+        user_id,
+        channel,
+        action,
+        payload
+    ))

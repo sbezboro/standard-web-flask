@@ -1,11 +1,6 @@
-import requests
-import rollbar
-
 from flask import render_template
-from flask import request
 from flask import url_for
 
-from standardweb import app
 from standardweb.models import EmailToken
 from standardweb.tasks import send_email as send_email_task
 

@@ -7,21 +7,23 @@ import requests
 CODE_DIR = '/home/sbezboro/standard-web-flask'
 ENV_DIR = '/home/sbezboro/standard-web-flask-env'
 WEB_SERVICE = 'standard-web-flask'
+TASK_SERVICE = 'standard-web-celery'
 
 env.roledefs = {
     'web': ['208.110.64.130']
 }
 
+
 def deploy():
     local("git pull")
 
-    execute(update_and_restart_webs)
+    execute(update_and_restart_services)
 
     rollbar_record_deploy()
 
 
 @roles('web')
-def update_and_restart_webs():
+def update_and_restart_services():
     with cd(CODE_DIR):
         with prefix('source %s/bin/activate' % ENV_DIR):
             run("git pull")
@@ -29,7 +31,7 @@ def update_and_restart_webs():
             if result.failed:
                 abort('Could not install required packages. Aborting.')
 
-            run('supervisorctl restart %s' % WEB_SERVICE)
+            run('supervisorctl restart %s %s' % (WEB_SERVICE, TASK_SERVICE))
 
 
 def rollbar_record_deploy():
