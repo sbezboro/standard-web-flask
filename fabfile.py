@@ -31,7 +31,8 @@ def update_and_restart_services():
             if result.failed:
                 abort('Could not install required packages. Aborting.')
 
-            run('supervisorctl restart %s %s' % (WEB_SERVICE, TASK_SERVICE))
+            run('supervisorctl restart %s' % WEB_SERVICE)
+            run('supervisorctl restart %s' % TASK_SERVICE)
 
 
 def rollbar_record_deploy():

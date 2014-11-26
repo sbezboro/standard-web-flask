@@ -1,13 +1,14 @@
 from standardweb.models import *
 from standardweb.lib.constants import *
+from standardweb.tasks import api_forum_post as api_forum_post_task
+from standardweb.tasks import api_new_message as api_new_message_task
 from standardweb.vendor.minecraft_api import MinecraftJsonApi
-
-from sqlalchemy.orm import joinedload
 
 import rollbar
 
 
 apis = {}
+
 
 def _global_console_command(command):
     for server in Server.query.filter_by(online=True):
@@ -16,7 +17,7 @@ def _global_console_command(command):
         api.call('runConsoleCommand', command)
 
 
-def _api_call(server, type, data=None):
+def api_call(server, type, data=None):
     api = get_api(server.address)
 
     try:
@@ -69,66 +70,32 @@ def get_api(host):
 
 
 def get_server_status(server):
-    resp = _api_call(server, 'server_status')
+    resp = api_call(server, 'server_status')
 
     return resp.get('data') if resp else None
 
 
 def send_player_stats(server, stats):
-    _api_call(server, 'player_stats', data=stats)
+    api_call(server, 'player_stats', data=stats)
 
 
 def send_stats(server, data):
-    _api_call(server, 'stats', data=data)
+    api_call(server, 'stats', data=data)
 
 
 def forum_post(user, forum_name, topic_name, path, is_new_topic=False):
-    base_url = url_for('index', _external=True).rstrip('/')
-    
-    for server in Server.query.filter_by(online=True):
-        data = {
-            'forum_name': forum_name,
-            'topic_name': topic_name,
-            'path': '%s%s' % (base_url, path),
-            'is_new_topic': is_new_topic
-        }
-
-        if user.player:
-            data['uuid'] = user.player.uuid
-            data['username'] = user.player.username
-        else:
-            data['username'] = user.username
-
-        _api_call(server, 'forum_post', data=data)
+    api_forum_post_task.apply_async((
+        user.get_username(),
+        user.player.uuid if user.player else None,
+        forum_name,
+        topic_name,
+        path,
+        is_new_topic
+    ))
 
 
 def new_message(to_player, from_user):
-    from_username = from_user.get_username()
-    from_uuid = from_user.player.uuid if from_user.player else None
-
-    url = url_for('messages', username=from_username, _external=True)
-
-    player_stats = PlayerStats.query.options(
-        joinedload(PlayerStats.server)
-    ).filter(
-        PlayerStats.player == to_player,
-        Server.online == True
-    )
-
-    # send the message only if the player is currently on the server
-    servers = [player_stat.server for player_stat in player_stats if player_stat.is_online]
-
-    for server in servers:
-        data = {
-            'from_username': from_username,
-            'from_uuid': from_uuid,
-            'to_uuid': to_player.uuid,
-            'no_user': not to_player.user,
-            'url': url
-        }
-
-        _api_call(server, 'new_message', data=data)
-
-
-def set_donator(username):
-    _global_console_command('permissions player addgroup %s donator' % username)
+    api_new_message_task.apply_async((
+        to_player.id,
+        from_user.id
+    ))

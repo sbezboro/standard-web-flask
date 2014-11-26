@@ -23,17 +23,23 @@ cache = MemcachedCache(app.config['MEMCACHED_URLS'])
 
 def make_celery(app):
     celery = Celery(app.import_name, broker=app.config['CELERY_BROKER_URL'])
+
     celery.conf.update(app.config)
-    TaskBase = celery.Task
 
-    class ContextTask(TaskBase):
-        abstract = True
+    # don't wrap tasks with app contexts in development
+    # since the tasks are run inline
+    if not app.config['CELERY_ALWAYS_EAGER']:
+        TaskBase = celery.Task
 
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return TaskBase.__call__(self, *args, **kwargs)
+        class ContextTask(TaskBase):
+            abstract = True
 
-    celery.Task = ContextTask
+            def __call__(self, *args, **kwargs):
+                with app.app_context():
+                    return TaskBase.__call__(self, *args, **kwargs)
+
+        celery.Task = ContextTask
+
     return celery
 
 
