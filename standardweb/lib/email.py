@@ -7,6 +7,7 @@ from flask import url_for
 
 from standardweb import app
 from standardweb.models import EmailToken
+from standardweb.tasks import send_email as send_email_task
 
 
 DEFAULT_FROM_EMAIL = 'Standard Survival <server@standardsurvival.com>'
@@ -83,39 +84,15 @@ def send_email(to_email, subject, text_body, html_body, from_email=None):
     if not to_email:
         return None
 
-    return _send_email(from_email or DEFAULT_FROM_EMAIL, to_email, subject, text_body, html_body)
+    send_email_task.apply_async((
+        from_email or DEFAULT_FROM_EMAIL,
+        to_email,
+        subject,
+        text_body,
+        html_body
+    ))
 
-
-def _send_email(from_email, to_emails, subject, text_body, html_body):
-    auth = ('api', app.config['MAILGUN_API_KEY'])
-
-    data = {
-        'from': from_email,
-        'to': to_emails,
-        'subject': subject,
-        'text': text_body,
-        'html': html_body
-    }
-
-    result = None
-
-    try:
-        result = requests.post(EMAIL_URL, auth=auth, data=data)
-    except:
-        rollbar.report_exc_info(request=request)
-    else:
-        if result.status_code == 200:
-            rollbar.report_message('Email sent', level='info', request=request, extra_data={
-                'data': data,
-                'result': result.json()
-            })
-        else:
-            rollbar.report_message('Problem sending email', level='error', request=result, extra_data={
-                'data': data,
-                'result': result
-            })
-
-    return result
+    return None
 
 
 def _render_email(template_name, tvars):
