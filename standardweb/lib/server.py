@@ -7,6 +7,7 @@ from sqlalchemy.orm import joinedload
 import calendar
 from datetime import datetime
 from datetime import timedelta
+import math
 
 
 @cache.CachedResult('ranking')
@@ -60,11 +61,16 @@ def get_player_list_data(server):
 
     player_info.sort(key=lambda x: x[0].displayname.lower())
 
+    try:
+        tps = int(math.ceil(float(server_status['tps'])))
+    except ValueError:
+        tps = 'N/A'
+
     return {
         'player_info': player_info,
         'num_players': server_status['numplayers'],
         'max_players': server_status['maxplayers'],
-        'tps': server_status['tps']
+        'tps': tps
     }
 
 

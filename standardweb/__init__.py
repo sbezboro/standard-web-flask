@@ -46,6 +46,9 @@ def make_celery(app):
     return celery
 
 
+celery = make_celery(app)
+
+
 def set_up_rollbar():
     class CustomRequest(Request):
         @property
@@ -71,10 +74,9 @@ def set_up_rollbar():
 
     app.request_class = CustomRequest
 
+
 if app.config.has_key('ROLLBAR_ACCESS_TOKEN'):
     set_up_rollbar()
-
-celery = make_celery(app)
 
 
 import middleware
