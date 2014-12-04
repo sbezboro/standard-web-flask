@@ -1,10 +1,11 @@
-from standardweb.models import *
+import rollbar
+
+from standardweb import app
 from standardweb.lib.constants import *
+from standardweb.models import Server
 from standardweb.tasks import api_forum_post as api_forum_post_task
 from standardweb.tasks import api_new_message as api_new_message_task
 from standardweb.vendor.minecraft_api import MinecraftJsonApi
-
-import rollbar
 
 
 apis = {}

@@ -1,4 +1,5 @@
-from standardweb.models import *
+from standardweb import db, app
+from standardweb.models import ForumCategory, ForumTopic, ForumPost
 
 
 def migrate_post_topic_counts():

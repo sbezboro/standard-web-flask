@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import abort
 from flask import flash
 from flask import g
@@ -5,20 +7,21 @@ from flask import redirect
 from flask import request
 from flask import render_template
 from flask import send_file
-
-from standardweb.forms import MoveTopicForm, PostForm, NewTopicForm, ForumSearchForm
-from standardweb.lib import api
-from standardweb.models import *
-from standardweb.views import redirect_old_url
-from standardweb.views.decorators.auth import login_required
-
+from flask import url_for
+import rollbar
 from sqlalchemy import or_
 from sqlalchemy.sql.expression import func
 from sqlalchemy.orm import joinedload
 
-from datetime import datetime
-
-import rollbar
+from standardweb import app, db
+from standardweb.forms import MoveTopicForm, PostForm, NewTopicForm, ForumSearchForm
+from standardweb.lib import api
+from standardweb.models import (
+    ForumCategory, Forum, ForumPost, ForumTopic, User, ForumPostTracking, ForumAttachment,
+    PlayerStats, AuditLog, ForumBan
+)
+from standardweb.views import redirect_old_url
+from standardweb.views.decorators.auth import login_required
 
 
 TOPICS_PER_PAGE = 40

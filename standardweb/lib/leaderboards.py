@@ -1,7 +1,7 @@
-from standardweb.lib import cache
-from standardweb.models import *
-
 from sqlalchemy.orm import joinedload
+
+from standardweb.lib import cache
+from standardweb.models import KillType, KillCount, MaterialType, OreDiscoveryCount
 
 
 def _build_kill_leaderboard(server, type):

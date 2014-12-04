@@ -1,23 +1,29 @@
+from datetime import datetime
+from functools import wraps
+
 from flask import abort
 from flask import g
 from flask import jsonify
 from flask import request
-
-from functools import wraps
-
-from standardweb.models import *
-from standardweb.lib import helpers as h
-from standardweb.lib import player as libplayer
-from standardweb.lib import realtime
-from standardweb.lib.csrf import exempt_funcs
-from standardweb.lib.email import send_creation_email, send_verify_email
+from flask import url_for
 
 from sqlalchemy import or_
 from sqlalchemy.sql.expression import func
 from sqlalchemy.orm import joinedload
 
+from standardweb import app, db
+from standardweb.lib import helpers as h
+from standardweb.lib import player as libplayer
+from standardweb.lib import realtime
+from standardweb.lib.csrf import exempt_funcs
+from standardweb.lib.email import send_creation_email, send_verify_email
+from standardweb.models import (
+    Server, Player, DeathType, DeathEvent, KillCount, KillEvent, KillType, MaterialType,
+    OreDiscoveryEvent, OreDiscoveryCount, EmailToken, User, PlayerStats, VeteranStatus, Message, Title, AuditLog,
+    DeathCount
+)
 
-# Base API function decorator that builds a list of view functions for use in urls.py. 
+# Base API function decorator that builds a list of view functions for use in urls.py.
 def api_func(function):
 
     @wraps(function)

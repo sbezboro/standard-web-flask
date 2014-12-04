@@ -1,18 +1,19 @@
+from datetime import datetime, timedelta
+
 from flask import flash
 from flask import g
 from flask import redirect
 from flask import request
 from flask import render_template
 from flask import session
+from flask import url_for
+import rollbar
 
+from standardweb import app
 from standardweb.forms import LoginForm, VerifyEmailForm, ForgotPasswordForm, ResetPasswordForm
 from standardweb.lib.email import send_reset_password
-from standardweb.models import *
+from standardweb.models import Player, User, EmailToken
 from standardweb.views.decorators.auth import login_required
-
-from datetime import datetime
-
-import rollbar
 
 
 @app.route('/login', methods=['GET', 'POST'])

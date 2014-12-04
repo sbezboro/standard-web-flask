@@ -1,8 +1,8 @@
 import sys
 
-from standardweb import app
+from standardweb import app, db
 from standardweb.lib import minecraft_uuid
-from standardweb.models import *
+from standardweb.models import Player
 
 
 def main():

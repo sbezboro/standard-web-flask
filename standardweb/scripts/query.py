@@ -1,19 +1,21 @@
 """
 Script that should run every minute. Collects and stores stats from all servers to the db.
 """
-from standardweb.models import *
-from standardweb.lib import api
-from standardweb.lib.constants import *
-
-from sqlalchemy import not_
-from sqlalchemy.orm import joinedload
-
 from datetime import datetime, timedelta
 import time
 
 import requests
-
 import rollbar
+from sqlalchemy import not_
+from sqlalchemy.orm import joinedload
+
+from standardweb import app, db
+from standardweb.lib import api
+from standardweb.lib.constants import *
+from standardweb.models import (
+    Group, PlayerStats, GroupInvite, Player, AuditLog, PlayerActivity, IPTracking,
+    ServerStatus, MojangStatus, Server
+)
 
 
 def _handle_groups(server, server_groups):

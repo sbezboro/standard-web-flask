@@ -3,10 +3,11 @@ from flask import g
 from flask import redirect
 from flask import request
 from flask import render_template
-
+from flask import url_for
 from sqlalchemy.orm import joinedload
 
-from standardweb.models import *
+from standardweb import app
+from standardweb.models import Server, Group, Player, PlayerStats
 
 
 GROUPS_PER_PAGE = 10

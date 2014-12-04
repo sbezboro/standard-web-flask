@@ -1,32 +1,29 @@
+from datetime import datetime
+from datetime import timedelta
+import os
+
 from flask import abort
-from flask import flash
 from flask import g
 from flask import jsonify
 from flask import redirect
 from flask import request
 from flask import render_template
 from flask import send_file
+from flask import url_for
+from PIL import Image
+import requests
+import rollbar
+from sqlalchemy.orm import joinedload
+import StringIO
 
+from standardweb import app
 from standardweb.lib import leaderboards as libleaderboards
 from standardweb.lib import player as libplayer
 from standardweb.lib import server as libserver
-from standardweb.models import *
+from standardweb.models import Server, ServerStatus, Player, User
 from standardweb.views import redirect_old_url
 from standardweb.views.decorators.auth import login_required
 from standardweb.views.decorators.cache import last_modified
-
-from sqlalchemy.orm import joinedload
-
-from datetime import datetime
-from datetime import timedelta
-
-import StringIO
-
-from PIL import Image
-
-import requests
-
-import rollbar
 
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
