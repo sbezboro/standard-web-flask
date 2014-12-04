@@ -8,6 +8,7 @@ CODE_DIR = '/home/sbezboro/standard-web-flask'
 ENV_DIR = '/home/sbezboro/standard-web-flask-env'
 WEB_SERVICE = 'standard-web-flask'
 TASK_SERVICE = 'standard-web-celery'
+SCHEDULE_SERVICE = 'standard-web-celery-beat'
 
 env.roledefs = {
     'web': ['208.110.64.130']
@@ -33,6 +34,7 @@ def update_and_restart_services():
 
             run('supervisorctl restart %s' % WEB_SERVICE)
             run('supervisorctl restart %s' % TASK_SERVICE)
+            run('supervisorctl restart %s' % SCHEDULE_SERVICE)
 
 
 def rollbar_record_deploy():
