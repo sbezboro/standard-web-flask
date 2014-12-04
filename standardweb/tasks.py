@@ -11,6 +11,12 @@ from standardweb.models import Player, PlayerStats, Server, User
 
 
 @celery.task()
+def minute_query():
+    # testing
+    rollbar.report_message('Query', level='debug')
+
+
+@celery.task()
 def send_email(from_email, to_emails, subject, text_body, html_body):
     from standardweb.lib.email import EMAIL_URL
 

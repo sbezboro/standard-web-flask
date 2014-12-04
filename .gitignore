@@ -4,5 +4,7 @@
 *.un~
 local_settings.py
 .DS_Store
+celerybeat.pid
+celerybeat-schedule.db
 standardweb/faces/*/*
 standardweb/attachments
