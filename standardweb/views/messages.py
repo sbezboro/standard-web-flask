@@ -18,8 +18,8 @@ from standardweb.models import User, Player, Message
 from standardweb.views.decorators.auth import login_required
 
 
-MESSAGE_THROTTLE_COUNT = 5
-MESSAGE_THROTTLE_PERIOD = 10  # minutes
+MESSAGE_THROTTLE_COUNT = 60
+MESSAGE_THROTTLE_PERIOD = 60  # minutes
 
 
 @app.route('/messages')
@@ -28,8 +28,8 @@ MESSAGE_THROTTLE_PERIOD = 10  # minutes
 def messages(username=None):
     user = g.user
 
-    messages = []
 
+    messages = []
     form = MessageForm()
 
     template_vars = {
