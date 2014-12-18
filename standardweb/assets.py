@@ -3,7 +3,7 @@ from flask.ext.assets import Bundle, Environment
 from standardweb import app
 
 
-assets = Environment(app)
+assets_env = Environment(app)
 
 js = Bundle(
     Bundle(
@@ -40,5 +40,5 @@ css = Bundle(
     output='css/all.min.css'
 )
 
-assets.register('js_all', js)
-assets.register('css_all', css)
+assets_env.register('js_all', js)
+assets_env.register('css_all', css)
