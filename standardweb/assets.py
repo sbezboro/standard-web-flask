@@ -1,4 +1,6 @@
+import logging
 from flask.ext.assets import Bundle, Environment
+from webassets.script import CommandLineEnvironment
 
 from standardweb import app
 
@@ -42,3 +44,10 @@ css = Bundle(
 
 assets_env.register('js_all', js)
 assets_env.register('css_all', css)
+
+if not app.config['DEBUG']:
+    log = logging.getLogger('webassets')
+    log.addHandler(logging.StreamHandler())
+    log.setLevel(logging.DEBUG)
+    cmdenv = CommandLineEnvironment(assets_env, log)
+    cmdenv.build()

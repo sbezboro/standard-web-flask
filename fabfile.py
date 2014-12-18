@@ -1,11 +1,7 @@
-import logging
-
 from fabric.api import abort, run, local, cd, env, roles, execute, prefix
-from webassets.script import CommandLineEnvironment
 import requests
 
 from standardweb import app
-from standardweb.assets import assets_env
 
 
 CODE_DIR = '/home/sbezboro/standard-web-flask'
@@ -36,12 +32,6 @@ def update_and_restart_services():
             result = run("pip install -r requirements.txt --quiet")
             if result.failed:
                 abort('Could not install required packages. Aborting.')
-
-            log = logging.getLogger('webassets')
-            log.addHandler(logging.StreamHandler())
-            log.setLevel(logging.DEBUG)
-            cmdenv = CommandLineEnvironment(assets_env, log)
-            cmdenv.build()
 
             run('supervisorctl restart %s' % WEB_SERVICE)
             run('supervisorctl restart %s' % TASK_SERVICE)

@@ -78,7 +78,6 @@ def set_up_rollbar():
 if app.config.has_key('ROLLBAR_ACCESS_TOKEN'):
     set_up_rollbar()
 
-
 import assets
 import middleware
 import models
