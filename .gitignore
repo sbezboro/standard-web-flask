@@ -8,7 +8,6 @@ celerybeat.pid
 celerybeat-schedule
 celerybeat-schedule.db
 standardweb/faces/*/*
-standardweb/static/css/all.min.css
-standardweb/static/js/all.min.js
+gen/
 standardweb/attachments
 .webassets-cache/

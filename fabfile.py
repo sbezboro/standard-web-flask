@@ -33,6 +33,8 @@ def update_and_restart_services():
             if result.failed:
                 abort('Could not install required packages. Aborting.')
 
+            run('python app.py assets')
+
             run('supervisorctl restart %s' % WEB_SERVICE)
             run('supervisorctl restart %s' % TASK_SERVICE)
             run('supervisorctl restart %s' % SCHEDULE_SERVICE)

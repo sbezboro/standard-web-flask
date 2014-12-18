@@ -1,4 +1,5 @@
 import logging
+
 from flask.ext.assets import Bundle, Environment
 from webassets.script import CommandLineEnvironment
 
@@ -30,7 +31,7 @@ js = Bundle(
         'js/local/site.js'
     ),
     filters='uglifyjs',
-    output='js/all.min.js'
+    output='js/gen/all.min.js'
 )
 
 css = Bundle(
@@ -39,15 +40,8 @@ css = Bundle(
     'css/tipsy.css',
     'css/bbcode.css',
     filters='cssmin',
-    output='css/all.min.css'
+    output='css/gen/all.min.css'
 )
 
 assets_env.register('js_all', js)
 assets_env.register('css_all', css)
-
-if not app.config['DEBUG']:
-    log = logging.getLogger('webassets')
-    log.addHandler(logging.StreamHandler())
-    log.setLevel(logging.DEBUG)
-    cmdenv = CommandLineEnvironment(assets_env, log)
-    cmdenv.build()
