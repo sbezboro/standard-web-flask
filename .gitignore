@@ -8,3 +8,4 @@ celerybeat.pid
 celerybeat-schedule.db
 standardweb/faces/*/*
 standardweb/attachments
+.webassets-cache/

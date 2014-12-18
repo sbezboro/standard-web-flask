@@ -18,6 +18,10 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
+ASSETS_DEBUG = False
+ASSETS_AUTO_BUILD = False
+UGLIFYJS_EXTRA_ARGS = ['-c', '-m']
+
 try:
     from local_settings import *
 except ImportError:

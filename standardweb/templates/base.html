@@ -9,9 +9,9 @@
 
     <meta name="viewport" content="width=device-width, user-scalable=no" />
 
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tipsy.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+    {% assets "css_all" %}
+        <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+    {% endassets %}
 
     <!-- start Google Analytics -->
     <script type="text/javascript">
@@ -40,8 +40,10 @@
         {% endif %}
     </script>
     <!-- end Mixpanel -->
-    
-    <script type="text/javascript" src="{{ url_for('static', filename='js/all.min.js') }}"></script>
+
+    {% assets "js_all" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 
     {% if user %}
         <script type="application/javascript">
@@ -83,7 +85,6 @@
         <noscript><img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?ev=6018722527894&amp;cd[value]=0.00&amp;cd[currency]=CAD&amp;noscript=1" /></noscript>
     {% endif %}
     
-    <!--[if lte IE 8]><script type="text/javascript" src="{{ url_for('static', filename='js/excanvas.min.js') }}"></script><![endif]-->
     {% block script_files %}{% endblock %}
 </head>
 
