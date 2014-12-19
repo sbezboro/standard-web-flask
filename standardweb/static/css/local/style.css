@@ -1662,14 +1662,14 @@ fieldset {
 }
 
 .progress {
-    background: url('../images/progress.gif') no-repeat center;
+    background: url('../../images/progress.gif') no-repeat center;
 }
 
 .rank-star {
     float: left;
     margin-left: -18px;
     padding-top: 4px;
-    background: url('../images/star.gif') no-repeat center;
+    background: url('../../images/star.gif') no-repeat center;
     width: 16px;
     height: 16px;
     text-align: center;
@@ -1766,10 +1766,10 @@ fieldset > .alert {
 
 @font-face {
     font-family:"Minecraft Regular";
-    src:url("../fonts/minecraft.eot?") format("eot"),
-        url("../fonts/minecraft.woff") format("woff"),
-        url("../fonts/minecraft.ttf") format("truetype"),
-        url("../fonts/minecraft.svg#Minecraft") format("svg");
+    src:url("../../fonts/minecraft.eot?") format("eot"),
+        url("../../fonts/minecraft.woff") format("woff"),
+        url("../../fonts/minecraft.ttf") format("truetype"),
+        url("../../fonts/minecraft.svg#Minecraft") format("svg");
     font-weight:normal;font-style:normal;
 }
 

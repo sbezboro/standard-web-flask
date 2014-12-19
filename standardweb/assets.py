@@ -1,12 +1,9 @@
-import logging
-
 from flask.ext.assets import Bundle, Environment
-from webassets.script import CommandLineEnvironment
 
 from standardweb import app
 
 
-assets_env = Environment(app)
+env = Environment(app)
 
 js = Bundle(
     Bundle(
@@ -35,13 +32,17 @@ js = Bundle(
 )
 
 css = Bundle(
-    'css/font-awesome.min.css',
-    'css/style.css',
-    'css/tipsy.css',
-    'css/bbcode.css',
+    Bundle(
+        'css/thirdparty/font-awesome.min.css',
+        'css/thirdparty/tipsy.css',
+        'css/thirdparty/bbcode.css',
+    ),
+    Bundle(
+        'css/local/style.css',
+    ),
     filters='cssmin',
     output='css/gen/all.min.css'
 )
 
-assets_env.register('js_all', js)
-assets_env.register('css_all', css)
+env.register('js_all', js)
+env.register('css_all', css)

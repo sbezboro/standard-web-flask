@@ -5,7 +5,7 @@ from webassets.script import CommandLineEnvironment
 from werkzeug import script
 
 from standardweb import app
-from standardweb.assets import assets_env
+from standardweb.assets import env
 
 
 if __name__ == '__main__':
@@ -16,7 +16,7 @@ if __name__ == '__main__':
             log = logging.getLogger('webassets')
             log.addHandler(logging.StreamHandler())
             log.setLevel(logging.DEBUG)
-            cmdenv = CommandLineEnvironment(assets_env, log)
+            cmdenv = CommandLineEnvironment(env, log)
             cmdenv.build()
         else:
             raise Exception('Invalid command')
