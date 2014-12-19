@@ -75,6 +75,7 @@ class User(db.Model, Base):
     username = db.Column(db.String(30))
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     uuid = db.Column(db.String(32))
+    full_name = db.Column(db.String(50))
     email = db.Column(db.String(75))
     password = db.Column(db.String(128))
     admin = db.Column(db.Boolean, default=False)
@@ -170,6 +171,12 @@ class EmailToken(db.Model, Base):
 
     @classmethod
     def create_verify_token(cls, email, user_id, commit=True):
+        cls.query.filter_by(
+            type='verify',
+            email=email,
+            date_redeemed=None
+        ).delete()
+
         et = cls(token=cls._generate_token(),
                  type='verify',
                  email=email,

@@ -185,3 +185,8 @@ class ForumSearchForm(BaseForm):
 
 class MessageForm(BaseForm):
     text = TextAreaField('Text', validators=[DataRequired()])
+
+
+class ProfileSettingsForm(BaseForm):
+    full_name = TextField('Name', validators=[Optional()])
+    email = TextField('Email', validators=[DataRequired()])

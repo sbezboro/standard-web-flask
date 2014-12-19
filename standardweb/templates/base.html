@@ -129,6 +129,9 @@
                                         <i class="fa fa-user"></i><span>Profile</span>
                                     </a>
                                 {% endif %}
+                                <a href="{{ url_for('settings') }}">
+                                    <i class="fa fa-wrench"></i><span>Settings</span>
+                                </a>
                                 <a href="{{ url_for('logout') }}">
                                     <i class="fa fa-sign-out"></i><span>Log out</span>
                                 </a>
@@ -170,6 +173,7 @@
                         {% if not user.admin %}
                             <li><a href="{{ url_for('player', username=user.player.username) }}">{{ user.player.username|face_thumb }}{{ user.player.username }}</a></li>
                         {% endif %}
+                        <li><a href="{{ url_for('settings') }}">Settings</a></li>
                         <li><a href="{{ url_for('logout') }}">Log out</a></li>
                     {% else %}
                         <li><a href="{{ url_for('signup') }}">Sign up</a></li>

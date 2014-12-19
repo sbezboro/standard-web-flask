@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Standard Survival Minecraft Server{% endblock %}
+
+{% macro settings_option(name, type) -%}
+    <a href="{{ url_for('%s_settings' % type) }}">
+        <div class="option {% if type == active_option %}active{% endif %}">
+            {{ name }}
+        </div>
+    </a>
+{%- endmacro %}
+
+{% block content %}
+    <div id="main">
+        {% include 'includes/flash_messages.html' %}
+        <h2>Settings</h2>
+        <div class="settings-section">
+            <div class="settings-options">
+                {{ settings_option('Profile', 'profile') }}
+            </div>
+            <div class="settings-content">
+                {% block settings_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

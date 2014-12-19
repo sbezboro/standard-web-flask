@@ -1,0 +1,35 @@
+{% extends "settings/base.html" %}
+
+{% block title %}Profile Settings - Standard Survival Minecraft Server{% endblock %}
+
+{% block settings_content %}
+    <form method="POST" action="{{ url_for('profile_settings') }}">
+        {{ form.hidden_tag() }}
+        <div class="control-group">
+            <label>Username</label>
+            <div class="control">{{ user.get_username() }}</div>
+        </div>
+        {% if player and player.nickname %}
+        <div class="control-group">
+            <label>Nickname</label>
+            <div class="control">{{ player.nickname_html|safe }}</div>
+        </div>
+        {% endif %}
+        <div class="control-group">
+            {{ form.full_name.label }}
+            <div class="control">{{ form.full_name(placeholder='optional') }}</div>
+        </div>
+        <div class="control-group">
+            {{ form.email.label }}
+            <div class="control">{{ form.email }}</div>
+            {% if unverified_email %}
+                <div class="unverified-email">Email pending verification: {{ unverified_email }} - <a href="{{ url_for('resend_verification_email') }}">Resend verification email</a></div>
+            {% endif %}
+        </div>
+        <div class="control-group">
+            <div class="control">
+                <input class="btn tb" type="submit" value="Save">
+            </div>
+        </div>
+    </form>
+{% endblock %}
