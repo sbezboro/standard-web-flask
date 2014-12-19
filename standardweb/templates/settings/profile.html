@@ -16,11 +16,13 @@
         </div>
         {% endif %}
         <div class="control-group">
+            <span class="control-errors">{% if form.full_name.errors %}{{ form.full_name.errors[0] }}{% endif %}</span>
             {{ form.full_name.label }}
             <div class="control">{{ form.full_name(placeholder='optional') }}</div>
         </div>
         <div class="control-group">
             {{ form.email.label }}
+            <span class="control-errors">{% if form.email.errors %}{{ form.email.errors[0] }}{% endif %}</span>
             <div class="control">{{ form.email }}</div>
             {% if unverified_email %}
                 <div class="unverified-email">Email pending verification: {{ unverified_email }} - <a href="{{ url_for('resend_verification_email') }}">Resend verification email</a></div>
@@ -32,4 +34,7 @@
             </div>
         </div>
     </form>
+    <script type="application/javascript">
+        mixpanel.track('profile settings page view');
+    </script>
 {% endblock %}

@@ -8,6 +8,7 @@ from flask import render_template
 from flask import redirect
 from flask import request
 from flask import url_for
+from markupsafe import Markup
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
@@ -28,7 +29,6 @@ MESSAGE_THROTTLE_PERIOD = 60  # minutes
 @login_required()
 def messages(username=None):
     user = g.user
-
 
     messages = []
     form = MessageForm()
@@ -145,6 +145,12 @@ def messages(username=None):
         'username': username,
         'other_user_id': other_user_id
     })
+
+    if not user.email:
+        flash(Markup(
+            '<a href="%s">Set an email address</a> to receive email notifications for new messages!'
+            % url_for('profile_settings')
+        ), 'warning')
 
     return render_template('messages/index.html', **template_vars)
 
