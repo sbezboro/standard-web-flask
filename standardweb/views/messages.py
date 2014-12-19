@@ -13,6 +13,7 @@ from sqlalchemy.orm import joinedload
 
 from standardweb import app, db
 from standardweb.forms import MessageForm
+from standardweb.lib import realtime
 from standardweb.lib.notifier import notify_new_message
 from standardweb.models import User, Player, Message
 from standardweb.views.decorators.auth import login_required
@@ -122,6 +123,7 @@ def messages(username=None):
                 @after_this_request
                 def commit(response):
                     db.session.commit()
+                    realtime.unread_message_count(user)
                     return response
 
                 break
