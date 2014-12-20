@@ -33,7 +33,7 @@ def profile_settings():
     user = g.user
 
     form = ProfileSettingsForm(
-        full_name=user.full_name.strip(),
+        full_name=(user.full_name or '').strip(),
         email=user.email
     )
 
