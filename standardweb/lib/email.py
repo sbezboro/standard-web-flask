@@ -60,6 +60,11 @@ def send_new_message_email(user, message):
     if not _verify_email_preference(user, 'new_message'):
         return
 
+    to_email = user.email
+
+    if not to_email:
+        return
+
     from_user = message.from_user
     from_username = message.from_user.get_username()
 
@@ -68,8 +73,6 @@ def send_new_message_email(user, message):
     from_player_url = None
     if from_user.player:
         from_player_url = url_for('player', username=from_username, _external=True)
-
-    to_email = user.email
 
     unsubscribe_link = notifications.generate_unsubscribe_link(user, 'new_message')
 
