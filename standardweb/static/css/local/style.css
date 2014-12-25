@@ -1164,19 +1164,8 @@ fieldset {
     padding: 20px;
 }
 
-.settings-section .settings-content .checkbox {
-    margin-top: 10px;
-    position: relative;
-    font-size: 14px;
-}
-
-.settings-section .settings-content .checkbox input[type='checkbox'] {
-    position: absolute;
-    margin-left: -18px;
-}
-
-.settings-section .settings-content .checkbox label {
-    margin-left: 20px;
+.settings-section h3 {
+    margin: 0;
 }
 
 .settings-section .settings-content .control-group {
@@ -1195,6 +1184,21 @@ fieldset {
 .settings-section .settings-content .control input[type='text'] {
     min-width: 40%;
     padding: 5px;
+}
+
+.settings-section .settings-content .notification-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.settings-section .settings-content .notification-table td {
+    border-bottom: 1px solid #eee;
+    line-height: 22px;
+}
+
+.settings-section .settings-content .notification-table .checkbox {
+    width: 80px;
+    text-align: center;
 }
 
 .face-large {

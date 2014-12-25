@@ -4,3 +4,13 @@
 --
 <br>
 Standard Survival Minecraft Server - <a href="http://standardsurvival.com">standardsurvival.com</a>
+<br>
+<br>
+<div style="color: #bbb; font-size: 0.8em">
+    This email was sent to {{ to_email }}
+    <br>
+    {% if unsubscribe_url %}
+    To stop receiving this type of email: <a href="{{ unsubscribe_url }}">unsubscribe</a>
+    {% endif %}
+    - <a href="{{ preferences_url }}">email preferences</a>
+</div>

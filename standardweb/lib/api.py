@@ -96,7 +96,15 @@ def forum_post(user, forum_name, topic_name, path, is_new_topic=False):
 
 
 def new_message(to_player, from_user):
+    to_user = to_player.user
+    if to_user and not _verify_ingame_preference(to_user, 'new_message'):
+        return
+
     api_new_message_task.apply_async((
         to_player.id,
         from_user.id
     ))
+
+
+def _verify_ingame_preference(user, type):
+    return user.get_notification_preference(type).ingame

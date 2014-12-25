@@ -1,5 +1,6 @@
 from flask import render_template
 from flask import url_for
+from standardweb.lib import notifications
 
 from standardweb.models import EmailToken
 from standardweb.tasks import send_email as send_email_task
@@ -14,14 +15,14 @@ def send_creation_email(to_email, uuid, username):
 
     verify_url = url_for('create_account', token=email_token.token, _external=True)
 
-    text_body, html_body = _render_email('create_account', {
+    text_body, html_body = _render_email('create_account', to_email, {
         'username': username,
         'verify_url': verify_url
     })
 
     email_token.save(commit=True)
 
-    return send_email(to_email, '[Standard Survival] Please verify your email', text_body, html_body)
+    send_email(to_email, '[Standard Survival] Please verify your email', text_body, html_body)
 
 
 def send_verify_email(to_email, user):
@@ -29,14 +30,14 @@ def send_verify_email(to_email, user):
 
     verify_url = url_for('verify_email', token=email_token.token, _external=True)
 
-    text_body, html_body = _render_email('verify_email', {
+    text_body, html_body = _render_email('verify_email', to_email, {
         'username': user.player.username,
         'verify_url': verify_url
     })
 
     email_token.save(commit=True)
 
-    return send_email(to_email, '[Standard Survival] Please verify your email', text_body, html_body)
+    send_email(to_email, '[Standard Survival] Please verify your email', text_body, html_body)
 
 
 def send_reset_password(user):
@@ -44,16 +45,21 @@ def send_reset_password(user):
 
     verify_url = url_for('reset_password', token=email_token.token, _external=True)
 
-    text_body, html_body = _render_email('reset_password', {
+    to_email = user.email
+
+    text_body, html_body = _render_email('reset_password', to_email, {
         'verify_url': verify_url
     })
 
     email_token.save(commit=True)
 
-    return send_email(user.email, '[Standard Survival] Reset password', text_body, html_body)
+    return send_email(to_email, '[Standard Survival] Reset password', text_body, html_body)
 
 
 def send_new_message_email(user, message):
+    if not _verify_email_preference(user, 'new_message'):
+        return
+
     from_user = message.from_user
     from_username = message.from_user.get_username()
 
@@ -63,21 +69,26 @@ def send_new_message_email(user, message):
     if from_user.player:
         from_player_url = url_for('player', username=from_username, _external=True)
 
-    text_body, html_body = _render_email('messages/new_message', {
+    to_email = user.email
+
+    unsubscribe_link = notifications.generate_unsubscribe_link(user, 'new_message')
+
+    text_body, html_body = _render_email('messages/new_message', to_email, {
         'username': user.get_username(),
         'from_username': from_username,
         'message_body': message.body,
         'message_body_html': message.body_html,
         'conversation_url': conversation_url,
-        'from_player_url': from_player_url
+        'from_player_url': from_player_url,
+        'unsubscribe_url': unsubscribe_link
     })
 
-    return send_email(user.email, '[Standard Survival] New message from %s' % from_username, text_body, html_body)
+    send_email(to_email, '[Standard Survival] New message from %s' % from_username, text_body, html_body)
 
 
 def send_email(to_email, subject, text_body, html_body, from_email=None):
     if not to_email:
-        return None
+        return
 
     send_email_task.apply_async((
         from_email or DEFAULT_FROM_EMAIL,
@@ -87,10 +98,17 @@ def send_email(to_email, subject, text_body, html_body, from_email=None):
         html_body
     ))
 
-    return None
+
+def _verify_email_preference(user, type):
+    return user.get_notification_preference(type).email
 
 
-def _render_email(template_name, tvars):
+def _render_email(template_name, to_email, tvars):
+    tvars.update(
+        to_email=to_email,
+        preferences_url=url_for('notifications_settings', _external=True)
+    )
+
     text_body = render_template('emails/%s.txt' % template_name, **tvars)
     html_body = render_template('emails/%s.html' % template_name, **tvars)
 

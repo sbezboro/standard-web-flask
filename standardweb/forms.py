@@ -3,7 +3,7 @@ from standardweb.lib import csrf
 from flask import request
 
 from flask_wtf import Form
-from wtforms import HiddenField, FileField, PasswordField, SelectField, TextField, TextAreaField
+from wtforms import BooleanField, HiddenField, FileField, PasswordField, SelectField, TextField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 from wtforms.widgets import HTMLString, html_params, Select
 
@@ -190,3 +190,14 @@ class MessageForm(BaseForm):
 class ProfileSettingsForm(BaseForm):
     full_name = TextField('Name', validators=[Optional()])
     email = TextField('Email', validators=[DataRequired()])
+
+
+def generate_notification_settings_form(preferences):
+    class F(BaseForm):
+        pass
+
+    for preference in preferences:
+        setattr(F, '%s_email' % preference.name, BooleanField())
+        setattr(F, '%s_ingame' % preference.name, BooleanField())
+
+    return F()

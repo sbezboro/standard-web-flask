@@ -55,6 +55,10 @@ mutable.MutableDict.associate_with(JsonEncodedDict)
 
 
 class Base(object):
+
+    def __init__(self, **kwargs):
+        super(Base, self).__init__()
+
     def save(self, commit=True):
         db.session.add(self)
 
@@ -131,6 +135,49 @@ class User(db.Model, Base):
                 seen_at=None
             ).all()
         )
+
+    def get_notification_preferences(self, create=True, can_commit=True):
+        preferences = NotificationPreference.query.filter_by(
+            user=self
+        ).all()
+
+        if create:
+            active_preference_names = set()
+            for preference in preferences:
+                active_preference_names.add(preference.name)
+
+            missing_preference_names = NotificationPreference.NOTIFICATION_NAMES - active_preference_names
+            for name in missing_preference_names:
+                preference = NotificationPreference(
+                    user=self,
+                    name=name
+                )
+
+                preference.save(commit=False)
+
+                preferences.append(preference)
+
+            if can_commit:
+                db.session.commit()
+
+        return preferences
+
+    def get_notification_preference(self, type, create=True, can_commit=True):
+        preference = NotificationPreference.query.filter_by(
+            user=self,
+            name=type
+        ).first()
+
+        if not preference and create:
+            preference = NotificationPreference(
+                user=self,
+                name=type
+            )
+
+            preference.save(commit=can_commit)
+
+        return preference
+
 
     @classmethod
     def _make_password(cls, password, salt=None, iterations=None):
@@ -603,6 +650,33 @@ class AuditLog(db.Model, Base):
 
         audit_log.save(commit=commit)
         return audit_log
+
+
+class NotificationPreference(db.Model, Base):
+    NOTIFICATIONS = (
+        ('new_message', 'When I get a new message'),
+        ('subscribed_thread_post', 'When there is a new post in a thread I\'m subscribed to'),
+        ('news', 'When there is a news post')
+    )
+
+    NOTIFICATION_NAMES = frozenset([x[0] for x in NOTIFICATIONS])
+
+    NOTIFICATION_DESCRIPTION_MAP = {
+        x[0]: x[1] for x in NOTIFICATIONS
+    }
+
+    __tablename__ = 'notification_preference'
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    name = db.Column(db.String(64), primary_key=True)
+    email = db.Column(db.Boolean, default=True)
+    ingame = db.Column(db.Boolean, default=True)
+
+    user = db.relationship('User')
+
+    @property
+    def description(self):
+        return NotificationPreference.NOTIFICATION_DESCRIPTION_MAP[self.name]
 
 
 class ForumProfile(db.Model, Base):

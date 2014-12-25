@@ -2,3 +2,7 @@
 {% endblock %}
 --
 Standard Survival Minecraft Server - standardsurvival.com
+This email was sent to {{ to_email }}
+{% if unsubscribe_url %}
+To stop receiving this type of email, click: {{ unsubscribe_url }}
+{% endif %}

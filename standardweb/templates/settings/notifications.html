@@ -1,0 +1,54 @@
+{% extends "settings/base.html" %}
+
+{% block title %}Notification Settings - Standard Survival Minecraft Server{% endblock %}
+
+{% macro notification_option(description, type) -%}
+    <tr>
+        <td>
+            {{ description }}
+        </td>
+        <td class="checkbox">
+            <input type="checkbox" name="{{ type }}_email">
+        </td>
+        <td class="checkbox">
+            <input type="checkbox" name="{{ type }}_ingame">
+        </td>
+    </tr>
+{%- endmacro %}
+
+{% block settings_content %}
+    <form method="POST" action="{{ url_for('notifications_settings') }}">
+        {{ form.hidden_tag() }}
+        <h3>Notify me</h3>
+
+        <table class="notification-table">
+            <tr>
+                <th></th>
+                <th class="checkbox">By email</th>
+                <th class="checkbox">In-game</th>
+            </tr>
+            {% for preference in preferences %}
+                <tr>
+                    <td>
+                        {{ preference.description }}
+                    </td>
+                    <td class="checkbox">
+                        <input type="checkbox" name="{{ preference.name }}_email" {{ 'checked=checked' if preference.email }}>
+                    </td>
+                    <td class="checkbox">
+                        <input type="checkbox" name="{{ preference.name }}_ingame" {{ 'checked=checked' if preference.ingame }}>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <div class="control-group">
+            <div class="control">
+                <input class="btn tb" type="submit" value="Save">
+            </div>
+        </div>
+    </form>
+    <script type="application/javascript">
+        mixpanel.track('notification settings page view');
+    </script>
+{% endblock %}
