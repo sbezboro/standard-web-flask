@@ -3,6 +3,7 @@ from flask import Flask
 from flask import g
 from flask import got_request_exception
 from flask import Request
+from flask.ext.cdn import CDN
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.contrib.cache import MemcachedCache
 
@@ -17,6 +18,8 @@ app.config.from_object('settings')
 app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
 db = SQLAlchemy(app)
+
+cdn = CDN(app)
 
 cache = MemcachedCache(app.config['MEMCACHED_URLS'])
 

@@ -22,6 +22,9 @@ ASSETS_DEBUG = False
 ASSETS_AUTO_BUILD = False
 UGLIFYJS_EXTRA_ARGS = ['-c', '-m']
 
+FLASK_ASSETS_USE_CDN = True
+CDN_DOMAIN = 'd2rpyddsvhacm5.cloudfront.net'
+
 try:
     from local_settings import *
 except ImportError:
