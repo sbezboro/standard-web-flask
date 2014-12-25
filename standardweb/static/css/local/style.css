@@ -531,6 +531,10 @@ fieldset {
     margin-top: -4px;
 }
 
+.error .control input[type="text"] {
+    border-color: rgb(202, 0, 0);
+}
+
 .error {
     color: rgb(202, 0, 0);
 }

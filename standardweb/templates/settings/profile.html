@@ -20,7 +20,7 @@
             {{ form.full_name.label }}
             <div class="control">{{ form.full_name(placeholder='optional') }}</div>
         </div>
-        <div class="control-group">
+        <div class="control-group {{ 'error' if not user.email }}">
             {{ form.email.label }}
             <span class="control-errors">{% if form.email.errors %}{{ form.email.errors[0] }}{% endif %}</span>
             <div class="control">{{ form.email }}</div>
