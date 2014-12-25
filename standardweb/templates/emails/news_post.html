@@ -1,0 +1,8 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    {{ post_body_html|safe }}
+    <br>
+    <br>
+    <p>See the full topic here: <a href="{{ topic_url }}">{{ topic_url }}</a></p>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends 'emails/base.txt' %}
+
+{% block content %}
+{{ post_body }}
+
+See the full topic here: {{ topic_url }}
+
+{% endblock %}

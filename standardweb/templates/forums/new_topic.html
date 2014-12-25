@@ -34,6 +34,10 @@
                         <div class="control">{{ form.image() }}</div>
                     </div>
 
+                    {% if forum.locked %}
+                        {{ form.notify_all() }} {{ form.notify_all.label }}<br><br>
+                    {% endif %}
+
                     <div class="control-group">
                         <div class="control">
                             <input class="btn" type="submit" value="Post">

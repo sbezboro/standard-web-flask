@@ -16,6 +16,7 @@ from sqlalchemy.orm import joinedload
 from standardweb import app, db
 from standardweb.forms import MoveTopicForm, PostForm, NewTopicForm, ForumSearchForm
 from standardweb.lib import api
+from standardweb.lib.notifier import notify_news_post
 from standardweb.models import (
     ForumCategory, Forum, ForumPost, ForumTopic, User, ForumPostTracking, ForumAttachment,
     PlayerStats, AuditLog, ForumBan
@@ -406,6 +407,7 @@ def new_topic(forum_id):
         title = form.title.data
         body = form.body.data
         image = form.image.data
+        notify_all = form.notify_all.data
 
         last_post = forum.last_post
         if last_post.body == body and last_post.user_id == user.id:
@@ -432,6 +434,9 @@ def new_topic(forum_id):
         if image:
             if not ForumAttachment.create_attachment(post.id, image, commit=True):
                 flash('There was a problem with the upload', 'error')
+
+        if user.admin and notify_all:
+            notify_news_post(post)
 
         api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=True)
 

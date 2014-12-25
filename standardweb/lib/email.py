@@ -89,6 +89,28 @@ def send_new_message_email(user, message):
     send_email(to_email, '[Standard Survival] New message from %s' % from_username, text_body, html_body)
 
 
+def send_news_post_email(user, post_body, post_body_html, topic_id, topic_title):
+    if not _verify_email_preference(user, 'news'):
+        return
+
+    to_email = user.email
+
+    if not to_email:
+        return
+
+    forum_topic_url = url_for('forum_topic', topic_id=topic_id, _external=True)
+    unsubscribe_link = notifications.generate_unsubscribe_link(user, 'news')
+
+    text_body, html_body = _render_email('news_post', to_email, {
+        'post_body': post_body,
+        'post_body_html': post_body_html,
+        'topic_url': forum_topic_url,
+        'unsubscribe_url': unsubscribe_link
+    })
+
+    send_email(to_email, '[Standard Survival] %s' % topic_title, text_body, html_body)
+
+
 def send_email(to_email, subject, text_body, html_body, from_email=None):
     if not to_email:
         return

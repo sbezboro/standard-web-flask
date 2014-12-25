@@ -1,6 +1,7 @@
 from standardweb.lib import api
 from standardweb.lib import email
 from standardweb.lib import realtime
+from standardweb.tasks import email_news_post_all
 
 
 def notify_new_message(message, send_email=True):
@@ -17,3 +18,9 @@ def notify_new_message(message, send_email=True):
 
     if to_player:
         api.new_message(to_player, from_user)
+
+
+def notify_news_post(post):
+    email_news_post_all.apply_async((
+        post.id,
+    ))

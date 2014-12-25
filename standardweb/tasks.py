@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 
 from standardweb import app
 from standardweb import celery
-from standardweb.models import Player, PlayerStats, Server, User
+from standardweb.models import Player, PlayerStats, Server, User, ForumPost
 
 
 @celery.task()
@@ -129,3 +129,17 @@ def api_new_message(to_player_id, from_user_id):
         }
 
         api_call(server, 'new_message', data=data)
+
+@celery.task()
+def email_news_post_all(forum_post_id):
+    from standardweb.lib.email import send_news_post_email
+
+    users = User.query.filter(
+        User.email != None
+    )
+
+    post = ForumPost.query.get(forum_post_id)
+    topic = post.topic
+
+    for user in users:
+        send_news_post_email(user, post.body, post.body_html, topic.id, topic.name)
