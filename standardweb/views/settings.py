@@ -1,13 +1,14 @@
 import urllib
 
-from flask import abort, flash, g, redirect, render_template, url_for
+from flask import abort, flash, g, redirect, render_template, request, url_for
 from markupsafe import Markup
+import rollbar
 
 from standardweb import app, db
 from standardweb.forms import generate_notification_settings_form, ProfileSettingsForm
 from standardweb.lib.email import send_verify_email
 from standardweb.lib.notifications import verify_unsubscribe_request
-from standardweb.models import EmailToken, User
+from standardweb.models import EmailToken, User, AuditLog
 from standardweb.views.decorators.auth import login_required
 
 
@@ -86,6 +87,13 @@ def notifications_settings():
 
         db.session.commit()
 
+        AuditLog.create('notification_settings_saved', user_id=user.id, data={
+            x.name: {
+                'email': x.email,
+                'ingame': x.ingame
+            } for x in preferences
+        }, commit=True)
+
         flash('Notification settings saved!', 'success')
 
     template_vars = {
@@ -117,13 +125,32 @@ def resend_verification_email():
 @app.route('/unsubscribe/<encoded_email>/<type>/<signature>')
 def unsubscribe(encoded_email, type, signature):
     if not verify_unsubscribe_request(encoded_email, type, signature):
+        rollbar.report_message('Unsubscribe signature failure', level='error', extra_data={
+            'current_user_id': g.user.id if g.user else None,
+            'path': request.path,
+        })
+
         abort(403)
 
     email = urllib.unquote(encoded_email)
 
     user = User.query.filter_by(email=email).first()
     if not user:
-        abort(403)
+        flash('Invalid link', 'error')
+        return redirect(url_for('index'))
+
+    if g.user and g.user != user:
+        rollbar.report_message('Unsubscribing email of a different user', level='warning', extra_data={
+            'current_user_id': g.user.id,
+            'current_user_email': g.user.email,
+            'target_user_id': user.id,
+            'target_user_email': email
+        })
+
+    AuditLog.create('unsubscribe', user_id=g.user.id if g.user else user.id, data={
+        'email': email,
+        'type': type
+    }, commit=False)
 
     preference = user.get_notification_preference(type, can_commit=False)
     preference.email = False

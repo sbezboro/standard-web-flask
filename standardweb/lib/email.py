@@ -1,7 +1,7 @@
 from flask import render_template
 from flask import url_for
-from standardweb.lib import notifications
 
+from standardweb.lib import notifications
 from standardweb.models import EmailToken
 from standardweb.tasks import send_email as send_email_task
 
