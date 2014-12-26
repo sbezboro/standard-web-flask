@@ -93,11 +93,6 @@ def _dated_url_for(endpoint, **values):
 
 
 @app.context_processor
-def override_url_for():
-    return dict(url_for=_dated_url_for)
-
-
-@app.context_processor
 def rts_auth_data():
     data = {}
 
