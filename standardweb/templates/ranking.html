@@ -31,7 +31,7 @@
                         {{ player.displayname_html|safe }}
                     </a>
                     {% if online_now %}
-                        <img src="/static/images/online.png" alt="Online now!" title="Online now!">
+                        <img src="{{ url_for('static', filename='images/online.png') }}" alt="Online now!" title="Online now!">
                     {% endif %}
                 </td>
                 <td class="timeSpent">

@@ -69,6 +69,16 @@ def inject_debug():
 
 
 @app.context_processor
+def inject_cdn_domain():
+    if not app.config['DEBUG']:
+        cdn_domain = '//%s' % app.config['CDN_DOMAIN']
+    else:
+        cdn_domain = ''
+        
+    return dict(cdn_domain=cdn_domain)
+
+
+@app.context_processor
 def inject_new_messages():
     new_messages = 0
 

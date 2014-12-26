@@ -404,7 +404,7 @@
               '<div class="user">',
                 '<a href="/player/' + username + '">',
                   '<span><img class="face-thumb" src="/face/16/' + username + '.png">' + username + '</span>',
-                  active ? '<img src="/static/images/online.png">': ' ',
+                  active ? '<img src="' + StandardWeb.cdnDomain + '/static/images/online.png">': ' ',
                 '</a>- ' + address,
                '</div>'
             ].join('');
@@ -412,7 +412,7 @@
             html += [
               '<div class="user">',
                 'Anonymous',
-                active ? '<img src="/static/images/online.png">': ' ',
+                active ? '<img src="' + StandardWeb.cdnDomain + '/static/images/online.png">': ' ',
                 '- ' + address,
               '</div>'
             ].join('');

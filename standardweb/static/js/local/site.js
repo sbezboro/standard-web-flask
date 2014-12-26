@@ -115,9 +115,9 @@
         if (!loading) {
           loading = true;
 
-          $refreshImage.attr('src', '/static/images/spinner.gif');
+          $refreshImage.attr('src', StandardWeb.cdnDomain + '/static/images/spinner.gif');
           $content.fadeTo(0, 0.25).load('player_list', function() {
-            $refreshImage.attr('src', '/static/images/refresh.png');
+            $refreshImage.attr('src', StandardWeb.cdnDomain +'/static/images/refresh.png');
             $content.fadeTo(100, 1);
             loading = false;
           });

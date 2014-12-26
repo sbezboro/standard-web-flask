@@ -190,6 +190,7 @@
         <script type="application/javascript">
             StandardWeb.userId = {{ user.id }};
             StandardWeb.username = '{{ user.get_username() }}';
+            StandardWeb.cdnDomain = '{{ cdn_domain }}';
         </script>
         {% if user.player %}
             <script type="application/javascript">

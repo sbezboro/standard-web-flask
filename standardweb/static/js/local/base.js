@@ -17,6 +17,7 @@
     userId: null,
     username: null,
     nickname: null,
+    cdnDomain: null,
 
     refreshFromnow: function($rootElement) {
       $rootElement = $rootElement || document;
