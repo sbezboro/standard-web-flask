@@ -769,6 +769,40 @@ def forum_attachment(hash):
     return send_file(f, mimetype=attachment.content_type)
 
 
+@app.route('/forums/topic/<int:topic_id>/subscribe')
+@login_required()
+def forum_topic_subscribe(topic_id):
+    user = g.user
+
+    topic = ForumTopic.query.get(topic_id)
+
+    if not topic or topic.deleted:
+        abort(404)
+
+    subscription = ForumTopicSubscription.query.filter_by(
+        user=user,
+        topic=topic
+    ).first()
+
+    if subscription:
+        flash('You are already subscribed to this topic', 'warning')
+    else:
+        subscription = ForumTopicSubscription(
+            user=user,
+            topic=topic
+        )
+
+        subscription.save(commit=False)
+
+        AuditLog.create('topic_subscribe', user_id=user.id, data={
+            'topic_id': topic.id
+        }, commit=True)
+
+        flash('Subscribed successfully!', 'success')
+
+    return redirect(topic.url)
+
+
 @app.route('/forums/topic/<int:topic_id>/unsubscribe')
 @login_required()
 def forum_topic_unsubscribe(topic_id):

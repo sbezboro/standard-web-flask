@@ -13,6 +13,8 @@
         <div class="controls">
             {% if subscription %}
                 <a href="{{ url_for('forum_topic_unsubscribe', topic_id=topic.id) }}">Unsubscribe</a>
+            {% else %}
+                <a href="{{ url_for('forum_topic_subscribe', topic_id=topic.id) }}">Subscribe to replies in this topic</a>
             {% endif %}
         </div>
         <div class="clear"></div>
