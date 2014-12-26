@@ -74,7 +74,7 @@ def inject_cdn_domain():
         cdn_domain = '//%s' % app.config['CDN_DOMAIN']
     else:
         cdn_domain = ''
-        
+
     return dict(cdn_domain=cdn_domain)
 
 

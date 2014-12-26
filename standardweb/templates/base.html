@@ -190,7 +190,6 @@
         <script type="application/javascript">
             StandardWeb.userId = {{ user.id }};
             StandardWeb.username = '{{ user.get_username() }}';
-            StandardWeb.cdnDomain = '{{ cdn_domain }}';
         </script>
         {% if user.player %}
             <script type="application/javascript">
@@ -201,6 +200,8 @@
     {% endif %}
 
     <script type="application/javascript">
+        StandardWeb.cdnDomain = '{{ cdn_domain }}';
+        
         var rtsAuthData = {{ rts_auth_data|tojson|safe }};
         var rtsBaseUrl = '{{ rts_base_url }}';
         var rtsPrefix = '{{ rts_prefix }}';

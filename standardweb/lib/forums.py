@@ -3,6 +3,8 @@ import bbcode
 import cgi
 import re
 
+from standardweb import app
+
 
 _bbcode_parser = bbcode.Parser(replace_links=False)
 
@@ -41,7 +43,7 @@ _emoticon_map = {
 }
 
 emoticon_map = [
-    (re.compile(cgi.escape(k)), '<img src="%s"/>' % ('/static/images/forums/' + v))
+    (re.compile(cgi.escape(k)), '<img src="%s%s"/>' % (app.config['CDN_DOMAIN'], '/static/images/forums/' + v))
     for k, v in _emoticon_map.iteritems()
 ]
 
