@@ -1,7 +1,7 @@
 from standardweb.lib import api
 from standardweb.lib import email
 from standardweb.lib import realtime
-from standardweb.tasks import email_news_post_all
+from standardweb.tasks import email_news_post_all, email_subscribed_topic_post
 
 
 def notify_new_message(message, send_email=True):
@@ -22,5 +22,11 @@ def notify_new_message(message, send_email=True):
 
 def notify_news_post(post):
     email_news_post_all.apply_async((
+        post.id,
+    ))
+
+
+def notify_subscribed_topic_post(post):
+    email_subscribed_topic_post.apply_async((
         post.id,
     ))

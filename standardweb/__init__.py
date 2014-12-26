@@ -1,3 +1,5 @@
+import traceback
+
 from celery import Celery
 from flask import Flask
 from flask import g
@@ -29,11 +31,18 @@ def make_celery(app):
 
     celery.conf.update(app.config)
 
+    TaskBase = celery.Task
+
     # don't wrap tasks with app contexts in development
     # since the tasks are run inline
-    if not app.config.get('CELERY_ALWAYS_EAGER'):
-        TaskBase = celery.Task
+    if app.config.get('CELERY_ALWAYS_EAGER'):
+        class ContextTask(TaskBase):
+            abstract = True
 
+            def on_failure(self, exc, task_id, args, kwargs, einfo):
+                traceback.print_exc()
+                rollbar.report_exc_info()
+    else:
         class ContextTask(TaskBase):
             abstract = True
 
@@ -44,7 +53,7 @@ def make_celery(app):
             def on_failure(self, exc, task_id, args, kwargs, einfo):
                 rollbar.report_exc_info()
 
-        celery.Task = ContextTask
+    celery.Task = ContextTask
 
     return celery
 

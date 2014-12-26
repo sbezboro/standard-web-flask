@@ -45,7 +45,7 @@
             <form class="post-form" action="{{ url_for('edit_post', post_id=post.id) }}" method="post">
                 {{ form.hidden_tag() }}
                 <fieldset>
-                    <div class="control-group">
+                    <div class="control-group vertical">
                         {{ form.body.label }}
                         <span class="control-errors">{% if form.body.errors %}{{ form.body.errors[0] }}{% endif %}</span>
                         <div class="control">{{ form.body() }}</div>

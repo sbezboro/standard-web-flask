@@ -514,6 +514,22 @@ fieldset {
     font-weight: bold;
 }
 
+.control-group.vertical label {
+    font-size: 14px;
+    width: 100px;
+    float: none;
+}
+
+.control-group.checkbox label {
+    float: none;
+    font-weight: normal;
+    font-size: inherit;
+}
+
+.control-group.checkbox.disabled label {
+    color: #bbb;
+}
+
 .control-errors {
     color: rgb(202, 0, 0);
     font-size: smaller;
@@ -1688,6 +1704,7 @@ fieldset {
 .forum-form-section {
     background: #fff;
     border: 1px solid #ddd;
+    font-size: 14px;
 }
 
 .forum-form-section fieldset {
@@ -1696,12 +1713,6 @@ fieldset {
 
 .forum-form-section .control-group {
     margin: 0 0 14px;
-}
-
-.forum-form-section label {
-    font-size: 14px;
-    width: 100px;
-    float: none;
 }
 
 .forum-form-section .control {
@@ -1722,10 +1733,6 @@ fieldset {
     width: 100%;
     height: 250px;
     resize: vertical;
-}
-
-.forum-form-section a {
-    font-size: 12px;
 }
 
 .forum-search {

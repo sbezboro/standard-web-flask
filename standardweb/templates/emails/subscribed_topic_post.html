@@ -1,0 +1,11 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    <h3>Hi {{ username }}!</h3>
+    <p>There was a new reply in a topic you are subscribed to:</p>
+    <div style="margin-left: 20px; max-width: 900px">
+        <p>{{ post_body_html|safe }}</p>
+    </div>
+    <br>
+    <p>See the post on the forums here: <a href="{{ post_url }}">{{ post_url }}</a>. No longer interested in this topic? Click here to unsubscribe: <a href="{{ unsubscribe_topic_url }}">{{ unsubscribe_topic_url }}</a>.</p>
+{% endblock %}

@@ -16,10 +16,10 @@ from sqlalchemy.orm import joinedload
 from standardweb import app, db
 from standardweb.forms import MoveTopicForm, PostForm, NewTopicForm, ForumSearchForm
 from standardweb.lib import api
-from standardweb.lib.notifier import notify_news_post
+from standardweb.lib.notifier import notify_news_post, notify_subscribed_topic_post
 from standardweb.models import (
     ForumCategory, Forum, ForumPost, ForumTopic, User, ForumPostTracking, ForumAttachment,
-    PlayerStats, AuditLog, ForumBan
+    PlayerStats, AuditLog, ForumBan, ForumTopicSubscription
 )
 from standardweb.views import redirect_old_url
 from standardweb.views.decorators.auth import login_required
@@ -308,6 +308,8 @@ def forum_topic(topic_id):
 
         api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=False)
 
+        notify_subscribed_topic_post(post)
+
         return redirect(post.url)
 
     page = request.args.get('p')
@@ -351,8 +353,15 @@ def forum_topic(topic_id):
         for stats in player_stats
     }
 
+    subscription = None
+
     if user:
         topic.update_read(user)
+
+        subscription = ForumTopicSubscription.query.filter_by(
+            user=user,
+            topic=topic
+        ).first()
 
     retval = {
         'topic': topic,
@@ -360,7 +369,8 @@ def forum_topic(topic_id):
         'player_stats': player_stats,
         'page_size': page_size,
         'page': page,
-        'form': form
+        'form': form,
+        'subscription': subscription
     }
 
     return render_template('forums/topic.html', **retval)
@@ -408,6 +418,7 @@ def new_topic(forum_id):
         body = form.body.data
         image = form.image.data
         notify_all = form.notify_all.data
+        subscribe = form.subscribe.data
 
         last_post = forum.last_post
         if last_post.body == body and last_post.user_id == user.id:
@@ -437,6 +448,18 @@ def new_topic(forum_id):
 
         if user.admin and notify_all:
             notify_news_post(post)
+
+        if subscribe:
+            subscription = ForumTopicSubscription(
+                user=user,
+                topic=topic
+            )
+
+            subscription.save(commit=False)
+
+            AuditLog.create('topic_subscribe', user_id=user.id, data={
+                'topic_id': topic.id
+            }, commit=True)
 
         api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=True)
 
@@ -744,6 +767,34 @@ def forum_attachment(hash):
     f = file(attachment.file_path, 'rb')
 
     return send_file(f, mimetype=attachment.content_type)
+
+
+@app.route('/forums/topic/<int:topic_id>/unsubscribe')
+@login_required()
+def forum_topic_unsubscribe(topic_id):
+    user = g.user
+
+    topic = ForumTopic.query.get(topic_id)
+
+    if not topic or topic.deleted:
+        abort(404)
+
+    subscription = ForumTopicSubscription.query.filter_by(
+        user=user,
+        topic=topic
+    ).first()
+
+    if subscription:
+        db.session.delete(subscription)
+        flash('Unsubscribed from the topic successfully!', 'success')
+
+        AuditLog.create('topic_unsubscribe', user_id=user.id, data={
+            'topic_id': topic.id
+        })
+    else:
+        flash('You weren\'t subscribed to the topic', 'warning')
+
+    return redirect(topic.url)
 
 
 redirect_old_url('/forum/', 'forums')

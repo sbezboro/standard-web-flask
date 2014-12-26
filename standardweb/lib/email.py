@@ -89,7 +89,7 @@ def send_new_message_email(user, message):
     send_email(to_email, '[Standard Survival] New message from %s' % from_username, text_body, html_body)
 
 
-def send_news_post_email(user, post_body, post_body_html, topic_id, topic_title):
+def send_news_post_email(user, post_body, post_body_html, topic_id, topic_name):
     if not _verify_email_preference(user, 'news'):
         return
 
@@ -108,7 +108,32 @@ def send_news_post_email(user, post_body, post_body_html, topic_id, topic_title)
         'unsubscribe_url': unsubscribe_link
     })
 
-    send_email(to_email, '[Standard Survival] %s' % topic_title, text_body, html_body)
+    send_email(to_email, '[Standard Survival] %s' % topic_name, text_body, html_body)
+
+
+def send_subscribed_topic_post_email(user, post_id, post_body, post_body_html, topic_id, topic_name):
+    if not _verify_email_preference(user, 'subscribed_thread_post'):
+        return
+
+    to_email = user.email
+
+    if not to_email:
+        return
+
+    forum_post_url = url_for('forum_post', post_id=post_id, _external=True)
+    unsubscribe_topic_url = url_for('forum_topic_unsubscribe', topic_id=topic_id, _external=True)
+    unsubscribe_url = notifications.generate_unsubscribe_link(user, 'subscribed_thread_post')
+
+    text_body, html_body = _render_email('subscribed_topic_post', to_email, {
+        'username': user.get_username(),
+        'post_body': post_body,
+        'post_body_html': post_body_html,
+        'post_url': forum_post_url,
+        'unsubscribe_topic_url': unsubscribe_topic_url,
+        'unsubscribe_url': unsubscribe_url
+    })
+
+    send_email(to_email, '[Standard Survival] New reply in the topic "%s"' % topic_name, text_body, html_body)
 
 
 def send_email(to_email, subject, text_body, html_body, from_email=None):

@@ -655,7 +655,7 @@ class AuditLog(db.Model, Base):
 class NotificationPreference(db.Model, Base):
     NOTIFICATIONS = (
         ('new_message', 'When I get a new message'),
-        ('subscribed_thread_post', 'When there is a new post in a thread I\'m subscribed to'),
+        ('subscribed_thread_post', 'When there is a new post in a topic I\'m subscribed to'),
         ('news', 'When there is a news post')
     )
 
@@ -804,7 +804,7 @@ class ForumPost(db.Model, Base):
     __tablename__ = 'forum_post'
 
     id = db.Column(db.Integer, primary_key=True)
-    topic_id =  db.Column(db.Integer, db.ForeignKey('forum_topic.id'))
+    topic_id = db.Column(db.Integer, db.ForeignKey('forum_topic.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     created = db.Column(db.DateTime, default=datetime.utcnow)
     updated = db.Column(db.DateTime, default=None)
@@ -916,3 +916,13 @@ class ForumBan(db.Model, Base):
 
     user = db.relationship('User', foreign_keys='ForumBan.user_id', backref=db.backref('forum_ban', uselist=False))
     by_user = db.relationship('User', foreign_keys='ForumBan.by_user_id')
+
+
+class ForumTopicSubscription(db.Model, Base):
+    __tablename__ = 'forum_topic_subscription'
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    topic_id = db.Column(db.Integer, db.ForeignKey('forum_topic.id'), primary_key=True)
+
+    user = db.relationship('User')
+    topic = db.relationship('ForumTopic')
