@@ -48,6 +48,7 @@ def make_celery(app):
 
             def __call__(self, *args, **kwargs):
                 with app.app_context():
+                    g.user = None
                     return TaskBase.__call__(self, *args, **kwargs)
 
             def on_failure(self, exc, task_id, args, kwargs, einfo):
