@@ -24,7 +24,7 @@
   var currentUsername;
 
   function resize() {
-    var baseHeight = $(window).height() - $("#header").outerHeight() - $(".sub-header").outerHeight();
+    var baseHeight = $(window).height() - $(".header").outerHeight() - $(".sub-header").outerHeight();
     var consoleHeight = baseHeight - 30;
     var detailHeight = baseHeight - 22;
     var playersHeight = baseHeight - 150;

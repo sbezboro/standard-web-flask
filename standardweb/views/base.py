@@ -268,7 +268,7 @@ def face(username, size=16):
 
     if not image:
         image = libplayer.extract_face(Image.open(PROJECT_PATH + '/standardweb/static/images/char.png'), size)
-        image.save(path, optimize=True)
+        image.save(path)
 
     tmp = StringIO.StringIO()
     image.save(tmp, 'PNG', optimize=True)
