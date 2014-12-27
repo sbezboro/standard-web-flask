@@ -2,12 +2,12 @@
 @import 'media';
 @import 'mixins';
 
-@container-width: 960px;
+@main-width: 960px;
 
 body {
   background-color: #F5F5F5;
   color: @background;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Helvetica', 'Arial', sans-serif;
   margin: 0;
   padding: 0;
   text-align: center;
@@ -60,7 +60,7 @@ code {
   .header-inner {
     margin: 0 auto;
     text-align: left;
-    width: @container-width;
+    width: @main-width;
     
     @media @tablet, @mobile {
       width: 100%;
