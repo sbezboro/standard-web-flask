@@ -7,7 +7,7 @@ from flask import url_for
 from standardweb import app
 from standardweb.lib import csrf
 from standardweb.lib import helpers as h
-from standardweb.models import Message, User
+from standardweb.models import User
 from sqlalchemy.orm import joinedload
 
 import hashlib

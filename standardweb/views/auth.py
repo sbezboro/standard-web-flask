@@ -14,9 +14,11 @@ from standardweb.forms import LoginForm, VerifyEmailForm, ForgotPasswordForm, Re
 from standardweb.lib.email import send_reset_password
 from standardweb.models import Player, User, EmailToken
 from standardweb.views.decorators.auth import login_required
+from standardweb.views.decorators.ssl import ssl_required
 
 
 @app.route('/login', methods=['GET', 'POST'])
+@ssl_required()
 def login():
     form = LoginForm()
 
