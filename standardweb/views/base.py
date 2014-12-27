@@ -257,7 +257,7 @@ def face(username, size=16):
         else:
             if resp.status_code == 200:
                 image = libplayer.extract_face(Image.open(StringIO.StringIO(resp.content)), size)
-                image.save(path)
+                image.save(path, optimize=True)
 
     if not image:
         try:
@@ -268,10 +268,10 @@ def face(username, size=16):
 
     if not image:
         image = libplayer.extract_face(Image.open(PROJECT_PATH + '/standardweb/static/images/char.png'), size)
-        image.save(path)
+        image.save(path, optimize=True)
 
     tmp = StringIO.StringIO()
-    image.save(tmp, 'PNG')
+    image.save(tmp, 'PNG', optimize=True)
     tmp.seek(0)
 
     return send_file(tmp, mimetype="image/png")
