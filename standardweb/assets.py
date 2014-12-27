@@ -38,9 +38,13 @@ css = Bundle(
         'css/thirdparty/bbcode.css',
     ),
     Bundle(
+        'css/local/base.less',
+        'css/local/colors.less',
+        'css/local/media.less',
+        'css/local/mixins.less',
         'css/local/style.css',
     ),
-    filters='cssmin',
+    filters='less',
     output='css/gen/all.min.css'
 )
 

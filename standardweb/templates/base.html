@@ -9,6 +9,7 @@
 
     <meta name="viewport" content="width=device-width, user-scalable=no" />
 
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
     {% assets "css_all" %}
         <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
     {% endassets %}
@@ -89,10 +90,11 @@
 </head>
 
 <body>
-    <div id="header">
-        <div id="inner">
-            <div class="desktop">
-                <ul id="nav-menu">
+    <div class="header">
+        <div class="header-inner">
+            <a href="#" class="mobile-nav-btn extender" data-target="header-content"><i class="fa fa-bars"></i></a>
+            <div class="header-content" id="header-content">
+                <ul class="header-nav">
                     <li><a href="/" class="strong {% block select_index %}{% endblock %}">Standard Survival</a></li>
                     <li><a class="{% block select_guide %}{% endblock %}" href="{{ url_for('guide') }}">Guide</a></li>
                     <li><a class="{% block select_ranking %}{% endblock %}" href="{{ url_for('ranking', server_id=server.id if server else None) }}">Ranking</a></li>
@@ -105,9 +107,9 @@
                         <li><a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a></li>
                     {% endif %}
                 </ul>
-                <div id="account">
+                <div class="header-account">
                     {% if user %}
-                        <a class="messages {% if new_messages %}new{% endif %}" href="{{ url_for('messages') }}" title="Messages">
+                        <a class="messages {% if new_messages %}new{% else %}old{% endif %}" href="{{ url_for('messages') }}" title="Messages">
                             <i class="fa fa-envelope"></i>
                             <span class="new-count">{{ new_messages }}</span>
                         </a>
@@ -138,49 +140,14 @@
                             </div>
                         </div>
                     {% else %}
-                        <a class="{% block select_signup %}{% endblock %}" href="{{ url_for('signup') }}">Sign up</a>&nbsp;
-                        <a class="{% block select_login %}{% endblock %}" href="{{ url_for('login', next=request.path) }}">Log in</a>
+                        <ul class="header-nav">
+                            <li><a class="{% block select_signup %}{% endblock %}" href="{{ url_for('signup') }}">Sign up</a></li>
+                            <li><a class="{% block select_login %}{% endblock %}" href="{{ url_for('login', next=request.path) }}">Log in</a></li>
+                        </ul>
                     {% endif %}
                 </div>
             </div>
-            <div class="mobile">
-                <div class="mobile-title">
-                    Standard Survival
-                </div>
-                <div class="mobile-nav">
-                    <a href="#" class="btn extender" data-target="mobile-nav-menu"><i class="fa fa-bars"></i></a>
-                </div>
-                <ul id="mobile-nav-menu">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="{{ url_for('guide') }}">Guide</a></li>
-                    <li><a href="{{ url_for('ranking', server_id=server.id if server else None) }}">Ranking</a></li>
-                    <li><a href="{{ url_for('groups', server_id=server.id if server else None) }}">Groups</a></li>
-                    <li><a href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a></li>
-                    <li><a href="{{ url_for('forums') }}">Forums</a></li>
-                    <li><a href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a></li>
-                    <li><a href="{{ url_for('player_search') }}">Player Search</a></li>
-                    {% if user and user.admin %}<li><a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a></li>{% endif %}
-                        <li>&nbsp;</li>
-                    {% if user %}
-                        <li>
-                            <a class="messages {% if new_messages %}new{% endif %}" href="{{ url_for('messages') }}">
-                            <i class="fa fa-envelope"></i>
-                            {% if new_messages %}
-                                <span class="new-count">{{ new_messages }}</span>
-                            {% endif %}
-                        </a>
-                        </li>
-                        {% if not user.admin %}
-                            <li><a href="{{ url_for('player', username=user.player.username) }}">{{ user.player.username|face_thumb }}{{ user.player.username }}</a></li>
-                        {% endif %}
-                        <li><a href="{{ url_for('settings') }}">Settings</a></li>
-                        <li><a href="{{ url_for('logout') }}">Log out</a></li>
-                    {% else %}
-                        <li><a href="{{ url_for('signup') }}">Sign up</a></li>
-                        <li><a href="{{ url_for('login', next=request.path) }}">Log in</a></li>
-                    {% endif %}
-                </ul>
-            </div>
+            <div class="clearfix"></div>
         </div>
     </div>
     <div id="container">
