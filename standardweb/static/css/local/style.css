@@ -1527,7 +1527,14 @@ fieldset {
 .forum-post .post-author:hover .post-author-admin {
     display: inline-block;
     float: right;
-    vertical-align: top;
+    margin-top: 5px;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+.forum-post .post-author .messaging {
+    float: right;
+    display: inline-block;
 }
 
 .forum-post .post-content {

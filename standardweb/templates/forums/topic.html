@@ -70,6 +70,12 @@
                         </div>
                     {% endif %}
 
+                    <div class="messaging">
+                        {% if user and post.user != user %}
+                            <a class="btn btn-lite" href="{{ url_for('messages', username=post.user.get_username()) }}">Send Message</a>
+                        {% endif %}
+                    </div>
+
                     {% if user.admin or user in topic.forum.moderators and not post.user.admin %}
                         <div class="post-author-admin">
                             {% if not post.user.forum_ban %}
