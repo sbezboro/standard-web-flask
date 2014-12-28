@@ -1,11 +1,14 @@
+import base64
 from datetime import datetime
 from functools import wraps
+import re
 
 from flask import abort
 from flask import g
 from flask import jsonify
 from flask import request
 from flask import url_for
+import rollbar
 
 from sqlalchemy import or_
 from sqlalchemy.sql.expression import func
@@ -16,7 +19,8 @@ from standardweb.lib import helpers as h
 from standardweb.lib import player as libplayer
 from standardweb.lib import realtime
 from standardweb.lib.csrf import exempt_funcs
-from standardweb.lib.email import send_creation_email, send_verify_email
+from standardweb.lib.email import send_creation_email, send_verify_email, verify_mailgun_signature
+from standardweb.lib.notifier import notify_new_message
 from standardweb.models import (
     Server, Player, DeathType, DeathEvent, KillCount, KillEvent, KillType, MaterialType,
     OreDiscoveryEvent, OreDiscoveryCount, EmailToken, User, PlayerStats, VeteranStatus, Message, Title, AuditLog,
@@ -435,3 +439,72 @@ def mark_messages_read():
     return jsonify({
         'err': 0
     })
+
+
+@api_func
+def message_reply():
+    api_key = app.config['MAILGUN_API_KEY']
+
+    token = request.form.get('token')
+    timestamp = request.form.get('timestamp')
+    signature = request.form.get('signature')
+
+    if not verify_mailgun_signature(api_key, token, timestamp, signature):
+        return jsonify({})
+
+    body = request.form.get('stripped-text')
+    full_body = request.form.get('body-plain')
+    sender = request.form.get('sender')
+
+    from_user = User.query.filter_by(email=sender).first()
+
+    if from_user:
+        # in the email try to find the 'token' of the user who sent the original message
+        match = re.search(r'--([^\s]+)--', full_body)
+
+        if match:
+            to_user_token = match.groups()[0]
+
+            try:
+                to_user_id = base64.b64decode(to_user_token)
+            except Exception:
+                rollbar.report_message('Message not sent via email - cannot parse token', level='warning', extra_data={
+                    'from_user_id': from_user.id,
+                    'to_user_token': to_user_token
+                })
+            else:
+                to_user = User.query.options(
+                    joinedload(User.player)
+                ).get(to_user_id)
+
+                if to_user:
+                    message = Message(
+                        from_user=from_user,
+                        to_user=to_user,
+                        to_player=to_user.player,
+                        body=body,
+                        user_ip=request.remote_addr
+                    )
+                    message.save()
+
+                    notify_new_message(message)
+
+                    rollbar.report_message('Message successfully sent via email', level='debug', extra_data={
+                        'from_user_id': from_user.id,
+                        'to_user_id': to_user.id
+                    })
+                else:
+                    rollbar.report_message('Message not sent via email - to user not found', level='warning', extra_data={
+                        'from_user_id': from_user.id,
+                        'to_user_id': to_user_id
+                    })
+        else:
+            rollbar.report_message('Message not sent via email - token not found', level='warning', extra_data={
+                'from_user_id': from_user.id
+            })
+    else:
+        rollbar.report_message('Message not sent via email - sender email unrecognized', level='warning', extra_data={
+            'sender': sender
+        })
+
+    return jsonify({})

@@ -1,3 +1,7 @@
+import base64
+import hashlib
+import hmac
+
 from flask import render_template
 from flask import url_for
 
@@ -7,7 +11,8 @@ from standardweb.tasks import send_email as send_email_task
 
 
 DEFAULT_FROM_EMAIL = 'Standard Survival <server@standardsurvival.com>'
-EMAIL_URL = 'https://api.mailgun.net/v2/standardsurvival.com/messages'
+MESSAGE_REPLY_FROM_EMAIL = 'Standard Survival <message-reply@mail.standardsurvival.com>'
+EMAIL_URL = 'https://api.mailgun.net/v2/mail.standardsurvival.com/messages'
 
 
 def send_creation_email(to_email, uuid, username):
@@ -66,7 +71,7 @@ def send_new_message_email(user, message):
         return
 
     from_user = message.from_user
-    from_username = message.from_user.get_username()
+    from_username = from_user.get_username()
 
     conversation_url = url_for('messages', username=from_username, _external=True)
 
@@ -78,6 +83,7 @@ def send_new_message_email(user, message):
 
     text_body, html_body = _render_email('messages/new_message', to_email, {
         'username': user.get_username(),
+        'secret_token': base64.b64encode(str(from_user.id)),
         'from_username': from_username,
         'message_body': message.body,
         'message_body_html': message.body_html,
@@ -86,7 +92,13 @@ def send_new_message_email(user, message):
         'unsubscribe_url': unsubscribe_link
     })
 
-    send_email(to_email, '[Standard Survival] New message from %s' % from_username, text_body, html_body)
+    send_email(
+        to_email,
+        '[Standard Survival] New message from %s' % from_username,
+        text_body,
+        html_body,
+        from_email=MESSAGE_REPLY_FROM_EMAIL
+    )
 
 
 def send_news_post_email(user, post_body, post_body_html, topic_id, topic_name):
@@ -147,6 +159,16 @@ def send_email(to_email, subject, text_body, html_body, from_email=None):
         text_body,
         html_body
     ))
+
+
+def verify_mailgun_signature(api_key, token, timestamp, signature):
+    expected_signature = hmac.new(
+        key=api_key,
+        msg='{}{}'.format(timestamp, token),
+        digestmod=hashlib.sha256
+    ).hexdigest()
+
+    return signature == expected_signature
 
 
 def _verify_email_preference(user, type):
