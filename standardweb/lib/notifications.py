@@ -1,4 +1,5 @@
 import hashlib
+import hmac
 import urllib
 
 from flask import url_for
@@ -7,8 +8,11 @@ from standardweb import app
 
 
 def _generate_signature(encoded_email, type):
-    content = '%s/%s' % (encoded_email, type)
-    return hashlib.sha256(content + app.config['UNSUBSCRIBE_SECRET']).hexdigest()
+    return hmac.new(
+        app.config['UNSUBSCRIBE_SECRET'],
+        msg='%s/%s' % (encoded_email, type),
+        digestmod=hashlib.sha256
+    ).hexdigest()
 
 
 def verify_unsubscribe_request(encoded_email, type, signature):

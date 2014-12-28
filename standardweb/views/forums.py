@@ -785,7 +785,7 @@ def forum_topic_subscribe(topic_id):
     ).first()
 
     if subscription:
-        flash('You are already subscribed to this topic', 'warning')
+        flash('You are already subscribed to this topic.', 'warning')
     else:
         subscription = ForumTopicSubscription(
             user=user,
@@ -798,7 +798,7 @@ def forum_topic_subscribe(topic_id):
             'topic_id': topic.id
         }, commit=True)
 
-        flash('Subscribed successfully!', 'success')
+        flash('Subscribed successfully! You will be notified when someone replies.', 'success')
 
     return redirect(topic.url)
 

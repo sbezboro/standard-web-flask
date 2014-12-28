@@ -1,3 +1,4 @@
+import hmac
 from flask import abort
 from flask import g
 from flask import request
@@ -114,7 +115,11 @@ def rts_auth_data():
 
         content = '-'.join([str(user_id), username, uuid, str(int(admin))])
 
-        token = hashlib.sha256(content + app.config['RTS_SECRET']).hexdigest()
+        token = hmac.new(
+            app.config['RTS_SECRET'],
+            msg=content,
+            digestmod=hashlib.sha256
+        ).hexdigest()
 
         data = {
             'user_id': user_id,

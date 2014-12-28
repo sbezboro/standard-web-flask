@@ -159,7 +159,7 @@ def unsubscribe(encoded_email, type, signature):
     email_preferences_url = url_for('notifications_settings')
 
     flash(
-        Markup('Successfully unsubscribed! Manage more email preferences <a href="%s">here</a>' % email_preferences_url),
+        Markup('Successfully unsubscribed! Manage more email preferences <a href="%s">here</a>.' % email_preferences_url),
         'success'
     )
 
