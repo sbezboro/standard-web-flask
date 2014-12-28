@@ -19,7 +19,12 @@ from standardweb.lib import helpers as h
 from standardweb.lib import player as libplayer
 from standardweb.lib import realtime
 from standardweb.lib.csrf import exempt_funcs
-from standardweb.lib.email import send_creation_email, send_verify_email, verify_mailgun_signature
+from standardweb.lib.email import (
+    send_creation_email,
+    send_verify_email,
+    verify_mailgun_signature,
+    verify_message_reply_signature
+)
 from standardweb.lib.notifier import notify_new_message
 from standardweb.models import (
     Server, Player, DeathType, DeathEvent, KillCount, KillEvent, KillType, MaterialType,
@@ -450,34 +455,37 @@ def message_reply():
     signature = request.form.get('signature')
 
     if not verify_mailgun_signature(api_key, token, timestamp, signature):
-        return jsonify({})
+        abort(403)
 
     body = request.form.get('stripped-text')
     full_body = request.form.get('body-plain')
     sender = request.form.get('sender')
 
-    from_user = User.query.filter_by(email=sender).first()
+    # try to find the reply token of the original message
+    match = re.search(r'--([^\s]+)-([^\s]+)-([^\s]+)--', full_body)
 
-    if from_user:
-        # in the email try to find the 'token' of the user who sent the original message
-        match = re.search(r'--([^\s]+)--', full_body)
+    if match:
+        b64_from_user_id, b64_to_user_id, signature = match.groups()
 
-        if match:
-            to_user_token = match.groups()[0]
-
-            try:
-                to_user_id = base64.b64decode(to_user_token)
-            except Exception:
-                rollbar.report_message('Message not sent via email - cannot parse token', level='warning', extra_data={
-                    'from_user_id': from_user.id,
-                    'to_user_token': to_user_token
-                })
-            else:
+        try:
+            # swap to/from in the original message since this is a reply
+            reply_to_user_id = base64.b64decode(b64_from_user_id)
+            reply_from_user_id = base64.b64decode(b64_to_user_id)
+        except Exception:
+            rollbar.report_message('Message not sent via email - cannot parse token', level='warning', extra_data={
+                'b64_from_user_id': b64_from_user_id,
+                'b64_to_user_id': b64_to_user_id
+            })
+        else:
+            if verify_message_reply_signature(reply_to_user_id, reply_from_user_id, signature):
                 to_user = User.query.options(
                     joinedload(User.player)
-                ).get(to_user_id)
+                ).get(reply_to_user_id)
+                from_user = User.query.options(
+                    joinedload(User.player)
+                ).get(reply_from_user_id)
 
-                if to_user:
+                if to_user and from_user:
                     message = Message(
                         from_user=from_user,
                         to_user=to_user,
@@ -494,17 +502,20 @@ def message_reply():
                         'to_user_id': to_user.id
                     })
                 else:
-                    rollbar.report_message('Message not sent via email - to user not found', level='warning', extra_data={
-                        'from_user_id': from_user.id,
-                        'to_user_id': to_user_id
+                    rollbar.report_message('Message not sent via email - user not found', level='warning', extra_data={
+                        'reply_from_user_id': reply_from_user_id,
+                        'reply_to_user_id': reply_to_user_id
                     })
-        else:
-            rollbar.report_message('Message not sent via email - token not found', level='warning', extra_data={
-                'from_user_id': from_user.id
-            })
+            else:
+                rollbar.report_message('Message not sent via email - reply token signature mismatch', level='warning', extra_data={
+                    'reply_from_user_id': reply_from_user_id,
+                    'reply_to_user_id': reply_to_user_id,
+                    'signature': signature
+                })
     else:
-        rollbar.report_message('Message not sent via email - sender email unrecognized', level='warning', extra_data={
-            'sender': sender
+        rollbar.report_message('Message not sent via email - token not found', level='warning', extra_data={
+            'sender': sender,
+            'full_body': full_body
         })
 
     return jsonify({})

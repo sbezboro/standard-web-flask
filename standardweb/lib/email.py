@@ -5,6 +5,7 @@ import hmac
 from flask import render_template
 from flask import url_for
 
+from standardweb import app
 from standardweb.lib import notifications
 from standardweb.models import EmailToken
 from standardweb.tasks import send_email as send_email_task
@@ -81,9 +82,15 @@ def send_new_message_email(user, message):
 
     unsubscribe_link = notifications.generate_unsubscribe_link(user, 'new_message')
 
+    reply_token = '%s-%s-%s' % (
+        base64.b64encode(str(from_user.id)),
+        base64.b64encode(str(user.id)),
+        _generate_message_reply_signature(from_user.id, user.id)
+    )
+
     text_body, html_body = _render_email('messages/new_message', to_email, {
         'username': user.get_username(),
-        'secret_token': base64.b64encode(str(from_user.id)),
+        'reply_token': reply_token,
         'from_username': from_username,
         'message_body': message.body,
         'message_body_html': message.body_html,
@@ -169,6 +176,19 @@ def verify_mailgun_signature(api_key, token, timestamp, signature):
     ).hexdigest()
 
     return signature == expected_signature
+
+
+def verify_message_reply_signature(from_user_id, to_user_id, signature):
+    expected_signature = _generate_message_reply_signature(from_user_id, to_user_id)
+    return signature == expected_signature
+
+
+def _generate_message_reply_signature(from_user_id, to_user_id):
+    return hmac.new(
+        key=app.config['REPLY_TOKEN_SECRET'],
+        msg='%s-%s' % (from_user_id, to_user_id),
+        digestmod=hashlib.sha256
+    ).hexdigest()
 
 
 def _verify_email_preference(user, type):
