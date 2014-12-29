@@ -5,8 +5,8 @@
 @container-width: 960px;
 
 body {
-  background-color: #F5F5F5;
-  color: @background;
+  background-color: @background;
+  color: @foreground;
   font-family: 'Helvetica', 'Arial', sans-serif;
   margin: 0;
   padding: 0;
@@ -52,7 +52,7 @@ code {
 
 .header {
   .box-shadow(0 1px 10px rgba(0,0,0,0.8));
-  background-color: #222;
+  background-color: @header-background;
   padding: 10px 0 10px;
   position: relative;
   text-align: left;
@@ -109,7 +109,7 @@ code {
         color: @header-menu;
 
         &:hover {
-          color: #fff;
+          color: @white;
         }
       }
 
@@ -163,7 +163,7 @@ code {
 
             .count {
               .box-shadow(0 1px 2px rgba(0,0,0,0.7));
-              background: @new;
+              background: @new-background;
               border-radius: 3px;
               bottom: 5px;
               color: @white;
@@ -188,12 +188,12 @@ code {
       @media @desktop {
         display: none;
       }
-      color: #ededed;
+
+      color: @header-menu;
       float: right;
       margin-right: 0;
-      padding: 2px 10px 2px;
-      border: none;
-      font-size: 22px;
+      padding: 0 14px;
+      font-size: 1.8em;
     }
   }
 }
@@ -209,19 +209,18 @@ code {
     height: 100%;
     width: @container-width;
 
-
     ul {
       list-style-type: none;
       margin: 0;
       padding: 0;
 
       li {
-        border-left: 1px solid #bbb;
+        border-left: 1px solid @semi-dark-border;
         display: inline-block;
         float:left;
 
         &:last-child {
-          border-right: 1px solid #bbb;
+          border-right: 1px solid @semi-dark-border;
         }
 
         a {
@@ -255,35 +254,35 @@ code {
 }
 
 .sub-header {
-    height: 30px;
-    text-align: left;
+  height: 30px;
+  text-align: left;
 
-    border-bottom: 1px solid #aaa;
+  border-bottom: 1px solid #aaa;
 
-    background: #ddd;
+  background: #ddd;
 }
 
 .sub-header ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    border-left: 1px solid #bbb;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  border-left: 1px solid #bbb;
 }
 
 .sub-header li {
-    margin-right: -4px;
-    padding: 0;
-    vertical-align: middle;
-    display: inline-block;
+  margin-right: -4px;
+  padding: 0;
+  vertical-align: middle;
+  display: inline-block;
 }
 
 .sub-header li div {
-    color: #222;
-    padding: 0 11px;
-    border-right: 1px solid #bbb;
-    display: table-cell;
-    height: 30px;
-    vertical-align: middle;
+  color: #222;
+  padding: 0 11px;
+  border-right: 1px solid #bbb;
+  display: table-cell;
+  height: 30px;
+  vertical-align: middle;
 }
 
 .content {
@@ -294,4 +293,10 @@ code {
   margin: 0 auto;
   width: @container-width;
   padding-bottom: 40px;
+
+  @media @mobile, @tablet {
+    box-sizing: border-box;
+    padding: 0 20px;
+    width: 100%;
+  }
 }

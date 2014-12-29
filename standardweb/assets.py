@@ -40,8 +40,10 @@ css = Bundle(
     Bundle(
         'css/local/base.less',
         'css/local/colors.less',
+        'css/local/layouts.less',
         'css/local/media.less',
         'css/local/mixins.less',
+        'css/local/pages/index.less',
         'css/local/style.css',
     ),
     filters='less',

@@ -14,6 +14,12 @@
   background-clip: padding-box;
 }
 
+.box-sizing (@string) {
+  -webkit-box-sizing: @string;
+  -moz-box-sizing: @string;
+  box-sizing: @string;
+}
+
 .gradient (@startColor: #eee, @endColor: white) {
   background-color: @startColor;
   background: -webkit-gradient(linear, left top, left bottom, from(@startColor), to(@endColor));

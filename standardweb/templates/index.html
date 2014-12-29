@@ -11,43 +11,44 @@
             </div>
         {% endif %}
         {% include 'includes/flash_messages.html' %}
-        <div id="splash">
-            <h1>Standard Survival</h1>
-            <img src="{{ url_for('static', filename='images/standard-survival.jpg') }}" width="958px" height="201px" alt="Standard Survival Minecraft Server">
+        <h1>Standard Survival</h1>
+        <div class="splash">
+            <img src="{{ url_for('static', filename='images/standard-survival.jpg') }}" alt="Standard Survival Minecraft Server">
         </div>
-        <div id="left-section">
-            <h3>Connect To</h3>
-            <p itemscope itemtype="http://schema.org/Product"><b itemprop="name" id="address" class="clipboard" data-clipboard-target="address">standardsurvival.com</b></p>
-        
-            <h3>Description</h3>
-            <p><b>Standard Survival</b> is a Minecraft survival server that tries to be as close to the vanilla experience as possible. It's where you can simply play the original game without any of the drastically game-changing plugins or features that you would usually find elsewhere on most servers. This means <b>the server does not have teleport commands (/tp, /home, /spawn), economy, skill systems, ranks, etc</b>. Every player will always be equal.</p>
-            <p>There is a custom plugin written for the server for a basic level of protection called Groups, but otherwise gameplay is as close to vanilla as possible. You can build, craft, mine, explore, kill, grief and do anything else you want that's possible in Minecraft; there are no gameplay-related rules. The usual no-hacking, no-racism and no-abuse rules are in place to make sure the server provides a fun and friendly experience for everyone.</p>
-            <p>Click <a href="{{ url_for('guide') }}">here</a> for a guide explaining more details about the server, gameplay and rules.</p>
-            
-            <h3>Player Graph</h3>
-            <div class="graph player-graph progress"></div>
-            <br/>
-            <p>Hosting this Minecraft server is a lot of fun, but it does need time and especially money to run. Please consider helping me cover the cost of running the server (currently $80/month) by clicking the donate button below. Thanks.</p>
-            <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-                <input type="hidden" name="cmd" value="_s-xclick">
-                <input type="hidden" name="hosted_button_id" value="R4GTC8E7Z8Y84">
-                <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-                <img alt="Donate" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-            </form>
-        </div>
-        <div id="sidebar">
-            <div class="player-list">
-                <h3>
-                    Server Status
-                    <span class="refresh-button">
-                        <img class="refresh-image"/>
-                    </span>
-                </h3>
-                <div class="player-list-players">
+        <div class="grid">
+            <div class="col-13-16">
+                <h3>Connect To</h3>
+                <p itemscope itemtype="http://schema.org/Product"><b itemprop="name" id="address" class="clipboard" data-clipboard-target="address">standardsurvival.com</b></p>
+
+                <h3>Description</h3>
+                <p><b>Standard Survival</b> is a Minecraft survival server that tries to be as close to the vanilla experience as possible. It's where you can simply play the original game without any of the drastically game-changing plugins or features that you would usually find elsewhere on most servers. This means <b>the server does not have teleport commands (/tp, /home, /spawn), economy, skill systems, ranks, etc</b>. Every player will always be equal.</p>
+                <p>There is a custom plugin written for the server for a basic level of protection called Groups, but otherwise gameplay is as close to vanilla as possible. You can build, craft, mine, explore, kill, grief and do anything else you want that's possible in Minecraft; there are no gameplay-related rules. The usual no-hacking, no-racism and no-abuse rules are in place to make sure the server provides a fun and friendly experience for everyone.</p>
+                <p>Click <a href="{{ url_for('guide') }}">here</a> for a guide explaining more details about the server, gameplay and rules.</p>
+
+                <h3>Player Graph</h3>
+                <div class="graph player-graph progress"></div>
+                <br/>
+                <p>Hosting this Minecraft server is a lot of fun, but it does need time and especially money to run. Please consider helping me cover the cost of running the server (currently $80/month) by clicking the donate button below. Thanks.</p>
+                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+                    <input type="hidden" name="cmd" value="_s-xclick">
+                    <input type="hidden" name="hosted_button_id" value="R4GTC8E7Z8Y84">
+                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                    <img alt="Donate" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+                </form>
+            </div>
+            <div class="col-3-16">
+                <div class="player-list">
+                    <h3>
+                        Server Status
+                        <span class="refresh-button">
+                            <img class="refresh-image"/>
+                        </span>
+                    </h3>
+                    <div class="player-list-players">
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="clear"></div>
     </div>
     <a class="github-banner" href="https://github.com/sbezboro/standard-web-flask"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" width="149" height="149"></a>
     <script type="text/javascript">
