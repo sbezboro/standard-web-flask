@@ -28,6 +28,39 @@ input[type="text"], input[type="password"], textarea {
   }
 }
 
+h1 {
+  font-size: 3.0em;
+  margin-bottom: 0;
+  text-shadow: 1px 1px #bfbfbf;
+}
+
+h2 {
+  font-size: 1.75em;
+  margin-bottom: 0.5em;
+}
+
+h3 {
+  font-size: 1.35em;
+  margin-bottom: 0.5em;
+}
+
+a {
+  color: @default-anchor;
+  text-decoration: none;
+
+  &:hover {
+    color: @default-anchor-hover;
+  }
+}
+
+code {
+  background-color: #eee;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #db382d;
+  padding: 1px 2px;
+}
+
 .clearfix {
   display: block;
   zoom: 1;
@@ -42,12 +75,8 @@ input[type="text"], input[type="password"], textarea {
   }
 }
 
-code {
-  background-color: #eee;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  color: #db382d;
-  padding: 1px 2px;
+.cursor-pointer {
+  cursor: pointer;
 }
 
 .header {

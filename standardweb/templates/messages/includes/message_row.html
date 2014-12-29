@@ -12,9 +12,9 @@
                         {{ message.from_user.player.username|face_thumb }}
                         {{ message.from_user.player.displayname_html|safe }}
                     </a>
-                        {% if message.from_user.player.nickname %}
-                            ({{ message.from_user.player.username }})
-                        {% endif %}
+                    {% if message.from_user.player.nickname %}
+                        ({{ message.from_user.player.username }})
+                    {% endif %}
                 {% else %}
                     {{ message.from_user.username }}
                 {% endif %}

@@ -131,6 +131,12 @@
     $('.clipboard').each(function() {
       var $elem = $(this);
 
+      $elem.tipsy({
+        trigger: 'manual',
+        gravity: 'w',
+        offset: 10
+      });
+
       var clipboard = new ZeroClipboard($elem, {
         moviePath: '/static/flash/ZeroClipboard.swf'
       });
