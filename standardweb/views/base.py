@@ -1,6 +1,7 @@
 from datetime import datetime
 from datetime import timedelta
 import os
+from subprocess import call
 
 from flask import abort
 from flask import g
@@ -258,6 +259,11 @@ def face(username, size=16):
             if resp.status_code == 200:
                 image = libplayer.extract_face(Image.open(StringIO.StringIO(resp.content)), size)
                 image.save(path, optimize=True)
+
+                try:
+                    call(['optipng', path])
+                except OSError:
+                    rollbar.report_exc_info(request=request)
 
     if not image:
         try:
