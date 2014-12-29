@@ -3,7 +3,7 @@
 {% block title %}Create account - Standard Survival Minecraft Server{% endblock %}
 
 {% block content %}
-  <div id="main">
+  <div class="container">
     <div class="center-section">
       <form id="verify-form" action="{{ url_for('create_account', token=email_token.token) }}" method="post">
         {{ form.hidden_tag() }}

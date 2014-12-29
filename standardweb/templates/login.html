@@ -4,7 +4,7 @@
 
 {% block select_login %}selected{% endblock %}
 {% block content %}
-  <div id="main">
+  <div class="container">
     <div class="center-section">
       <form id="login-form" action="{{ url_for('login') }}" method="post">
         {{ form.hidden_tag() }}

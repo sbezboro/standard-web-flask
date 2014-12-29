@@ -7,7 +7,7 @@
 {% block select_forum %}selected{% endblock %}
 
 {% block content %}
-    <div id="main">
+    <div class="container">
         {% if user and not user.email %}
             <div class="alert warning">
                 Please set an email address for your account <a href="{{ url_for('profile_settings') }}">here</a>.

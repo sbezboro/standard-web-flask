@@ -9,14 +9,14 @@
       <div class="inner">
         <ul>
           {% for s in servers %}
-          <li {% if server == s %}class="selected"{% endif %}>
+            <li class="{% if server == s %}selected{% endif %}">
               <a class="tooltip {% if not s.online %}disabled{% endif %}" href="{% if s.online %}/{{s.id}}/chat{% else %}#{% endif %}" title="{% if s.online %}Address: {% endif %}{{ s.address }}">{{ s.name }}</a>
-          </li>
+            </li>
           {% endfor %}
         </ul>
       </div>
     </div>
-    <div id="main">
+    <div class="container">
       {% include 'includes/flash_messages.html' %}
 
       <h2>Live Server Chat</h2>

@@ -10,14 +10,14 @@
         <div class="inner">
             <ul>
                 {% for s in servers %}
-                <li {% if server == s %}class="selected"{% endif %}>
-                    <a class="tooltip" href="/{{s.id}}/ranking" title="Address: {{ s.address }}">{{ s.name }}</a>
-                </li>
+                    <li class="{% if server == s %}selected{% endif %}">
+                        <a class="tooltip" href="{{ url_for('ranking', server_id=s.id) }}" title="Address: {{ s.address }}">{{ s.name }}</a>
+                    </li>
                 {% endfor %}
             </ul>
         </div>
     </div>
-    <div id="main">
+    <div class="container">
         <h2>Top 10 Players</h2>
         <table class="ranking-table">
         {% for player, time_spent, online_now in ranking %}

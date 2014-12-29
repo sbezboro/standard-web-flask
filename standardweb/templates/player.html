@@ -16,7 +16,7 @@
 
 {% block select_player %}{% if user.username == username %}selected{% endif %}{% endblock %}
 {% block content %}
-    <div id="main">
+    <div class="container">
         {% include 'includes/flash_messages.html' %}
         {% if player %}
         <div class="player-section">

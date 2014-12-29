@@ -1,178 +1,187 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
-<head>
-    <title>{% block title %}Standard Survival Minecraft Server{% endblock %}</title>
-    <meta name="description" content="{% block description %}The website for the Standard Survival Minecraft Server, a vanilla-inspired survival server with a unique twist.{% endblock %}">
-    {% if noindex %}
-    <meta name="robots" content="noindex">
-    {% endif %}
-
-    <meta name="viewport" content="width=device-width, user-scalable=no" />
-
-    {% assets "css_all" %}
-        <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
-    {% endassets %}
-
-    <!-- start Google Analytics -->
-    <script type="text/javascript">
-        var _gaq = _gaq || [];
-
-        _gaq.push(['_setAccount', 'UA-32372174-1']);
-        _gaq.push(['_trackPageview']);
-
-        {% if not is_debug %}
-        (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
+    <head>
+        <title>{% block title %}Standard Survival Minecraft Server{% endblock %}</title>
+        <meta name="description" content="{% block description %}The website for the Standard Survival Minecraft Server, a vanilla-inspired survival server with a unique twist.{% endblock %}">
+        {% if noindex %}
+        <meta name="robots" content="noindex">
         {% endif %}
-    </script>
-    <!-- end Google Analytics -->
 
-    <!-- start Mixpanel -->
-    <script type="text/javascript">
-        (function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
-        for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="//cdn.mxpnl.com/libs/mixpanel-2.2.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);
-        mixpanel.init("d083272fecc0ee934ee53c649adc06e4");
-        {% if is_debug %}
-            mixpanel.disable();
-        {% endif %}
-    </script>
-    <!-- end Mixpanel -->
+        <meta name="viewport" content="width=device-width, user-scalable=no"/>
 
-    {% assets "js_all" %}
-        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-    {% endassets %}
+        {% assets "css_all" %}
+            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+        {% endassets %}
 
-    {% if user %}
-        <script type="application/javascript">
-            mixpanel.register({
-                user_id: {{ user.id }}
-            });
-            mixpanel.identify({{ user.id }});
-            mixpanel.people.set({
-                id: {{ user.id }},
-                {% if user.email %}'$email': '{{ user.email }}',{% endif %}
-                '$name': '{{ user.player.username if user.player else user.username }}',
-                username: '{{ user.player.username if user.player else user.username }}',
-                '$created': '{{ user.date_joined.isoformat() }}'
-            });
-        </script>
-    {% endif %}
-
-    {% if g.first_login %}
-        <script type="application/javascript">
-            mixpanel.alias({{ user.id }});
-            mixpanel.track('account created');
-        </script>
-
+        <!-- start Google Analytics -->
         <script type="text/javascript">
-            (function() {
-              var _fbq = window._fbq || (window._fbq = []);
-              if (!_fbq.loaded) {
-                var fbds = document.createElement('script');
-                fbds.async = true;
-                fbds.src = '//connect.facebook.net/en_US/fbds.js';
-                var s = document.getElementsByTagName('script')[0];
-                s.parentNode.insertBefore(fbds, s);
-                _fbq.loaded = true;
-              }
-            })();
-            window._fbq = window._fbq || [];
-            window._fbq.push(['track', '6018722527894', {'value':'0.00','currency':'CAD'}]);
-        </script>
-        <noscript><img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?ev=6018722527894&amp;cd[value]=0.00&amp;cd[currency]=CAD&amp;noscript=1" /></noscript>
-    {% endif %}
-    
-    {% block script_files %}{% endblock %}
-</head>
+            var _gaq = _gaq || [];
 
-<body>
-    <div class="header">
-        <div class="header-inner">
-            <a href="#" class="mobile-nav-btn extender" data-target="header-content"><i class="fa fa-bars"></i></a>
-            <div class="header-content" id="header-content">
-                <ul class="header-nav">
-                    <li><a href="/" class="strong {% block select_index %}{% endblock %}">Standard Survival</a></li>
-                    <li><a class="{% block select_guide %}{% endblock %}" href="{{ url_for('guide') }}">Guide</a></li>
-                    <li><a class="{% block select_ranking %}{% endblock %}" href="{{ url_for('ranking', server_id=server.id if server else None) }}">Ranking</a></li>
-                    <li><a class="{% block select_groups %}{% endblock %}" href="{{ url_for('groups', server_id=server.id if server else None) }}">Groups</a></li>
-                    <li><a class="{% block select_leaderboards %}{% endblock %}" href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a></li>
-                    <li><a class="{% block select_forum %}{% endblock %}" href="{{ url_for('forums') }}">Forums</a></li>
-                    <li><a class="{% block select_chat %}{% endblock %}" href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a></li>
-                    <li><a class="{% block select_search %}{% endblock %}" href="{{ url_for('player_search') }}">Player Search</a></li>
-                    {% if user and user.admin %}
-                        <li><a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a></li>
-                    {% endif %}
-                </ul>
-                <div class="header-account">
-                    {% if user %}
-                        <a class="messages {% if new_messages %}new{% else %}old{% endif %}" href="{{ url_for('messages') }}" title="Messages">
-                            <i class="fa fa-envelope"></i>
-                            <span class="new-count">{{ new_messages }}</span>
-                        </a>
-                        <div class="dropdown">
-                            {% if user.player %}
-                                <a class="{% block select_player %}{% endblock %} toggle" href="#">
-                                    {{ user.player.username|face_thumb }}{{ user.player.username }}
-                                    <span class="caret"></span>
-                                </a>
-                            {% else %}
-                                <a class="toggle" href="#">
-                                    {{ user.username }}
-                                    <span class="caret"></span>
-                                </a>
-                            {% endif %}
-                            <div class="options">
-                                {% if user.player %}
-                                    <a href="{{ url_for('player', username=user.player.username) }}">
-                                        <i class="fa fa-user"></i><span>Profile</span>
-                                    </a>
-                                {% endif %}
-                                <a href="{{ url_for('settings') }}">
-                                    <i class="fa fa-wrench"></i><span>Settings</span>
-                                </a>
-                                <a href="{{ url_for('logout') }}">
-                                    <i class="fa fa-sign-out"></i><span>Log out</span>
-                                </a>
-                            </div>
-                        </div>
-                    {% else %}
-                        <ul class="header-nav">
-                            <li><a class="{% block select_signup %}{% endblock %}" href="{{ url_for('signup') }}">Sign up</a></li>
-                            <li><a class="{% block select_login %}{% endblock %}" href="{{ url_for('login', next=request.path) }}">Log in</a></li>
-                        </ul>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="clearfix"></div>
-        </div>
-    </div>
-    <div id="container">
-        {% block content %}{% endblock %}
-    </div>
-    {% if user %}
-        <script type="application/javascript">
-            StandardWeb.userId = {{ user.id }};
-            StandardWeb.username = '{{ user.get_username() }}';
+            _gaq.push(['_setAccount', 'UA-32372174-1']);
+            _gaq.push(['_trackPageview']);
+
+            {% if not is_debug %}
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+            {% endif %}
         </script>
-        {% if user.player %}
+        <!-- end Google Analytics -->
+
+        <!-- start Mixpanel -->
+        <script type="text/javascript">
+            (function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
+            for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="//cdn.mxpnl.com/libs/mixpanel-2.2.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);
+            mixpanel.init("d083272fecc0ee934ee53c649adc06e4");
+            {% if is_debug %}
+                mixpanel.disable();
+            {% endif %}
+        </script>
+        <!-- end Mixpanel -->
+
+        {% assets "js_all" %}
+            <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+        {% endassets %}
+
+        {% if user %}
             <script type="application/javascript">
-                StandardWeb.playerId = {{ user.player_id }};
-                StandardWeb.nickname = '{{ user.player.nickname }}';
+                mixpanel.register({
+                    user_id: {{ user.id }}
+                });
+                mixpanel.identify({{ user.id }});
+                mixpanel.people.set({
+                    id: {{ user.id }},
+                    {% if user.email %}'$email': '{{ user.email }}',{% endif %}
+                    '$name': '{{ user.player.username if user.player else user.username }}',
+                    username: '{{ user.player.username if user.player else user.username }}',
+                    '$created': '{{ user.date_joined.isoformat() }}'
+                });
             </script>
         {% endif %}
-    {% endif %}
 
-    <script type="application/javascript">
-        StandardWeb.cdnDomain = '{{ cdn_domain }}';
+        {% if g.first_login %}
+            <script type="application/javascript">
+                mixpanel.alias({{ user.id }});
+                mixpanel.track('account created');
+            </script>
 
-        var rtsAuthData = {{ rts_auth_data|tojson|safe }};
-        var rtsBaseUrl = '{{ rts_base_url }}';
-        var rtsPrefix = '{{ rts_prefix }}';
+            <script type="text/javascript">
+                (function() {
+                  var _fbq = window._fbq || (window._fbq = []);
+                  if (!_fbq.loaded) {
+                    var fbds = document.createElement('script');
+                    fbds.async = true;
+                    fbds.src = '//connect.facebook.net/en_US/fbds.js';
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(fbds, s);
+                    _fbq.loaded = true;
+                  }
+                })();
+                window._fbq = window._fbq || [];
+                window._fbq.push(['track', '6018722527894', {'value':'0.00','currency':'CAD'}]);
+            </script>
+            <noscript><img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?ev=6018722527894&amp;cd[value]=0.00&amp;cd[currency]=CAD&amp;noscript=1" /></noscript>
+        {% endif %}
 
-        StandardWeb.realtime.init(rtsAuthData, rtsBaseUrl, rtsPrefix);
-    </script>
-</body>
+        {% block script_files %}{% endblock %}
+    </head>
+
+    <body>
+        <div class="header">
+            <div class="header-inner">
+                <a href="#" class="mobile-nav-btn extender" data-target="header-content"><i class="fa fa-bars"></i></a>
+                <div class="header-content" id="header-content">
+                    <ul class="header-nav">
+                        <li><a href="/" class="strong {% block select_index %}{% endblock %}">Standard Survival</a></li>
+                        <li><a class="{% block select_guide %}{% endblock %}" href="{{ url_for('guide') }}">Guide</a></li>
+                        <li><a class="{% block select_ranking %}{% endblock %}" href="{{ url_for('ranking', server_id=server.id if server else None) }}">Ranking</a></li>
+                        <li><a class="{% block select_groups %}{% endblock %}" href="{{ url_for('groups', server_id=server.id if server else None) }}">Groups</a></li>
+                        <li><a class="{% block select_leaderboards %}{% endblock %}" href="{{ url_for('leaderboards', server_id=server.id if server else None) }}">Leaderboards</a></li>
+                        <li><a class="{% block select_forum %}{% endblock %}" href="{{ url_for('forums') }}">Forums</a></li>
+                        <li><a class="{% block select_chat %}{% endblock %}" href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a></li>
+                        <li><a class="{% block select_search %}{% endblock %}" href="{{ url_for('player_search') }}">Player Search</a></li>
+                        {% if user and user.admin %}
+                            <li><a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a></li>
+                        {% endif %}
+                    </ul>
+                    <div class="header-account">
+                        {% if user %}
+                            <div class="icons">
+                                <a class="icon messages {% if new_messages %}new{% endif %}" href="{{ url_for('messages') }}" title="Messages">
+                                    <i class="fa fa-envelope"></i>
+                                    <span class="count">{{ new_messages }}</span>
+                                </a>
+                                {#
+                                <a class="icon notifications {% if new_notifications %}new{% endif %}" href="{{ url_for('messages') }}" title="Notifications">
+                                    <i class="fa fa-flag"></i>
+                                    <span class="count">{{ new_notifications }}</span>
+                                </a>
+                                #}
+                            </div>
+                            <div class="dropdown">
+                                {% if user.player %}
+                                    <a class="{% block select_player %}{% endblock %} toggle" href="#">
+                                        {{ user.player.username|face_thumb }}{{ user.player.username }}
+                                        <span class="caret"></span>
+                                    </a>
+                                {% else %}
+                                    <a class="toggle" href="#">
+                                        {{ user.username }}
+                                        <span class="caret"></span>
+                                    </a>
+                                {% endif %}
+                                <div class="options">
+                                    {% if user.player %}
+                                        <a href="{{ url_for('player', username=user.player.username) }}">
+                                            <i class="fa fa-user"></i><span>Profile</span>
+                                        </a>
+                                    {% endif %}
+                                    <a href="{{ url_for('settings') }}">
+                                        <i class="fa fa-wrench"></i><span>Settings</span>
+                                    </a>
+                                    <a href="{{ url_for('logout') }}">
+                                        <i class="fa fa-sign-out"></i><span>Log out</span>
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <ul class="header-nav">
+                                <li><a class="{% block select_signup %}{% endblock %}" href="{{ url_for('signup') }}">Sign up</a></li>
+                                <li><a class="{% block select_login %}{% endblock %}" href="{{ url_for('login', next=request.path) }}">Log in</a></li>
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+
+        {% if user %}
+            <script type="application/javascript">
+                StandardWeb.userId = {{ user.id }};
+                StandardWeb.username = '{{ user.get_username() }}';
+            </script>
+            {% if user.player %}
+                <script type="application/javascript">
+                    StandardWeb.playerId = {{ user.player_id }};
+                    StandardWeb.nickname = '{{ user.player.nickname }}';
+                </script>
+            {% endif %}
+        {% endif %}
+
+        <script type="application/javascript">
+            StandardWeb.cdnDomain = '{{ cdn_domain }}';
+
+            var rtsAuthData = {{ rts_auth_data|tojson|safe }};
+            var rtsBaseUrl = '{{ rts_base_url }}';
+            var rtsPrefix = '{{ rts_prefix }}';
+
+            StandardWeb.realtime.init(rtsAuthData, rtsBaseUrl, rtsPrefix);
+        </script>
+    </body>
 </html>
