@@ -898,7 +898,10 @@ class ForumAttachment(db.Model, Base):
 
     @property
     def url(self):
-        return url_for('forum_attachment', hash=self.hash)
+        if app.config['DEBUG']:
+            return url_for('forum_attachment', hash=self.hash)
+        else:
+            return 'https://%s%s' % (app.config['CDN_DOMAIN'], url_for('forum_attachment', hash=self.hash))
 
     @property
     def file_path(self):
