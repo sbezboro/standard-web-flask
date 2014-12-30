@@ -764,6 +764,9 @@ def forum_ban():
 @app.route('/attachment/<hash>')
 def forum_attachment(hash):
     attachment = ForumAttachment.query.filter_by(hash=hash).first()
+    if not attachment:
+        abort(404)
+    
     f = file(attachment.file_path, 'rb')
 
     return send_file(f, mimetype=attachment.content_type)
