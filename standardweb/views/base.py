@@ -1,7 +1,7 @@
 from datetime import datetime
 from datetime import timedelta
 import os
-from subprocess import call
+import subprocess
 
 from flask import abort
 from flask import g
@@ -261,7 +261,7 @@ def face(username, size=16):
                 image.save(path, optimize=True)
 
                 try:
-                    call(['optipng', path])
+                    subprocess.Popen(['optipng', path], stderr=subprocess.PIPE)
                 except OSError:
                     rollbar.report_exc_info(request=request)
 
