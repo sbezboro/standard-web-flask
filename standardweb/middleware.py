@@ -1,18 +1,19 @@
+import hashlib
 import hmac
+import os
+
 from flask import abort
 from flask import g
 from flask import request
 from flask import session
 from flask import url_for
+import rollbar
 
 from standardweb import app
 from standardweb.lib import csrf
 from standardweb.lib import helpers as h
 from standardweb.models import User
 from sqlalchemy.orm import joinedload
-
-import hashlib
-import os
 
 
 @app.before_request
@@ -38,6 +39,7 @@ def csrf_protect():
             token = session.get('csrf_token')
 
             if not token or token != request.form.get('csrf_token'):
+                rollbar.report_message('CSRF mismatch', request=request)
                 csrf.regenerate_token()
                 abort(403)
 
@@ -86,7 +88,7 @@ def inject_new_messages():
     if g.user:
         new_messages = g.user.get_unread_message_count()
 
-    return dict(new_messages=new_messages)
+    return dict(new_messages=2 or new_messages)
 
 
 def _dated_url_for(endpoint, **values):
