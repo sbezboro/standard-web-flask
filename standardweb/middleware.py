@@ -39,7 +39,10 @@ def csrf_protect():
             token = session.get('csrf_token')
 
             if not token or token != request.form.get('csrf_token'):
-                rollbar.report_message('CSRF mismatch', request=request)
+                rollbar.report_message('CSRF mismatch', request=request, extra_data={
+                    'session_token': token
+                })
+                
                 csrf.regenerate_token()
                 abort(403)
 
