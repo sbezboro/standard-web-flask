@@ -42,7 +42,7 @@ def csrf_protect():
                 rollbar.report_message('CSRF mismatch', request=request, extra_data={
                     'session_token': token
                 })
-                
+
                 csrf.regenerate_token()
                 abort(403)
 
@@ -91,7 +91,7 @@ def inject_new_messages():
     if g.user:
         new_messages = g.user.get_unread_message_count()
 
-    return dict(new_messages=2 or new_messages)
+    return dict(new_messages=new_messages)
 
 
 def _dated_url_for(endpoint, **values):
