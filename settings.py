@@ -16,6 +16,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'standardweb.tasks.minute_query',
         'schedule': crontab()
     },
+    'db-backup': {
+        'task': 'standardweb.tasks.db_backup',
+        'schedule': crontab(minute=0, hour=6)
+    },
 }
 
 ASSETS_DEBUG = False

@@ -80,7 +80,8 @@ def set_up_rollbar():
         app.config['ROLLBAR_ENVIRONMENT'],
         root=app.config['ROLLBAR_ROOT'],
         handler='blocking',
-        allow_logging_basic_config=False
+        allow_logging_basic_config=False,
+        timeout=5
     )
 
     got_request_exception.connect(report_exception, app)
