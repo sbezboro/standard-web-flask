@@ -18,7 +18,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'db-backup': {
         'task': 'standardweb.tasks.db_backup',
-        'schedule': crontab(minute=0, hour=6)
+        'schedule': crontab(minute=0, hour=12)  # 4AM PST
     },
 }
 

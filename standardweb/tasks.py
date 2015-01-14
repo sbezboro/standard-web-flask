@@ -57,7 +57,7 @@ def db_backup():
 
     # upload to S3
     conn = S3Connection(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'])
-    bucket = conn.get_bucket('standardbackups', validate=False)
+    bucket = conn.get_bucket(app.config['BACKUP_BUCKET_NAME'], validate=False)
     key = Key(bucket)
     key.key = 'mysql/' + gzip_filename
 
