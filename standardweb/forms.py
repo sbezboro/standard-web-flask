@@ -203,3 +203,9 @@ def generate_notification_settings_form(preferences):
         setattr(F, '%s_ingame' % preference.name, BooleanField())
 
     return F()
+
+
+class ChangePasswordForm(BaseForm):
+    current_password = PasswordField('Current Password', validators=[DataRequired()])
+    new_password = PasswordField('New Password', validators=[DataRequired()])
+    confirm_new_password = PasswordField('Confirm New Password', validators=[DataRequired()])

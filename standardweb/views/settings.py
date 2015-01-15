@@ -5,7 +5,11 @@ from markupsafe import Markup
 import rollbar
 
 from standardweb import app, db
-from standardweb.forms import generate_notification_settings_form, ProfileSettingsForm
+from standardweb.forms import (
+    generate_notification_settings_form,
+    ProfileSettingsForm,
+    ChangePasswordForm
+)
 from standardweb.lib.email import send_verify_email
 from standardweb.lib.notifications import verify_unsubscribe_request
 from standardweb.models import EmailToken, User, AuditLog
@@ -103,6 +107,37 @@ def notifications_settings():
     }
 
     return render_template('settings/notifications.html', **template_vars)
+
+
+@app.route('/settings/change_password', methods=['GET', 'POST'])
+@login_required()
+def change_password_settings():
+    user = g.user
+
+    form = ChangePasswordForm()
+
+    if form.validate_on_submit():
+        current_password = form.current_password.data
+        new_password = form.new_password.data
+        confirm_new_password = form.confirm_new_password.data
+
+        if not user.check_password(current_password):
+            form.current_password.errors = ['Incorrect password']
+        elif new_password != confirm_new_password:
+            form.new_password.errors = ['Passwords do not match']
+            form.confirm_new_password.errors = ['Passwords do not match']
+        else:
+            user.set_password(new_password, commit=False)
+            user.save(commit=True)
+
+            flash('Password changed', 'success')
+
+    template_vars = {
+        'form': form,
+        'active_option': 'change_password'
+    }
+
+    return render_template('settings/change_password.html', **template_vars)
 
 
 @app.route('/settings/profile/resend_verification_email')
