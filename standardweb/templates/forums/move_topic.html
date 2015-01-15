@@ -2,6 +2,8 @@
 
 {% block title %}Move Topic - {{ topic.forum.name }} - Standard Survival Forum{% endblock %}
 
+{% from 'includes/forms.html' import render_field %}
+
 {% block forum_content %}
     <div class="breadcrumbs">
         <a href="{{ url_for('forums') }}">Forums</a> &rarr;
@@ -17,21 +19,17 @@
             <form action="{{ url_for('move_topic', topic_id=topic.id) }}" method="post">
                 {{ form.hidden_tag() }}
                 <fieldset>
-                    <div class="control-group">
+                    <div class="control-group vertical">
                         <label class="control-label">Topic</label>
                         <div class="control">{{ topic.name }}</div>
                     </div>
 
-                    <div class="control-group">
+                    <div class="control-group vertical">
                         <label class="control-label">Current Forum</label>
                         <div class="control">{{ topic.forum.name }}</div>
                     </div>
 
-                    <div class="control-group">
-                        {{ form.destination.label }}
-                        <span class="control-errors">{% if form.destination.errors %}{{ form.destination.errors[0] }}{% endif %}</span>
-                        <div class="control">{{ form.destination() }}</div>
-                    </div>
+                    {{ render_field(form.destination, vertical=True) }}
 
                     <div class="control-group">
                         <div class="control">

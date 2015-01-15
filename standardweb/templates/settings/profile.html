@@ -2,6 +2,8 @@
 
 {% block title %}Profile Settings - Standard Survival Minecraft Server{% endblock %}
 
+{% from 'includes/forms.html' import render_field %}
+
 {% block settings_content %}
     <form method="POST" action="{{ url_for('profile_settings') }}">
         {{ form.hidden_tag() }}
@@ -15,11 +17,7 @@
             <div class="control">{{ player.nickname_html|safe }}</div>
         </div>
         {% endif %}
-        <div class="control-group">
-            <span class="control-errors">{% if form.full_name.errors %}{{ form.full_name.errors[0] }}{% endif %}</span>
-            {{ form.full_name.label }}
-            <div class="control">{{ form.full_name(placeholder='optional') }}</div>
-        </div>
+        {{ render_field(form.full_name, placeholder='optional') }}
         <div class="control-group {{ 'error' if not user.email }}">
             {{ form.email.label }}
             <span class="control-errors">{% if form.email.errors %}{{ form.email.errors[0] }}{% endif %}</span>

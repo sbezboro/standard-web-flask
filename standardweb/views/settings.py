@@ -122,7 +122,7 @@ def change_password_settings():
         confirm_new_password = form.confirm_new_password.data
 
         if not user.check_password(current_password):
-            form.current_password.errors = ['Incorrect password']
+            form.current_password.errors = ['Incorrect']
         elif new_password != confirm_new_password:
             form.new_password.errors = ['Passwords do not match']
             form.confirm_new_password.errors = ['Passwords do not match']

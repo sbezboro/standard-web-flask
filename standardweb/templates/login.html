@@ -3,6 +3,9 @@
 {% block title %}Login - Standard Survival Minecraft Server{% endblock %}
 
 {% block select_login %}selected{% endblock %}
+
+{% from 'includes/forms.html' import render_field %}
+
 {% block content %}
   <div class="container">
     <div class="center-section">
@@ -11,21 +14,9 @@
         <h2>Log in</h2>
         <fieldset>
           {% include 'includes/flash_messages.html' %}
-          <div class="control-group">
-            {{ form.username.label }}
-            <div class="control">
-              {{ form.username() }}
-              <span class="control-errors">{% if form.username.errors %}{{ form.username.errors[0] }}{% endif %}</span>
-            </div>
-          </div>
-          
-          <div class="control-group">
-            {{ form.password.label }}
-            <div class="control">
-              {{ form.password() }}
-              <span class="control-errors">{% if form.password.errors %}{{ form.password.errors[0] }}{% endif %}</span>
-            </div>
-          </div>
+
+          {{ render_field(form.username) }}
+          {{ render_field(form.password) }}
           
           <div class="control-group">
             <div class="control">

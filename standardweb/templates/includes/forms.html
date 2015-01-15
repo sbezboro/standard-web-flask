@@ -1,0 +1,14 @@
+{% macro render_field(field, vertical=False) %}
+    <div class="control-group {{ 'vertical' if vertical }} {{ 'error' if field.errors }}">
+        {{ field.label }}
+        {% if vertical %}
+            {% if field.errors %}<span class="control-errors">{{ field.errors[0] }}</span>{% endif %}
+            <div class="control">{{ field(**kwargs) }}</div>
+        {% else %}
+            <div class="control">
+                {{ field(**kwargs) }}
+                {% if field.errors %}<span class="control-errors">{{ field.errors[0] }}</span>{% endif %}
+            </div>
+        {% endif %}
+    </div>
+{%- endmacro %}

@@ -2,6 +2,8 @@
 
 {% block title %}{{ topic.name }} - {{ topic.forum.name }} - Standard Survival Forum{% endblock %}
 
+{% from 'includes/forms.html' import render_field %}
+
 {% block forum_content %}
     <div class="breadcrumbs">
         <a href="{{ url_for('forums') }}">Forums</a> &rarr;
@@ -153,17 +155,8 @@
                     <form class="post-form" action="{{ url_for('forum_topic', topic_id=topic.id, p=page) }}" method="post" enctype="multipart/form-data">
                         {{ form.hidden_tag() }}
                         <fieldset>
-                            <div class="control-group vertical">
-                                {{ form.body.label }}
-                                <span class="control-errors">{% if form.body.errors %}{{ form.body.errors[0] }}{% endif %}</span>
-                                <div class="control">{{ form.body() }}</div>
-                            </div>
-
-                            <div class="control-group vertical">
-                                {{ form.image.label }}
-                                <span class="control-errors">{% if form.image.errors %}{{ form.image.errors[0] }}{% endif %}</span>
-                                <div class="control">{{ form.image() }}</div>
-                            </div>
+                            {{ render_field(form.body, vertical=True) }}
+                            {{ render_field(form.image, vertical=True) }}
 
                             <div class="control-group">
                                 <div class="control">

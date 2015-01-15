@@ -273,13 +273,13 @@ fieldset {
     font-size: small;
 }
 
-.control input[type="text"], input[type="password"] {
+.control input[type="text"], .control input[type="password"] {
     width: 160px;
     height: 17px;
     margin-top: -4px;
 }
 
-.error .control input[type="text"] {
+.error .control input[type="text"], .error .control input[type="password"] {
     border-color: rgb(202, 0, 0);
 }
 
@@ -1659,6 +1659,15 @@ a:hover .ansi-container {
     .control-label {
         width: 100%;
         text-align: left;
+    }
+
+    .control-group label {
+        font-size: 14px;
+        display: block;
+        float: none;
+        text-align: left;
+        margin-bottom: 10px;
+        width: inherit;
     }
     
     .control {
