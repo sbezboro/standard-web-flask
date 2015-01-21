@@ -4,14 +4,14 @@ import requests
 from standardweb import app
 
 
-CODE_DIR = '/home/sbezboro/standard-web-flask'
-ENV_DIR = '/home/sbezboro/standard-web-flask-env'
+CODE_DIR = '/home/deploy/standard-web-flask'
+ENV_DIR = '/home/deploy/standard-web-flask/env'
 WEB_SERVICE = 'standard-web-flask'
 TASK_SERVICE = 'standard-web-celery'
 SCHEDULE_SERVICE = 'standard-web-celery-beat'
 
 env.roledefs = {
-    'web': ['208.110.64.130']
+    'web': ['209.222.7.106']
 }
 
 
