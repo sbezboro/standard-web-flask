@@ -10,6 +10,7 @@ WEB_SERVICE = 'standard-web-flask'
 TASK_SERVICE = 'standard-web-celery'
 SCHEDULE_SERVICE = 'standard-web-celery-beat'
 
+env.user = 'deploy'
 env.roledefs = {
     'web': ['209.222.7.106']
 }
