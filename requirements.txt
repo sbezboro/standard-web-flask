@@ -1,4 +1,4 @@
-Fabric==1.8.3
+Fabric==1.10.1
 Flask==0.10.1
 Flask-Assets==0.10
 Flask-CDN==1.1.0
@@ -25,10 +25,10 @@ celery==3.1.17
 cssmin==0.2.0
 ecdsa==0.11
 gnureadline==6.3.3
-ipython==2.1.0
+ipython==2.3.1
 itsdangerous==0.24
 kombu==3.0.24
-paramiko==1.12.3
+paramiko==1.15.2
 picopt==1.2.0
 ply==3.4
 pycrypto==2.6.1
@@ -37,8 +37,8 @@ python-memcached==1.53
 pytz==2014.9
 rarfile==2.7
 redis==2.10.3
-requests==2.3.0
-rollbar==0.9.0
+requests==2.5.1
+rollbar==0.9.6
 simple-pbkdf2==1.0
 six==1.5.2
 webassets==0.10.1

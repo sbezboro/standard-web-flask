@@ -56,7 +56,3 @@ def db_backup():
     rollbar.report_message('Database backup complete', level='info', extra_data={
         'filename': gzip_filename,
     })
-
-
-
-
