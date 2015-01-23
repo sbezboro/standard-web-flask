@@ -190,6 +190,9 @@ def _query_server(server, mojang_status):
 
         server_titles = set()
         for title_info in player_info.get('titles'):
+            if title_info['hidden']:
+                continue
+
             title = Title.query.filter_by(name=title_info['display_name']).first()
 
             if not title:
