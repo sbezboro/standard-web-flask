@@ -13,7 +13,6 @@ from standardweb import app
 from standardweb.forms import LoginForm, VerifyEmailForm, ForgotPasswordForm, ResetPasswordForm
 from standardweb.lib.email import send_reset_password
 from standardweb.models import Player, User, EmailToken
-from standardweb.views.decorators.auth import login_required
 from standardweb.views.decorators.ssl import ssl_required
 
 
@@ -58,7 +57,7 @@ def logout():
 
     flash('Successfully logged out', 'success')
 
-    return redirect(request.referrer)
+    return redirect(url_for('index'))
 
 
 @app.route('/signup')
@@ -67,7 +66,6 @@ def signup():
 
 
 @app.route('/verify/<token>')
-@login_required()
 def verify_email(token):
     email_token = EmailToken.query.filter_by(token=token).first()
 
@@ -75,14 +73,9 @@ def verify_email(token):
     if result:
         return result
 
-    if g.user.id != email_token.user_id:
-        flash('Link intended for another user', 'warning')
-        return redirect(url_for('index'))
-
     email_token.date_redeemed = datetime.utcnow()
-
-    g.user.email = email_token.email
-    g.user.save(commit=True)
+    email_token.user.email = email_token.email
+    email_token.user.save(commit=True)
 
     rollbar.report_message('Email verified', level='info', request=request)
 
