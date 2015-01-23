@@ -2,7 +2,7 @@ import pytz
 
 from flask import render_template
 
-from standardweb.tasks import send_rts_data as send_rts_data_task
+from standardweb.tasks.realtime import send_rts_data as send_rts_data_task
 
 
 def new_message(user, message):

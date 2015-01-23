@@ -93,9 +93,17 @@ if app.config.has_key('ROLLBAR_ACCESS_TOKEN'):
     set_up_rollbar()
 
 import assets
+
+import jobs.query
+import jobs.backup
+
 import middleware
 import models
-import tasks
+
+import tasks.email
+import tasks.realtime
+import tasks.server_api
+
 import template_filters
 
 import views.api

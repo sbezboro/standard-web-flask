@@ -8,7 +8,7 @@ from flask import url_for
 from standardweb import app
 from standardweb.lib import notifications
 from standardweb.models import EmailToken
-from standardweb.tasks import send_email as send_email_task
+from standardweb.tasks.email import send_email as send_email_task
 
 
 DEFAULT_FROM_EMAIL = 'Standard Survival <server@standardsurvival.com>'

@@ -1,6 +1,3 @@
-"""
-Script that should run every minute. Collects and stores stats from all servers to the db.
-"""
 from datetime import datetime, timedelta
 import time
 
@@ -9,7 +6,7 @@ import rollbar
 from sqlalchemy import not_
 from sqlalchemy.orm import joinedload
 
-from standardweb import app, db
+from standardweb import app, celery, db
 from standardweb.lib import api
 from standardweb.lib.constants import *
 from standardweb.models import (
@@ -271,7 +268,8 @@ def _get_mojang_status():
     return mojang_status
 
 
-def main():
+@celery.task()
+def minute_query():
     mojang_status = _get_mojang_status()
 
     durations = []
@@ -295,7 +293,3 @@ def main():
     extra_data['session'] = mojang_status.session
     rollbar.report_message('Server queries complete', 'debug',
                            extra_data=extra_data)
-
-
-if __name__ == '__main__':
-    main()

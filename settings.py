@@ -13,11 +13,11 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 
 CELERYBEAT_SCHEDULE = {
     'minute-query': {
-        'task': 'standardweb.tasks.minute_query',
+        'task': 'standardweb.jobs.query.minute_query',
         'schedule': crontab()
     },
     'db-backup': {
-        'task': 'standardweb.tasks.db_backup',
+        'task': 'standardweb.jobs.backup.db_backup',
         'schedule': crontab(minute=0, hour=12)  # 4AM PST
     },
 }
