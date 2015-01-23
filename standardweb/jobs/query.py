@@ -11,7 +11,7 @@ from standardweb.lib import api
 from standardweb.lib.constants import *
 from standardweb.models import (
     Group, PlayerStats, GroupInvite, Player, AuditLog, PlayerActivity, IPTracking,
-    ServerStatus, MojangStatus, Server
+    ServerStatus, MojangStatus, Server, Title
 )
 
 
@@ -187,6 +187,30 @@ def _query_server(server, mojang_status):
             player.save(commit=False)
         
         ip = player_info.get('address')
+
+        server_titles = set()
+        for title_info in player_info.get('titles'):
+            title = Title.query.filter_by(name=title_info['display_name']).first()
+
+            if not title:
+                title = Title(
+                    name=title_info['display_name'],
+                    broadcast=title_info['broadcast']
+                )
+
+                title.save(commit=False)
+
+            if title not in player.titles:
+                player.titles.append(title)
+                player.save(commit=False)
+
+            server_titles.add(title)
+
+        active_titles = set([x for x in player.titles])
+
+        # remove titles that the player no longer has on the server
+        for title in (active_titles - server_titles):
+            player.titles.remove(title)
         
         if ip:
             if not IPTracking.query.filter_by(ip=ip, player=player).first():

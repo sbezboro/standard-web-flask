@@ -11,8 +11,8 @@ from urlparse import urljoin
 from urlparse import urlparse
 
 
-VALID_IMAGE_UPLOAD_EXTENSIONS = set(['jpg', 'jpeg', 'gif', 'png'])
-MAX_UPLOAD_FILE_SIZE = 1024 * 1024 * 5 # 5MB
+VALID_IMAGE_UPLOAD_EXTENSIONS = frozenset(['jpg', 'jpeg', 'gif', 'png'])
+MAX_UPLOAD_FILE_SIZE = 1024 * 1024 * 5  # 5MB
 
 
 def _is_safe_url(target):
