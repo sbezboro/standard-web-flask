@@ -28,9 +28,10 @@ from standardweb.lib.email import (
 from standardweb.lib.notifier import notify_new_message
 from standardweb.models import (
     Server, Player, DeathType, DeathEvent, KillCount, KillEvent, KillType, MaterialType,
-    OreDiscoveryEvent, OreDiscoveryCount, EmailToken, User, PlayerStats, VeteranStatus, Message, Title, AuditLog,
-    DeathCount
+    OreDiscoveryEvent, OreDiscoveryCount, EmailToken, User, PlayerStats, VeteranStatus, Message,
+    Title, AuditLog, DeathCount
 )
+
 
 # Base API function decorator that builds a list of view functions for use in urls.py.
 def api_func(function):

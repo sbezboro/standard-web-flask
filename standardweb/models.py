@@ -616,6 +616,24 @@ class Message(db.Model, Base):
         return super(Message, self).save(commit)
 
 
+class AccessLog(db.Model, Base):
+    __tablename__ = 'access_log'
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    client_uuid = db.Column(db.String(36))
+    method = db.Column(db.String(10))
+    route = db.Column(db.String(40))
+    request_path = db.Column(db.String(1000))
+    response_code = db.Column(db.Integer)
+    response_time = db.Column(db.Integer)
+    user_agent = db.Column(db.String(1000))
+    ip_address = db.Column(db.String(15))
+
+    user = db.relationship('User')
+
+
 class AuditLog(db.Model, Base):
     __tablename__ = 'audit_log'
 

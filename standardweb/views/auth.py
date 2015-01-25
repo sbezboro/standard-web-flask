@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from flask import flash
 from flask import g
+from flask import make_response
 from flask import redirect
 from flask import request
 from flask import render_template
@@ -20,6 +21,8 @@ from standardweb.views.decorators.ssl import ssl_required
 @ssl_required()
 def login():
     form = LoginForm()
+
+    response = make_response(render_template('login.html', form=form))
 
     if form.validate_on_submit():
         username = request.form['username']
@@ -48,7 +51,9 @@ def login():
         else:
             flash('Invalid username/password combination', 'error')
 
-    return render_template('login.html', form=form)
+            response.status_code = 401
+
+    return response
 
 
 @app.route('/logout')

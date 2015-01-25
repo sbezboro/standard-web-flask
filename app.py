@@ -16,10 +16,11 @@ if __name__ == '__main__':
             log = logging.getLogger('webassets')
             log.addHandler(logging.StreamHandler())
             log.setLevel(logging.DEBUG)
+
             cmdenv = CommandLineEnvironment(env, log)
             cmdenv.build()
         else:
-            raise Exception('Invalid command')
+            raise Exception('Invalid command %s' % sys.argv[1])
     else:
         if app.config['DEBUG']:
             from flask_debugtoolbar import DebugToolbarExtension

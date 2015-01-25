@@ -1,6 +1,8 @@
 import hashlib
 import hmac
 import os
+import time
+import uuid
 
 from flask import abort
 from flask import g
@@ -13,6 +15,7 @@ from standardweb import app
 from standardweb.lib import csrf
 from standardweb.lib import helpers as h
 from standardweb.models import User
+from standardweb.tasks.access_log import log as log_task
 from sqlalchemy.orm import joinedload
 
 
@@ -28,6 +31,9 @@ def user_session():
         ).get(session['user_id'])
     else:
         g.user = None
+
+    if not session.get('client_uuid'):
+        session['client_uuid'] = uuid.uuid4()
 
 
 @app.before_request
@@ -57,6 +63,41 @@ def first_login():
             first_login = session.pop('first_login')
 
     g.first_login = first_login
+
+
+@app.before_request
+def track_request_time():
+    g._start_time = time.time()
+
+
+@app.after_request
+def access_log(response):
+    if (
+        request.endpoint and (
+            'static' in request.endpoint
+            or request.endpoint == 'face'
+        )
+    ):
+        return response
+
+    client_uuid = session.get('client_uuid')
+    user_id = g.user.id if g.user else None
+    route = request.url_rule.rule if request.url_rule else None
+    request_time = int(1000 * (time.time() - g._start_time))
+
+    log_task.apply_async((
+        client_uuid,
+        user_id,
+        request.method,
+        route,
+        request.path,
+        response.status_code,
+        request_time,
+        request.headers.get('User-Agent'),
+        request.remote_addr
+    ))
+
+    return response
 
 
 @app.context_processor
