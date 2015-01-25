@@ -188,6 +188,7 @@ def _query_server(server, mojang_status):
         
         ip = player_info.get('address')
 
+        """
         server_titles = set()
         for title_info in player_info.get('titles'):
             if title_info['hidden']:
@@ -214,6 +215,7 @@ def _query_server(server, mojang_status):
         # remove titles that the player no longer has on the server
         for title in (active_titles - server_titles):
             player.titles.remove(title)
+        """
         
         if ip:
             if not IPTracking.query.filter_by(ip=ip, player=player).first():
