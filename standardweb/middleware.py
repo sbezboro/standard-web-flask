@@ -80,7 +80,7 @@ def access_log(response):
     ):
         return response
 
-    client_uuid = session.get('client_uuid')
+    client_uuid = str(session.get('client_uuid'))
     user_id = g.user.id if g.user else None
     route = request.url_rule.rule if request.url_rule else None
     request_time = int(1000 * (time.time() - g._start_time))
