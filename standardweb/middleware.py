@@ -34,6 +34,7 @@ def user_session():
 
     if not session.get('client_uuid'):
         session['client_uuid'] = uuid.uuid4()
+        session.permanent = True
 
 
 @app.before_request
@@ -72,17 +73,20 @@ def track_request_time():
 
 @app.after_request
 def access_log(response):
-    if (
-        request.endpoint and (
-            'static' in request.endpoint
-            or request.endpoint == 'face'
-        )
+    endpoint = request.endpoint
+    route = request.url_rule.rule if request.url_rule else None
+
+    if endpoint and (
+        'static' in endpoint or endpoint == 'face'
     ):
+        return response
+
+    if route and route.startswith('/api'):
         return response
 
     client_uuid = str(session.get('client_uuid'))
     user_id = g.user.id if g.user else None
-    route = request.url_rule.rule if request.url_rule else None
+
     request_time = int(1000 * (time.time() - g._start_time))
 
     log_task.apply_async((
@@ -90,7 +94,8 @@ def access_log(response):
         user_id,
         request.method,
         route,
-        request.path,
+        request.full_path.rstrip('?'),
+        request.referrer,
         response.status_code,
         request_time,
         request.headers.get('User-Agent'),

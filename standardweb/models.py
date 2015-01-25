@@ -626,6 +626,7 @@ class AccessLog(db.Model, Base):
     method = db.Column(db.String(10))
     route = db.Column(db.String(40))
     request_path = db.Column(db.String(1000))
+    request_referrer = db.Column(db.String(1000))
     response_code = db.Column(db.Integer)
     response_time = db.Column(db.Integer)
     user_agent = db.Column(db.String(1000))

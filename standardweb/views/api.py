@@ -33,7 +33,7 @@ from standardweb.models import (
 )
 
 
-# Base API function decorator that builds a list of view functions for use in urls.py.
+# Base API function decorator that auto creates url rules for API endpoints.
 def api_func(function):
 
     @wraps(function)
