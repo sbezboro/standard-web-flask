@@ -290,11 +290,13 @@ def _get_mojang_status():
     except:
         pass
 
-    mojang_status = MojangStatus(website=statuses.get('minecraft.net', False),
-                                 session=statuses.get('session.minecraft.net', False),
-                                 account=statuses.get('account.mojang.com', False),
-                                 auth=statuses.get('auth.mojang.com', False),
-                                 skins=statuses.get('skins.minecraft.net', False))
+    mojang_status = MojangStatus(
+        website=statuses.get('minecraft.net', False),
+        session=statuses.get('session.minecraft.net', False),
+        account=statuses.get('account.mojang.com', False),
+        auth=statuses.get('auth.mojang.com', False),
+        skins=statuses.get('skins.minecraft.net', False)
+    )
     mojang_status.save(commit=True)
 
     return mojang_status
