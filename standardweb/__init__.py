@@ -7,10 +7,10 @@ from flask import got_request_exception
 from flask import Request
 from flask.ext.cdn import CDN
 from flask.ext.sqlalchemy import SQLAlchemy
-from werkzeug.contrib.cache import MemcachedCache
-
 import rollbar
 from rollbar.contrib.flask import report_exception
+from werkzeug.contrib.cache import MemcachedCache
+from werkzeug.contrib.fixers import ProxyFix
 
 
 app = Flask(__name__)
@@ -18,6 +18,8 @@ app = Flask(__name__)
 app.config.from_object('settings')
 
 app.jinja_env.add_extension('jinja2.ext.loopcontrols')
+
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 db = SQLAlchemy(app)
 
