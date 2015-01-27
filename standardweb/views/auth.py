@@ -22,8 +22,6 @@ from standardweb.views.decorators.ssl import ssl_required
 def login():
     form = LoginForm()
 
-    response = make_response(render_template('login.html', form=form))
-
     if form.validate_on_submit():
         username = request.form['username']
         password = request.form['password']
@@ -51,9 +49,9 @@ def login():
         else:
             flash('Invalid username/password combination', 'error')
 
-            response.status_code = 401
+            return render_template('login.html', form=form), 401
 
-    return response
+    return render_template('login.html', form=form)
 
 
 @app.route('/logout')
