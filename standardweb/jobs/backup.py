@@ -1,6 +1,6 @@
+from datetime import datetime
 import gzip
 import os
-import time
 
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
@@ -23,7 +23,7 @@ def db_backup():
         if os.path.isfile(path):
             os.unlink(path)
 
-    filename = time.strftime('%m%d%Y-%H%M%S.sql')
+    filename = datetime.utcnow().strftime('backup-%Y-%m-%d-%H-%M-%S.sql')
     backup_path = os.path.join(backup_dir, filename)
 
     password = ' -p' + app.config['DB_BACKUP_PASSWORD'] if app.config['DB_BACKUP_PASSWORD'] else ''
