@@ -521,6 +521,11 @@ fieldset {
     margin: 0 auto;
 }
 
+.player-stat-section {
+    width: 230px;
+    display: inline-block;
+}
+
 .player-header {
     background: #eaeaea;
     padding: 20px;
