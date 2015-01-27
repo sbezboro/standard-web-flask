@@ -187,39 +187,8 @@ def _query_server(server, mojang_status):
             player.nickname_ansi = nickname_ansi
             player.nickname = nickname
             player.save(commit=False)
-        
+
         ip = player_info.get('address')
-
-        server_titles = set()
-        for title_info in player_info.get('titles'):
-            if title_info['hidden']:
-                continue
-
-            if not new_titles.get(title_info['display_name']):
-                title = Title.query.filter_by(name=title_info['display_name']).first()
-
-            if not title:
-                title = Title(
-                    name=title_info['display_name'],
-                    broadcast=title_info['broadcast']
-                )
-
-                title.save(commit=False)
-
-                new_titles[title_info['display_name']] = title
-
-            if title not in player.titles:
-                player.titles.append(title)
-                player.save(commit=False)
-
-            server_titles.add(title)
-
-        active_titles = set([x for x in player.titles])
-
-        # remove titles that the player no longer has on the server
-        for title in (active_titles - server_titles):
-            player.titles.remove(title)
-        
         if ip:
             if not IPTracking.query.filter_by(ip=ip, player=player).first():
                 existing_player_ip = IPTracking(ip=ip, player=player)
