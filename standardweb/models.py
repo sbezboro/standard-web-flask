@@ -187,7 +187,7 @@ class User(db.Model, Base):
         if not iterations:
             iterations = 10000
 
-        hash_val = pbkdf2_bin(bytes(password), bytes(salt), iterations, keylen=32, hashfunc=hashlib.sha256)
+        hash_val = pbkdf2_bin(password.encode('utf-8'), salt, iterations, keylen=32, hashfunc=hashlib.sha256)
         hash_val = hash_val.encode('base64').strip()
         return '%s$%s$%s$%s' % ('pbkdf2_sha256', iterations, salt, hash_val)
 
