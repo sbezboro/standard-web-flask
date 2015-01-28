@@ -2,8 +2,11 @@ import calendar
 from datetime import datetime
 from datetime import timedelta
 import math
+import time
 
 from sqlalchemy.orm import joinedload
+from sqlalchemy import func
+from standardweb import db
 
 from standardweb.lib import api
 from standardweb.lib import cache
@@ -80,26 +83,23 @@ def get_player_graph_data(server, granularity=15, start_date=None, end_date=None
     end_date = end_date or datetime.utcnow()
     start_date = start_date or end_date - timedelta(days=7)
 
-    statuses = ServerStatus.query.filter(
+    result = db.session.query(
+        func.round((func.unix_timestamp(ServerStatus.timestamp) - time.timezone) / (granularity * 60)),
+        func.avg(ServerStatus.player_count)
+    ).filter(
         ServerStatus.server == server,
-        ServerStatus.timestamp > start_date,
-        ServerStatus.timestamp < end_date
-    ).order_by('timestamp')
+        ServerStatus.timestamp >= start_date,
+        ServerStatus.timestamp <= end_date
+    ).group_by('1').order_by(
+        ServerStatus.timestamp
+    ).all()
 
-    index = 0
     points = []
-    for status in statuses:
-        if index % granularity == 0:
-            data = {
-                'time': int(calendar.timegm(status.timestamp.timetuple()) * 1000),
-                'player_count': status.player_count
-            }
-
-            points.append(data)
-
-        index += 1
-
-    points.sort(key=lambda x: x['time'])
+    for chunk, count in result:
+        points.append({
+            'time': int(chunk * granularity * 60 * 1000),
+            'player_count': int(count)
+        })
 
     return {
         'start_time': int(calendar.timegm(start_date.timetuple()) * 1000),
