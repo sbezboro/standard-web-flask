@@ -75,14 +75,16 @@ def get_player_list_data(server):
     }
 
 
+@cache.CachedResult('player-graph', time=120)
 def get_player_graph_data(server, granularity=15, start_date=None, end_date=None):
     end_date = end_date or datetime.utcnow()
     start_date = start_date or end_date - timedelta(days=7)
 
-    statuses = ServerStatus.query.filter(ServerStatus.server == server,
-                                         ServerStatus.timestamp > start_date,
-                                         ServerStatus.timestamp < end_date) \
-        .order_by('timestamp')
+    statuses = ServerStatus.query.filter(
+        ServerStatus.server == server,
+        ServerStatus.timestamp > start_date,
+        ServerStatus.timestamp < end_date
+    ).order_by('timestamp')
 
     index = 0
     points = []

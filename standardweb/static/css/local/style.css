@@ -524,6 +524,7 @@ fieldset {
 .player-stat-section {
     width: 230px;
     display: inline-block;
+    vertical-align: top;
 }
 
 .player-header {

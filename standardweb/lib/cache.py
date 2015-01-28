@@ -1,10 +1,4 @@
-from flask import make_response
-from flask import request
-
 from standardweb import cache
-
-from datetime import datetime
-from functools import wraps
 
 
 class CachedResult(object):
@@ -29,4 +23,11 @@ class CachedResult(object):
 
     def _cache_key(self, *args, **kwargs):
         key = self.prefix + '-' + '-'.join([str(getattr(arg, 'id', arg)) for arg in args])
+
+        if kwargs:
+            try:
+                key += '-' + '-'.join('%s=%s' % (str(k), str(v)) for k, v in kwargs.iteritems())
+            except Exception:
+                pass
+
         return key
