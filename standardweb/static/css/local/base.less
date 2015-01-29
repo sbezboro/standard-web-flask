@@ -352,7 +352,7 @@ fieldset {
 }
 
 .alert {
-  border-radius: 4px;
+  .border-radius(4px);
   font-size: 14px;
   margin-top: 20px;
   padding: 10px;
@@ -367,12 +367,12 @@ fieldset {
     border: 1px solid #e5e6b6;
     color: #c09853;
   }
-  &.error {
+  &.info {
     background-color: #d9edf7;
     border: 1px solid #bce8f1;
     color: #3a87ad;
   }
-  &.error {
+  &.success {
     background-color: #dff0d8;
     border: 1px solid #d6e9c6;
     color: #468847;
@@ -450,7 +450,7 @@ fieldset {
   position: relative;
 
   &.open a {
-    color: #fff !important;
+    color: @white !important;
   }
 
   .options {
@@ -484,7 +484,7 @@ fieldset {
     &:after {
       border-left: 6px solid transparent;
       border-right: 6px solid transparent;
-      border-bottom: 6px solid #fff;
+      border-bottom: 6px solid @white;
       right: 25px;
       top: -6px;
     }
@@ -501,7 +501,7 @@ fieldset {
 
       &:hover {
         background: #3f3f3f;
-        color: #fff !important;
+        color: @white !important;
       }
     }
   }
@@ -586,7 +586,7 @@ fieldset {
       background: #999;
 
       a {
-        color: #fff;
+        color: @white;
         cursor: default;
       }
     }
