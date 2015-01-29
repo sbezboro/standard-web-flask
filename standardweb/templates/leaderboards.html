@@ -33,33 +33,39 @@
 
         {% for section in leaderboard_sections %}
             <div id="{{ section.name|lower }}" class="nav-section">
-                {% for leaderboard in section.leaderboards %}
-                    <div class="leaderboard-section {{ loop.cycle('left', 'right') }}">
-                        <h3>{{ leaderboard.title }}
-                            {% if leaderboard.subtitle %}
-                                <span class="subtitle">{{ leaderboard.subtitle }}</span>
-                            {% endif %}
-                        </h3>
-                        <table class="leaderboard-table">
-                            {% for count, player in leaderboard.list %}
-                            <tr>
-                                <td class="rank">
-                                    {{ loop.index }}
-                                </td>
-                                <td class="player">
-                                    <a href="/{{ server.id }}/player/{{ player.username }}">
-                                        {{ player.username|face_thumb }}
-                                        {{ player.displayname_html|safe }}
-                                    </a>
-                                </td>
-                                <td class="count">
-                                    {{ count }}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                {% endfor %}
+                <div class="grid">
+                    {% for leaderboard in section.leaderboards %}
+                        <div class="leaderboard-section col-1-2">
+                            <h3>{{ leaderboard.title }}
+                                {% if leaderboard.subtitle %}
+                                    <span class="subtitle">{{ leaderboard.subtitle }}</span>
+                                {% endif %}
+                            </h3>
+                            <table class="leaderboard-table">
+                                {% for count, player in leaderboard.list %}
+                                <tr>
+                                    <td class="rank">
+                                        {{ loop.index }}
+                                    </td>
+                                    <td class="player">
+                                        <a href="/{{ server.id }}/player/{{ player.username }}">
+                                            {{ player.username|face_thumb }}
+                                            {{ player.displayname_html|safe }}
+                                        </a>
+                                    </td>
+                                    <td class="count">
+                                        {{ count }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                        {% if loop.index % 2 == 0 %}
+                            </div>
+                            <div class="grid">
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
         {% endfor %}
     </div>

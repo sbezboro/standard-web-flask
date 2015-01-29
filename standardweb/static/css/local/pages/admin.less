@@ -1,0 +1,138 @@
+@import '../colors';
+@import '../mixins';
+
+.admin-panel {
+  .admin-left {
+    margin-right: 250px;
+  }
+
+  .console {
+    background-color: @black;
+    color: #eee;
+    font-family: "Lucida Console", Monaco, Consolas, monospace;
+    font-size: 10px;
+    height: 600px;
+    list-style: none;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding: 4px;
+    -webkit-font-smoothing: none;
+
+    a {
+      color: inherit;
+    }
+  }
+
+  .console-notification {
+    float: right;
+  }
+
+  .console-textbox {
+    .border-radius(0);
+    .box-sizing(border-box);
+    font-family: "Lucida Console", Monaco, monospace;
+    height: 22px;
+    width: 100%;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+  }
+
+  .admin-right {
+    float: right;
+    width: 250px;
+  }
+
+  .detail {
+    float: right;
+    width: 240px;
+    border-right: 1px solid #999;
+    height: 100%;
+    display: table-cell;
+
+    h3 {
+      margin: 4px 0 0;
+    }
+
+    .close {
+      .box-sizing(3px);
+      color: #222 !important;
+      border: 1px solid #bbb;
+      float: right;
+      font-size: 12px;
+      padding: 0 4px 0 4px;
+    }
+
+    .detail-inner {
+      padding: 10px;
+    }
+
+    .options {
+      margin-top: 10px;
+    }
+
+    .stats {
+      background: #fff;
+      border-left: 1px solid #bbb;
+      border-right: 1px solid #bbb;
+      border-top: 1px solid #bbb;
+      margin-bottom: 10px;
+
+      div {
+        border-bottom: 1px solid #bbb;
+
+        b {
+          color: #666;
+          display: block;
+          font-size: 10px;
+          margin-left: 2px;
+        }
+
+        span {
+          display: block;
+          font-size: 14px;
+          margin: 2px 6px 4px;
+        }
+      }
+    }
+  }
+
+  .players {
+    overflow-y: scroll;
+
+    a {
+      color: #555 !important;
+    }
+
+    .rank {
+      color: #777;
+      float: right;
+      font-size: 14px;
+    }
+  }
+
+  .player {
+    background: #e5e5e5;
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #fff;
+    border-bottom: 1px solid #aaa;
+    height: 20px;
+    padding: 5px;
+
+    &.selected {
+      background: #ccc;
+      border-bottom: 1px solid #cfcfcf;
+      border-top: 1px solid #bebebe;
+    }
+
+    &:hover {
+      background: #fff;
+    }
+  }
+
+  .users {
+    border-top: 2px solid #aaa;
+    overflow-y: scroll;
+    padding: 5px;
+  }
+}

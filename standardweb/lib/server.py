@@ -78,7 +78,7 @@ def get_player_list_data(server):
     }
 
 
-@cache.CachedResult('player-graph', time=120)
+@cache.CachedResult('player-graph', time=240)
 def get_player_graph_data(server, granularity=15, start_date=None, end_date=None):
     end_date = end_date or datetime.utcnow()
     start_date = start_date or end_date - timedelta(days=7)

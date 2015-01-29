@@ -103,7 +103,7 @@
                         <li><a class="{% block select_chat %}{% endblock %}" href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a></li>
                         <li><a class="{% block select_search %}{% endblock %}" href="{{ url_for('player_search') }}">Player Search</a></li>
                         {% if user and user.admin %}
-                            <li><a href="{{ url_for('admin', server_id=server.id if server else None) }}">Server Admin</a></li>
+                            <li><a href="{{ url_for('admin', server_id=server.id if server else None) }}">Admin</a></li>
                         {% endif %}
                     </ul>
                     <div class="header-account">
@@ -115,7 +115,7 @@
                                 </a>
                                 {#
                                 <a class="icon notifications {% if new_notifications %}new{% endif %}" href="{{ url_for('messages') }}" title="Notifications">
-                                    <i class="fa fa-flag"></i>
+                                    <i class="fa fa-bell"></i>
                                     <span class="count">{{ new_notifications }}</span>
                                 </a>
                                 #}

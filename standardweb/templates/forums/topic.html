@@ -19,7 +19,7 @@
                 <a href="{{ url_for('forum_topic_subscribe', topic_id=topic.id) }}">Subscribe to replies in this topic</a>
             {% endif %}
         </div>
-        <div class="clear"></div>
+        <div class="clearfix"></div>
     </div>
     <div class="forum-topic">
         {% for post in posts %}
@@ -86,7 +86,7 @@
                         </div>
                     {% endif %}
 
-                    <div class="clear"></div>
+                    <div class="clearfix"></div>
                 </div>
                 <div class="post-content" data-bbcode="{{ post.body }}">
                     {{ post.get_body_html(request.args.query)|safe }}
