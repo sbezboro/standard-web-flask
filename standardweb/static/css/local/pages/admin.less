@@ -1,9 +1,24 @@
 @import '../colors';
 @import '../mixins';
+@import '../media';
+
 
 .admin-panel {
   .admin-left {
     margin-right: 250px;
+    
+    @media @tablet, @mobile {
+      margin-right: 0px;
+    }
+  }
+
+  .admin-right {
+    float: right;
+    width: 250px;
+
+    @media @tablet, @mobile {
+      display: none;
+    }
   }
 
   .console {
@@ -18,6 +33,10 @@
     padding: 4px;
     -webkit-font-smoothing: none;
 
+    @media @tablet, @mobile {
+        font-size: 8px;
+    }
+
     a {
       color: inherit;
     }
@@ -25,6 +44,10 @@
 
   .console-notification {
     float: right;
+
+    @media @tablet, @mobile {
+      display: none;
+    }
   }
 
   .console-textbox {
@@ -35,11 +58,6 @@
     width: 100%;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
-  }
-
-  .admin-right {
-    float: right;
-    width: 250px;
   }
 
   .detail {

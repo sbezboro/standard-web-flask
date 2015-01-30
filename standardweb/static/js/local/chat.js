@@ -2,13 +2,13 @@
   StandardWeb.chat = {};
 
   $(document).ready(function() {
-    var $chat = $('#chat');
+    var $chat = $('.chat-area');
 
     if (!$chat.length) {
       return;
     }
 
-    var $chatTextbox = $('#chat-textbox');
+    var $chatTextbox = $('input[type="text"]');
 
     var chatStream = new StandardWeb.realtime.ChatStream($chat, $chatTextbox, StandardWeb.chat.serverId);
     chatStream.connect();

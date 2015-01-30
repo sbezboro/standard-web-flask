@@ -16,7 +16,7 @@
         </form>
 
         {% if query %}
-            <ul class="search-list">
+            <ul class="search-list lite-anchor">
             {% for player in results %}
                 <li>
                     <a href="{{ url_for('player', username=player.username) }}">

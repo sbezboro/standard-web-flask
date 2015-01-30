@@ -8,7 +8,7 @@
 
 {% block content %}
     {% if group %}
-        <div id="sub-header">
+        <div class="title-banner">
             <div class="group-header">
                 <h1>
                     Group: {{ group.name }}
@@ -18,71 +18,74 @@
     {% endif %}
     <div class="container">
         {% if group %}
-            <div class="player-stat-section">
-                <h2>Server</h2>
-                {{ server.name }}
+            <div class="grid">
+                <div class="col-1-4 lite-anchor">
+                    <h2>Server</h2>
+                    {{ server.name }}
+                </div>
+                <div class="col-1-4 lite-anchor">
+                    <h2>Established</h2>
+                    {{ group.established|from_now }}
+                </div>
+                <div class="col-1-4 lite-anchor">
+                    <h2>Land count</h2>
+                    {{ group.land_count }}
+                </div>
+                <div class="col-1-4 lite-anchor">
+                    <h2>Land limit</h2>
+                    {{ group.land_limit }}
+                </div>
             </div>
-            <div class="player-stat-section">
-                <h2>Established</h2>
-                {{ group.established|from_now }}
-            </div>
-            <div class="player-stat-section">
-                <h2>Land count</h2>
-                {{ group.land_count }}
-            </div>
-            <div class="player-stat-section">
-                <h2>Land limit</h2>
-                {{ group.land_limit }}
-            </div>
-            <div class="clearfix"></div>
-            <div class="player-stat-section">
-                <h2>Members</h2>
-                <h3>Leader</h3>
-                <a href="{{ url_for('player', server_id=server.id, username=leader.username) }}">
-                    {{ leader.username|face_thumb }}
-                    {{ leader.displayname_html|safe }}
-                </a>
+            <div class="grid">
+                <div class="col-1-4 lite-anchor">
+                    <h2>Members</h2>
+                    <h3>Leader</h3>
+                    <a href="{{ url_for('player', server_id=server.id, username=leader.username) }}">
+                        {{ leader.username|face_thumb }}
+                        {{ leader.displayname_html|safe }}
+                    </a>
 
-                {% if moderators %}
-                    <h3>Moderators</h3>
-                    {% for moderator in moderators %}
-                        <a href="{{ url_for('player', server_id=server.id, username=moderator.username) }}">
-                            {{ moderator.username|face_thumb }}
-                            {{ moderator.displayname_html|safe }}
-                        </a>
-                        <br>
-                    {% endfor %}
-                {% endif %}
-
-                {% if members %}
-                    <h3>Others</h3>
-                    {% for member in members %}
-                        <a href="{{ url_for('player', server_id=server.id, username=member.username) }}">
-                            {{ member.username|face_thumb }}
-                            {{ member.displayname_html|safe }}
-                        </a>
-                        <br>
-                    {% endfor %}
-                {% endif %}
-            </div>
-            {% if show_internals %}
-                {% if invites %}
-                    <div class="player-stat-section">
-                        <h2>Invites</h2>
-                        {% for invite in invites %}
-                            <a href="{{ url_for('player', server_id=server.id, username=invite.invite) }}">
-                                {{ invite.invite|face_thumb }}
-                                {{ invite.invite }}
+                    {% if moderators %}
+                        <h3>Moderators</h3>
+                        {% for moderator in moderators %}
+                            <a href="{{ url_for('player', server_id=server.id, username=moderator.username) }}">
+                                {{ moderator.username|face_thumb }}
+                                {{ moderator.displayname_html|safe }}
                             </a>
                             <br>
                         {% endfor %}
+                    {% endif %}
+
+                    {% if members %}
+                        <h3>Others</h3>
+                        {% for member in members %}
+                            <a href="{{ url_for('player', server_id=server.id, username=member.username) }}">
+                                {{ member.username|face_thumb }}
+                                {{ member.displayname_html|safe }}
+                            </a>
+                            <br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {% if show_internals %}
+                    {% if invites %}
+                        <div class="col-1-4 lite-anchor">
+                            <h2>Invites</h2>
+                            {% for invite in invites %}
+                                <a href="{{ url_for('player', server_id=server.id, username=invite.invite) }}">
+                                    {{ invite.invite|face_thumb }}
+                                    {{ invite.invite }}
+                                </a>
+                                <br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="col-1-4 lite-anchor">
+                        <h2>Lock count</h2>
+                        {{ group.lock_count }}
                     </div>
                 {% endif %}
-                <div class="player-stat-section">
-                    <h2>Lock count</h2>
-                    {{ group.lock_count }}
-                </div>
-            {% endif %}
+            </div>
         {% else %}
             <h2>The group {{ name }} does not exist</h2>
         {% endif %}

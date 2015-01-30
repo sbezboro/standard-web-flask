@@ -38,6 +38,7 @@ css = Bundle(
         'css/thirdparty/bbcode.css',
     ),
     Bundle(
+        'css/local/ansi.less',
         'css/local/base.less',
         'css/local/colors.less',
         'css/local/fonts.less',
@@ -45,6 +46,7 @@ css = Bundle(
         'css/local/media.less',
         'css/local/mixins.less',
         'css/local/pages/admin.less',
+        'css/local/pages/chat.less',
         'css/local/pages/index.less',
         'css/local/style.css',
     ),

@@ -1,0 +1,70 @@
+@import '../colors';
+@import '../mixins';
+@import '../media';
+
+.chat-container {
+  .box-shadow(0 0 14px rgba(0,0,0,1));
+
+  .chat-area {
+    background-color: #222;
+    color: #fff;
+    font-family: "Minecraft Regular";
+    font-size: 13px;
+    height: 500px;
+    list-style: none;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding: 4px;
+
+    @media @tablet, @mobile {
+      font-size: 10px;
+      height: 240px;
+    }
+
+    a {
+      color: inherit;
+    }
+  }
+
+  input[type="text"] {
+    .box-sizing(border-box);
+    border-radius: 0;
+    height: 22px;
+    width: 100%;
+  }
+}
+
+.players-table {
+  background-color: #444;
+  border-collapse: collapse;
+  color: @white;
+  font-family: "Minecraft Regular";
+  font-size: 12px;
+  margin: auto;
+  margin-top: 30px;
+  padding: 0;
+  table-layout:fixed;
+  text-shadow: 2px 2px #222;
+  width: 70%;
+
+  a {
+    color: @white;
+  }
+
+  tr {
+    padding: 0;
+    margin: 0;
+
+    td {
+      border: 3px solid #2f2f2f;
+      padding: 0;
+      margin: 0;
+      height: 18px;
+    }
+  }
+
+  .face-thumb {
+    border: 1px solid #222 !important;
+    margin-right: 4px;
+  }
+}
