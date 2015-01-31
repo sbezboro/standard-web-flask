@@ -1,22 +1,20 @@
+import binascii
+from datetime import datetime, timedelta
+import hashlib
+import os
+from pbkdf2 import pbkdf2_bin
+import re
+
 from flask import json
 from flask import url_for
-
-from standardweb import app
-from standardweb import db
-from standardweb.lib import helpers as h
-
-from pbkdf2 import pbkdf2_bin
-
+from markupsafe import Markup
 from sqlalchemy.ext import mutable
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
 
-from datetime import datetime, timedelta
-
-import binascii
-import hashlib
-import os
-import re
+from standardweb import app
+from standardweb import db
+from standardweb.lib import helpers as h
 
 
 def _get_or_create(cls, **kwargs):
@@ -127,6 +125,14 @@ class User(db.Model, Base):
             return self.player.username
 
         return self.username
+
+    def get_unread_notification_count(self):
+        return len(
+            Notification.query.with_entities(Notification.id).filter_by(
+                user=self,
+                seen_at=None
+            ).all()
+        )
 
     def get_unread_message_count(self):
         return len(
@@ -614,6 +620,70 @@ class Message(db.Model, Base):
             self.body_html = pat.sub(path, self.body_html)
 
         return super(Message, self).save(commit)
+
+
+class Notification(db.Model, Base):
+    __tablename__ = 'notification'
+
+    KICKED_FROM_GROUP = 'kicked_from_group'
+    NEW_GROUP_MEMBER = 'new_group_member'
+    GROUP_LAND_LIMIT_GROWTH = 'group_land_limit_growth'
+
+    VALID_TYPES = frozenset((
+        KICKED_FROM_GROUP,
+        NEW_GROUP_MEMBER,
+        GROUP_LAND_LIMIT_GROWTH
+    ))
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    type = db.Column(db.String(30))
+    seen_at = db.Column(db.DateTime)
+    data = db.Column(JsonEncodedDict, default={})
+
+    user = db.relationship(
+        'User',
+        foreign_keys='Notification.user_id',
+        backref=db.backref('notifications')
+    )
+
+    @property
+    def description(self):
+        if self.type == Notification.KICKED_FROM_GROUP:
+            group_name = self.data['group_name']
+
+            return Markup('You were kicked from the group <a href="%s">%s</a>' % (
+                url_for('group', name=group_name), group_name
+            ))
+        if self.type == Notification.NEW_GROUP_MEMBER:
+            group_name = self.data['group_name']
+            player_id = self.data['player_id']
+            player = Player.query.get(player_id)
+
+            return Markup('<a href="%s">%s</a> joined your group <a href="%s">%s</a>' % (
+                url_for('player', username=player.username),
+                player.displayname_html,
+                url_for('group', name=group_name),
+                group_name
+            ))
+        if self.type == Notification.GROUP_LAND_LIMIT_GROWTH:
+            group_name = self.data['group_name']
+            amount = self.data['amount']
+            new_limit = self.data['new_limit']
+
+            return Markup('Your group <a href="%s">%s</a> gained %d additional land resulting in a new limit of %d' % (
+                url_for('group', name=group_name),
+                group_name,
+                amount,
+                new_limit
+            ))
+
+    def save(self, commit=True):
+        if self.type not in Notification.VALID_TYPES:
+            raise Exception('Notification type "%s" not valid' % self.type)
+
+        return super(Notification, self).save(commit)
 
 
 class AccessLog(db.Model, Base):

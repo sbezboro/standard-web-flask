@@ -24,6 +24,7 @@ js = Bundle(
         'js/local/console.js',
         'js/local/graph.js',
         'js/local/messages.js',
+        'js/local/notifications.js',
         'js/local/realtime.js',
         'js/local/site.js'
     ),
@@ -48,6 +49,7 @@ css = Bundle(
         'css/local/pages/admin.less',
         'css/local/pages/chat.less',
         'css/local/pages/index.less',
+        'css/local/pages/notifications.less',
         'css/local/style.css',
     ),
     filters='less',

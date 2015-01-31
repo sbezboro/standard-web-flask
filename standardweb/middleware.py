@@ -43,11 +43,12 @@ def csrf_protect():
         func = app.view_functions.get(request.endpoint)
 
         if func and func not in csrf.exempt_funcs and 'debugtoolbar' not in request.endpoint:
-            token = session.get('csrf_token')
+            session_token = session.get('csrf_token')
+            request_token = request.form.get('csrf_token') or request.headers.get('X-CSRFToken')
 
-            if not token or token != request.form.get('csrf_token'):
+            if not session_token or session_token != request_token:
                 rollbar.report_message('CSRF mismatch', request=request, extra_data={
-                    'session_token': token
+                    'session_token': session_token
                 })
 
                 csrf.regenerate_token()
@@ -73,6 +74,9 @@ def track_request_time():
 
 @app.after_request
 def access_log(response):
+    if not hasattr(g, '_start_time'):
+        return response
+
     endpoint = request.endpoint
     route = request.url_rule.rule if request.url_rule else None
 
@@ -138,6 +142,16 @@ def inject_new_messages():
         new_messages = g.user.get_unread_message_count()
 
     return dict(new_messages=new_messages)
+
+
+@app.context_processor
+def inject_new_notifications():
+    new_notifications = 0
+
+    if g.user:
+        new_notifications = g.user.get_unread_notification_count()
+
+    return dict(new_notifications=new_notifications)
 
 
 def _dated_url_for(endpoint, **values):

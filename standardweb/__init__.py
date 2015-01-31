@@ -114,4 +114,5 @@ import views.base
 import views.forums
 import views.groups
 import views.messages
+import views.notifications
 import views.settings

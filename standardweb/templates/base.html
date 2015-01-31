@@ -113,12 +113,10 @@
                                     <i class="fa fa-envelope"></i>
                                     <span class="count">{{ new_messages }}</span>
                                 </a>
-                                {#
-                                <a class="icon notifications {% if new_notifications %}new{% endif %}" href="{{ url_for('messages') }}" title="Notifications">
+                                <a class="icon notifications {% if new_notifications %}new{% endif %}" href="{{ url_for('notifications') }}" title="Notifications">
                                     <i class="fa fa-bell"></i>
                                     <span class="count">{{ new_notifications }}</span>
                                 </a>
-                                #}
                             </div>
                             <div class="dropdown">
                                 {% if user.player %}
@@ -182,6 +180,7 @@
             var rtsPrefix = '{{ rts_prefix }}';
 
             StandardWeb.realtime.init(rtsAuthData, rtsBaseUrl, rtsPrefix);
+            StandardWeb.setCSRFToken('{{ session["csrf_token"] }}');
         </script>
     </body>
 </html>

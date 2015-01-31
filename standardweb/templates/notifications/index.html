@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications - Standard Survival Minecraft Server{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% include 'includes/flash_messages.html' %}
+        <h2>Notifications</h2>
+        <div class="border-section notifications-section">
+            {% if notifications %}
+                {% for notification in notifications %}
+                    <div class="notification grid {% if not notification.seen_at %}new{% endif %}" data-id="{{ notification.id }}">
+                        <div class="col-3-4">
+                            {{ notification.description }}
+                        </div>
+                        <div class="col-1-4 align-right">
+                            {{ notification.timestamp|from_now }}
+                            <i class="fa fa-check read"></i>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-notifications">
+                    No notifications yet
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script type="application/javascript">
+        StandardWeb.notifications.active = true;
+    </script>
+{% endblock %}

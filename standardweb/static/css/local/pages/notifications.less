@@ -1,0 +1,30 @@
+.notifications-section {
+  .notification {
+    border-bottom: 1px solid #eee;
+    padding: 20px;
+
+    &.new {
+      background: #F5F8FF;
+      font-weight: bold;
+
+      .read {
+        color: #ddd;
+
+        &:hover {
+          color: #bbb;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .read {
+      color: #999;
+      margin-left: 10px;
+    }
+  }
+
+  .no-notifications {
+    padding: 20px;
+    text-align: center;
+  }
+}
