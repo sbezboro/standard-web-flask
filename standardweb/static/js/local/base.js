@@ -41,6 +41,10 @@
         var now = moment();
         var date = moment($.trim($(this).text()));
 
+        if (!date.isValid()) {
+          date = moment($.trim($(this).attr('title')));
+        }
+
         if (date.isValid()) {
           if (now.diff(date, 'days') > 365) {
             val = date.format('MMMM D, YYYY');
@@ -70,4 +74,8 @@
       });
     }
   };
+
+  setInterval(function () {
+    StandardWeb.refreshFromnow();
+  }, 30000);
 })(window, document, $);
