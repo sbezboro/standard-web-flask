@@ -167,9 +167,9 @@
       socket.on('unread-count', function(data) {
         var count = data.count;
 
-        var $account = $('#account');
+        var $account = $('.header-account');
         var $messages = $account.find('.messages');
-        var $messagesCount = $account.find('.messages .new-count');
+        var $messagesCount = $account.find('.messages .count');
 
         if (count && !$messages.hasClass('new')) {
           $messages.addClass('new');
