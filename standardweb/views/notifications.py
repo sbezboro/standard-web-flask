@@ -19,7 +19,7 @@ def notifications():
         .joinedload(User.player)
     ).order_by(
         Notification.timestamp.desc()
-    ).limit(10)
+    ).limit(10).all()
 
     template_vars = {
         'notifications': notifications
