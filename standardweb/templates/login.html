@@ -8,8 +8,8 @@
 
 {% block content %}
   <div class="container">
-    <div class="center-section">
-      <form id="login-form" action="{{ url_for('login') }}" method="post">
+    <div class="center-form-section">
+      <form action="{{ url_for('login') }}" method="post">
         {{ form.hidden_tag() }}
         <h2>Log in</h2>
         <fieldset>

@@ -10,7 +10,7 @@
             <h2>Player Search</h2>
         {% endif %}
 
-        <form class="form-inline search-form" method="GET" action="{{ url_for('player_search') }}">
+        <form class="form-inline" method="GET" action="{{ url_for('player_search') }}">
             <input class="placeholder" type="text" name="q" placeholder="Username or Nickname" value="{{ query }}"/>
             <input class="btn btn-lite" type="submit" value="Search" />
         </form>

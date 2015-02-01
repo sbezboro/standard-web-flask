@@ -1,7 +1,7 @@
 (function(window, document, $) {
   $(document).ready(function() {
     var previousPoint = null;
-    var $graphTooltip = $('<div id="graph-tooltip"></div>').appendTo("body").css({
+    var $graphTooltip = $('<div class="graph-tooltip"></div>').appendTo("body").css({
       position: 'absolute',
       border: '1px solid #666',
       padding: '2px',
@@ -46,7 +46,7 @@
         url: "/" + serverId + "/player_graph",
         data: data,
         success: function(data) {
-          $graph.removeClass('progress');
+          $graph.removeClass('spinner-progress-bar');
 
           var points = data.points;
           var startTime = data.start_time - offset;

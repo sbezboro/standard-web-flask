@@ -1,54 +1,6 @@
 
 
 
-.player-list span {
-    display: inline-block;
-}
-
-.player-list .refresh-button {
-    cursor: pointer;
-}
-
-#graph-tooltip {
-    font-size: 10pt;
-    border-radius: 4px;
-    -moz-border-radius: 4px;
-}
-
-.latest-news .title {
-    font-weight: bold;
-}
-
-.latest-news .detail {
-    font-size: 10pt;
-}
-
-.center-section {
-    margin: auto;
-    width: 600px;
-    color: #626262;
-}
-
-.center-section fieldset {
-    background-color: #fff;
-    border: 1px solid #bcbcbc;
-    border-radius: 4px;
-    padding: 20px;
-}
-
-.center-section .help {
-    font-size: 0.9em;
-}
-
-.center-section .errorlist {
-    background-color: #fee;
-    list-style-type: none;
-    color: rgb(202, 0, 0);
-    font-size: 1.0em;
-    margin: 0 0 20px;
-    padding: 8px;
-    border: 1px solid #fdd;
-}
 
 
 .command-list {
@@ -69,12 +21,6 @@
 
 .server-selector > .selected {
     color: #AAA;
-}
-
-.graph {
-    width: 100%;
-    height: 100px;
-    margin-bottom: 10px;
 }
 
 .group-header {
@@ -1011,37 +957,8 @@
     background: #fff;
 }
 
-.rank-star {
-    float: left;
-    margin-left: -18px;
-    padding-top: 4px;
-    background: url('../../images/star.gif') no-repeat center;
-    width: 16px;
-    height: 16px;
-    text-align: center;
-    font-size: 12px;
-    color: #000;
-}
-
-.rank-star:hover {
-    color: #4e4e4e;
-}
-
-.ansi-container span {
-    text-shadow: 1px 1px #444;
-}
-
-a:hover .ansi-container {
-    opacity: 0.7;
-}
-
 
 @media (max-width: 960px) {
-    .center-section {
-        width: 90%;
-        max-width: 600px;
-    }
-    
     .player-forum-section {
         width: 25%;
         margin-bottom: 14px;
@@ -1052,20 +969,7 @@ a:hover .ansi-container {
     .player-forum-section h3 {
         margin: 0 0 10px;
     }
-    
-    .ranking-table {
-        font-size: 12px;
-    }
 
-    .leaderboard-stat-section {
-        width: 100%;
-    }
-
-    .leaderboard-stat-section .stat-row {
-        width: 100%;
-    }
-
-    
     .players-table {
         width: 100%;
         padding: 0;
