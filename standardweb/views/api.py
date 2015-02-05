@@ -289,6 +289,7 @@ def join_server():
     num_new_messages = 0
     from_uuids = set()
     no_user = True
+    past_usernames = set()
 
     if player:
         no_user = not player.user
@@ -308,6 +309,17 @@ def join_server():
 
             num_new_messages += 1
 
+        past_username_logs = AuditLog.query.filter_by(
+            player=player,
+            type='player_rename'
+        ).order_by(
+            AuditLog.timestamp
+        )
+
+        for log in past_username_logs:
+            past_username = log.data['old_name']
+            past_usernames.add(past_username)
+
     return jsonify({
         'err': 0,
         'player_messages': {
@@ -315,7 +327,8 @@ def join_server():
             'from_uuids': list(from_uuids),
             'url': url
         },
-        'no_user': no_user
+        'no_user': no_user,
+        'past_usernames': list(past_usernames)
     })
 
 

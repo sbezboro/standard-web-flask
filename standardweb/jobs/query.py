@@ -137,8 +137,6 @@ def _handle_groups(server, server_groups):
 
 def _query_server(server, mojang_status):
     server_status = api.get_server_status(server) or {}
-
-    new_titles = {}
     
     player_stats = []
     
