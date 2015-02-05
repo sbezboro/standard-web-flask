@@ -219,11 +219,23 @@ def rank_query():
         ).filter_by(uuid=uuid).first()
     else:
         player = Player.query.options(
+            joinedload(Player.titles)
+        ).filter(
+            or_(
+                Player.username == username,
+                Player.nickname == username
+            )
+        ).first()
+
+        if not player:
+            player = Player.query.options(
                 joinedload(Player.titles)
-            ).filter(or_(Player.username.ilike('%%%s%%' % username),
-                                         Player.nickname.ilike('%%%s%%' % username)))\
-            .order_by(func.ifnull(Player.nickname, Player.username))\
-            .limit(1).first()
+            ).filter(
+                or_(
+                    Player.username.ilike('%%%s%%' % username),
+                    Player.nickname.ilike('%%%s%%' % username)
+                )
+            ).first()
 
     if not player:
         return jsonify({
@@ -289,7 +301,6 @@ def join_server():
     num_new_messages = 0
     from_uuids = set()
     no_user = True
-    past_usernames = set()
 
     if player:
         no_user = not player.user
@@ -309,17 +320,6 @@ def join_server():
 
             num_new_messages += 1
 
-        past_username_logs = AuditLog.query.filter_by(
-            player=player,
-            type='player_rename'
-        ).order_by(
-            AuditLog.timestamp
-        )
-
-        for log in past_username_logs:
-            past_username = log.data['old_name']
-            past_usernames.add(past_username)
-
     return jsonify({
         'err': 0,
         'player_messages': {
@@ -327,8 +327,7 @@ def join_server():
             'from_uuids': list(from_uuids),
             'url': url
         },
-        'no_user': no_user,
-        'past_usernames': list(past_usernames)
+        'no_user': no_user
     })
 
 
@@ -381,6 +380,30 @@ def audit_log():
 
     return jsonify({
         'err': 0
+    })
+
+
+@server_api
+def past_usernames():
+    uuid = request.args.get('uuid')
+
+    past_usernames = set()
+
+    player = Player.query.filter_by(uuid=uuid).first()
+
+    past_username_logs = AuditLog.query.filter_by(
+        player=player,
+        type='player_rename'
+    ).order_by(
+        AuditLog.timestamp
+    )
+
+    for log in past_username_logs:
+        past_username = log.data['old_name']
+        past_usernames.add(past_username)
+
+    return jsonify({
+        'past_usernames': list(past_usernames)
     })
 
 
