@@ -10,6 +10,7 @@ from flask import url_for
 from markupsafe import Markup
 from sqlalchemy.ext import mutable
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import backref
 from sqlalchemy.sql import func
 
 from standardweb import app
@@ -276,6 +277,14 @@ class Player(db.Model, Base):
     @property
     def displayname_html(self):
         return self.nickname_html if self.nickname else self.username
+
+    @property
+    def past_usernames(self):
+        logs = self.audit_logs.filter_by(type='player_rename')
+
+        return list(set([
+            log.data['old_name'] for log in logs
+        ]))
 
 
 class PlayerStats(db.Model, Base):
@@ -718,7 +727,14 @@ class AuditLog(db.Model, Base):
 
     server = db.relationship('Server')
     user = db.relationship('User')
-    player = db.relationship('Player')
+    player = db.relationship(
+        'Player',
+        backref=backref(
+            'audit_logs',
+            order_by='AuditLog.timestamp',
+            lazy='dynamic'
+        )
+    )
 
     PLAYER_RENAME = 'player_rename'
 

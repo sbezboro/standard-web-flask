@@ -15,25 +15,6 @@ VALID_IMAGE_UPLOAD_EXTENSIONS = frozenset(['jpg', 'jpeg', 'gif', 'png'])
 MAX_UPLOAD_FILE_SIZE = 1024 * 1024 * 5  # 5MB
 
 
-def _is_safe_url(target):
-    ref_url = urlparse(request.host_url)
-    test_url = urlparse(urljoin(request.host_url, target))
-
-    return test_url.scheme in ('http', 'https') and \
-        ref_url.netloc == test_url.netloc
-
-
-def _get_redirect_target():
-    for target in request.args.get('next'), request.referrer:
-        if not target:
-            continue
-
-        if _is_safe_url(target):
-            return target
-
-    return ''
-
-
 # from https://github.com/industrydive/wtforms_extended_selectfield/blob/master/wtforms_extended_selectfield.py
 class ExtendedSelectWidget(Select):
     """
@@ -141,7 +122,24 @@ class RedirectForm(BaseForm):
         super(RedirectForm, self).__init__(*args, **kwargs)
 
         if not self.next.data:
-            self.next.data = _get_redirect_target()
+            self.next.data = RedirectForm._get_redirect_target()
+
+    @classmethod
+    def _is_safe_url(cls, target):
+        ref_url = urlparse(request.host_url)
+        test_url = urlparse(urljoin(request.host_url, target))
+
+        return test_url.scheme in ('http', 'https') and \
+            ref_url.netloc == test_url.netloc
+
+    @classmethod
+    def _get_redirect_target(cls):
+        target = request.args.get('next')
+
+        if target and cls._is_safe_url(target):
+            return target
+
+        return ''
 
 
 class LoginForm(RedirectForm):

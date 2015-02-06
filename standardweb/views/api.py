@@ -11,7 +11,6 @@ from flask import url_for
 import rollbar
 
 from sqlalchemy import or_
-from sqlalchemy.sql.expression import func
 from sqlalchemy.orm import joinedload
 
 from standardweb import app, db
@@ -292,6 +291,17 @@ def rank_query():
 
 
 @server_api
+def past_usernames():
+    uuid = request.args.get('uuid')
+
+    player = Player.query.filter_by(uuid=uuid).first()
+
+    return jsonify({
+        'past_usernames': player.past_usernames
+    })
+
+
+@server_api
 def join_server():
     url = url_for('messages', _external=True)
     uuid = request.form.get('uuid')
@@ -380,30 +390,6 @@ def audit_log():
 
     return jsonify({
         'err': 0
-    })
-
-
-@server_api
-def past_usernames():
-    uuid = request.args.get('uuid')
-
-    past_usernames = set()
-
-    player = Player.query.filter_by(uuid=uuid).first()
-
-    past_username_logs = AuditLog.query.filter_by(
-        player=player,
-        type='player_rename'
-    ).order_by(
-        AuditLog.timestamp
-    )
-
-    for log in past_username_logs:
-        past_username = log.data['old_name']
-        past_usernames.add(past_username)
-
-    return jsonify({
-        'past_usernames': list(past_usernames)
     })
 
 

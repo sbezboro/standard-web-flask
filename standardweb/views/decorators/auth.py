@@ -15,7 +15,11 @@ def login_required(show_message=True):
                 if show_message:
                     flash('You must log in first', 'warning')
 
-                return redirect(url_for('login', next=request.path))
+                next = None
+                if request.path not in (url_for('index'), url_for('login')):
+                    next = request.path
+
+                return redirect(url_for('login', next=next))
 
             return func(*args, **kwargs)
 

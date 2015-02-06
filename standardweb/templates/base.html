@@ -147,7 +147,7 @@
                         {% else %}
                             <ul class="header-nav">
                                 <li><a class="{% block select_signup %}{% endblock %}" href="{{ url_for('signup') }}">Sign up</a></li>
-                                <li><a class="{% block select_login %}{% endblock %}" href="{{ url_for('login', next=request.path) }}">Log in</a></li>
+                                <li><a class="{% block select_login %}{% endblock %}" href="{{ url_for('login') }}">Log in</a></li>
                             </ul>
                         {% endif %}
                     </div>
