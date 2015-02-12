@@ -181,6 +181,29 @@
       }.bind(this));
     });
 
+    StandardWeb.realtime.subscribe('notifications', function(error, socket) {
+      if (error) {
+        return;
+      }
+
+      socket.on('unread-count', function(data) {
+        var count = data.count;
+
+        var $account = $('.header-account');
+        var $notifications = $account.find('.notifications');
+        var $notificationsCount = $account.find('.notifications .count');
+
+        if (count && !$notifications.hasClass('new')) {
+          $notifications.addClass('new');
+        } else if (!count && $notifications.hasClass('new')) {
+          $notifications.removeClass('new');
+        }
+
+        $notificationsCount.html(count);
+      }.bind(this));
+    });
+
+
     StandardWeb.refreshFromnow();
 
     $('.placeholder').placeholder();

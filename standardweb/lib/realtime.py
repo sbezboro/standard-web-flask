@@ -29,6 +29,14 @@ def unread_message_count(user):
     send_rts_data(user.id, 'messages', 'unread-count', payload)
 
 
+def unread_notification_count(user):
+    payload = {
+        'count': user.get_unread_notification_count()
+    }
+
+    send_rts_data(user.id, 'notifications', 'unread-count', payload)
+
+
 def send_rts_data(user_id, channel, action, payload):
     send_rts_data_task.apply_async((
         user_id,

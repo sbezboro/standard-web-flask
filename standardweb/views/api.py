@@ -24,11 +24,12 @@ from standardweb.lib.email import (
     verify_mailgun_signature,
     verify_message_reply_signature
 )
+from standardweb.lib.notifications import InvalidNotificationError
 from standardweb.lib.notifier import notify_new_message
 from standardweb.models import (
     Server, Player, DeathType, DeathEvent, KillCount, KillEvent, KillType, MaterialType,
     OreDiscoveryEvent, OreDiscoveryCount, EmailToken, User, PlayerStats, VeteranStatus, Message,
-    Title, AuditLog, DeathCount
+    Title, AuditLog, DeathCount, Notification
 )
 
 
@@ -387,6 +388,48 @@ def audit_log():
         player_id=player_id,
         commit=True
     )
+
+    return jsonify({
+        'err': 0
+    })
+
+
+@server_api
+def new_notification():
+    body = request.json
+
+    type = body.get('type')
+    data = body.get('data')
+    uuid = body.pop('uuid')
+
+    player = Player.query.options(
+        joinedload(Player.user)
+    ).filter_by(uuid=uuid).first()
+
+    if not player:
+        return jsonify({
+            'err': 1,
+            'message': 'Invalid player uuid'
+        }), 400
+
+    player_id = player.id
+    user_id = None
+
+    if player.user:
+        user_id = player.user.id
+
+    try:
+        Notification.create(
+            type,
+            data=data,
+            user_id=user_id,
+            player_id=player_id
+        )
+    except InvalidNotificationError:
+        return jsonify({
+            'err': 1,
+            'message': 'Invalid notification data'
+        }), 400
 
     return jsonify({
         'err': 0

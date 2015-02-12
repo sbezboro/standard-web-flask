@@ -3,6 +3,7 @@ from flask import abort, g, render_template, jsonify
 from sqlalchemy.orm import joinedload
 
 from standardweb import app
+from standardweb.lib import realtime
 from standardweb.models import Notification, User
 from standardweb.views.decorators.auth import login_required
 
@@ -19,7 +20,7 @@ def notifications():
         .joinedload(User.player)
     ).order_by(
         Notification.timestamp.desc()
-    ).limit(10).all()
+    ).limit(20).all()
 
     template_vars = {
         'notifications': notifications
@@ -42,6 +43,8 @@ def read_notification(notification_id):
 
     notification.seen_at = datetime.utcnow()
     notification.save(commit=True)
+
+    realtime.unread_notification_count(user)
 
     return jsonify({
         'err': 0

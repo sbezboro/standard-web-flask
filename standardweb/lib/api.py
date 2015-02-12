@@ -106,5 +106,9 @@ def new_message(to_player, from_user):
     ))
 
 
+def new_notification(player, notification):
+    pass
+
+
 def _verify_ingame_preference(user, type):
     return user.get_notification_preference(type).ingame
