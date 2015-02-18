@@ -392,7 +392,7 @@ def forum_post(post_id):
         abort(404)
 
     topic = post.topic
-    posts = topic.posts
+    posts = filter(lambda post: not post.deleted, topic.posts)
     index = posts.index(post)
 
     page = int(index / POSTS_PER_PAGE) + 1
