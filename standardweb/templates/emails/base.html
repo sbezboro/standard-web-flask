@@ -1,5 +1,8 @@
 {% block content %}
 {% endblock %}
+{% if notifications_url %}
+    See all notifications here: <a href="{{ notifications_url }}">{{ notifications_url }}</a>
+{% endif %}
 <br>
 --
 <br>

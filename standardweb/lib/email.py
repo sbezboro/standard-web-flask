@@ -153,6 +153,7 @@ def send_news_post_email(user, notification):
 
     topic = post.topic
 
+    notifications_url = url_for('notifications', _external=True)
     forum_topic_url = url_for('forum_topic', topic_id=post.topic_id, _external=True)
     unsubscribe_link = notifications.generate_unsubscribe_link(user, 'news')
 
@@ -160,7 +161,8 @@ def send_news_post_email(user, notification):
         'post_body': post.id,
         'post_body_html': post.body_html,
         'topic_url': forum_topic_url,
-        'unsubscribe_url': unsubscribe_link
+        'unsubscribe_url': unsubscribe_link,
+        'notifications_url': notifications_url
     })
 
     send_email(to_email, '[Standard Survival] %s' % topic.name, text_body, html_body)
@@ -181,6 +183,7 @@ def send_subscribed_topic_post_email(user, notification):
 
     topic = post.topic
 
+    notifications_url = url_for('notifications', _external=True)
     forum_post_url = url_for('forum_post', post_id=post_id, _external=True)
     unsubscribe_topic_url = url_for('forum_topic_unsubscribe', topic_id=topic.id, _external=True)
     unsubscribe_url = notifications.generate_unsubscribe_link(user, 'subscribed_thread_post')
@@ -191,14 +194,15 @@ def send_subscribed_topic_post_email(user, notification):
         'post_body_html': post.body_html,
         'post_url': forum_post_url,
         'unsubscribe_topic_url': unsubscribe_topic_url,
-        'unsubscribe_url': unsubscribe_url
+        'unsubscribe_url': unsubscribe_url,
+        'notifications_url': notifications_url
     })
 
     send_email(to_email, '[Standard Survival] New reply in the topic "%s"' % topic.name, text_body, html_body)
 
 
 def send_notification_email(user, notification):
-    func = NOTIFICATION_EMAILS[notification.type]
+    func = NOTIFICATION_EMAILS.get(notification.type)
 
     if func:
         func(user, notification)

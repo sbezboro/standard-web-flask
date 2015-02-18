@@ -1,5 +1,9 @@
 {% block content %}
 {% endblock %}
+{% if notifications_url %}
+See all notifications here: {{ notifications_url }}
+{% endif %}
+
 --
 Standard Survival Minecraft Server - standardsurvival.com
 This email was sent to {{ to_email }}
