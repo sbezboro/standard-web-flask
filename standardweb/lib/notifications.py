@@ -1,14 +1,15 @@
 import hashlib
 import hmac
 import urllib
+from datetime import datetime
 
 from flask import url_for
 from markupsafe import Markup
 from sqlalchemy.orm import joinedload
 from voluptuous import All, Length, Required, Schema, Any
 
-from standardweb import app
-from standardweb.models import Player, User, ForumPost
+from standardweb import app, db
+from standardweb.models import Player, User, ForumPost, Notification
 
 
 KICKED_FROM_GROUP = 'kicked_from_group'
@@ -147,16 +148,18 @@ class SubscribedTopicPostNotification(NotificationDefinition):
         player = user.player
 
         if player:
-            return Markup('<a href="%s">%s</a> posted in the topic <a href="%s">%s</a>' % (
+            return Markup('<a href="%s">%s</a> <a href="%s">posted</a> in the topic <a href="%s">%s</a>' % (
                 url_for('player', username=player.username),
                 player.displayname_html,
                 url_for('forum_post', post_id=post.id),
+                url_for('forum_topic', topic_id=post.topic_id),
                 post.topic.name
             ))
         else:
-            return Markup('%s posted in the topic <a href="%s">%s</a>' % (
+            return Markup('%s <a href="%s">posted</a> in the topic <a href="%s">%s</a>' % (
                 user.username,
                 url_for('forum_post', post_id=post.id),
+                url_for('forum_topic', topic_id=post.topic_id),
                 post.topic.name
             ))
 
@@ -200,3 +203,25 @@ def generate_unsubscribe_link(user, type):
     signature = _generate_signature(encoded_email, type)
 
     return url_for('unsubscribe', encoded_email=encoded_email, type=type, signature=signature, _external=True)
+
+
+def mark_notifications_read(user, key_values, allow_commit=True):
+    notifications = Notification.query.filter_by(
+        user=user,
+        seen_at=None
+    )
+
+    updated = False
+    for notification in notifications:
+        # check the list of key values against the notification's data
+        for kw in key_values:
+            # if a key value matches this notification, mark it as read
+            # and continue to the next notification
+            if all(notification.data.get(k) == v for k, v in kw.iteritems()):
+                notification.seen_at = datetime.utcnow()
+                notification.save(commit=False)
+                updated = True
+                break
+
+    if allow_commit and updated:
+        db.session.commit()

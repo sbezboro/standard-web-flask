@@ -16,6 +16,7 @@ from sqlalchemy.orm import joinedload
 from standardweb import app, db
 from standardweb.forms import MoveTopicForm, PostForm, NewTopicForm, ForumSearchForm
 from standardweb.lib import api
+from standardweb.lib import notifications
 from standardweb.lib.notifier import notify_news_post, notify_subscribed_topic_post
 from standardweb.models import (
     ForumCategory, Forum, ForumPost, ForumTopic, User, ForumPostTracking, ForumAttachment,
@@ -345,8 +346,10 @@ def forum_topic(topic_id):
 
     player_ids = set([post.user.player_id for post in posts])
 
-    player_stats = PlayerStats.query.filter(PlayerStats.server_id == app.config['MAIN_SERVER_ID'],
-                                            PlayerStats.player_id.in_(player_ids))
+    player_stats = PlayerStats.query.filter(
+        PlayerStats.server_id == app.config['MAIN_SERVER_ID'],
+        PlayerStats.player_id.in_(player_ids)
+    )
 
     player_stats = {
         stats.player: stats
@@ -356,6 +359,11 @@ def forum_topic(topic_id):
     subscription = None
 
     if user:
+        notifications.mark_notifications_read(
+            user,
+            [{'post_id': post.id} for post in posts],
+            allow_commit=False
+        )
         topic.update_read(user)
 
         subscription = ForumTopicSubscription.query.filter_by(
