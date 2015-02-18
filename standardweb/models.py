@@ -114,6 +114,8 @@ class User(db.Model, Base):
             'user_id': user.id
         })
 
+        db.session.commit()
+
         return user
 
     def check_password(self, plaintext_password):

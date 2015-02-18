@@ -5,7 +5,11 @@
 {% block content %}
     <div class="container">
         {% include 'includes/flash_messages.html' %}
+        <div class="pull-right">
+            <a class="btn btn-lite" href="{{ url_for('read_notification_all') }}">Mark all as read</a>
+        </div>
         <h2>Notifications</h2>
+        <div class="clearfix"></div>
         <div class="border-section notifications-section">
             {% if notifications %}
                 {% for notification in notifications %}

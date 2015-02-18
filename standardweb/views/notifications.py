@@ -1,8 +1,8 @@
 from datetime import datetime
-from flask import abort, g, render_template, jsonify
+from flask import abort, g, jsonify, redirect, render_template, url_for
 from sqlalchemy.orm import joinedload
 
-from standardweb import app
+from standardweb import app, db
 from standardweb.lib import realtime
 from standardweb.models import Notification, User
 from standardweb.views.decorators.auth import login_required
@@ -27,6 +27,25 @@ def notifications():
     }
 
     return render_template('notifications/index.html', **template_vars)
+
+
+@app.route('/notifications/read/all')
+@login_required()
+def read_notification_all():
+    user = g.user
+
+    Notification.query.filter_by(
+        user=user,
+        seen_at=None
+    ).update({
+        'seen_at': datetime.utcnow()
+    })
+
+    db.session.commit()
+
+    realtime.unread_notification_count(user)
+
+    return redirect(url_for('notifications'))
 
 
 @app.route('/notifications/read/<int:notification_id>', methods=['POST'])
