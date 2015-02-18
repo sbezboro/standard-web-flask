@@ -1,0 +1,15 @@
+{% macro notification_row(notification) -%}
+    <div class="notification grid {% if not notification.seen_at %}new{% endif %}" data-id="{{ notification.id }}">
+        <div class="col-3-4">
+            {{ notification.description }}
+        </div>
+        <div class="col-1-4 align-right">
+            {{ notification.timestamp|from_now }}
+            <i class="fa fa-check read"></i>
+        </div>
+    </div>
+{%- endmacro %}
+
+{% if notification %}
+    {{ notification_row(notification) }}
+{% endif %}
