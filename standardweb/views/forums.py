@@ -388,7 +388,7 @@ def forum_topic(topic_id):
 def forum_post(post_id):
     post = ForumPost.query.get(post_id)
 
-    if not post:
+    if not post or post.deleted:
         abort(404)
 
     topic = post.topic
