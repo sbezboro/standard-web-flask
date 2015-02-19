@@ -6,13 +6,15 @@ from datetime import datetime
 from flask import url_for
 from markupsafe import Markup
 from sqlalchemy.orm import joinedload
-from voluptuous import All, Length, Required, Schema, Any
+from voluptuous import All, Length, Required, Schema, Any, Optional
 
 from standardweb import app, db
 from standardweb.models import Player, User, ForumPost, Notification
 
 
 KICKED_FROM_GROUP = 'kicked_from_group'
+GROUP_KICK_IMMINENT = 'group_kick_imminent'
+GROUP_DESTROYED = 'group_destroyed'
 NEW_GROUP_MEMBER = 'new_group_member'
 GROUP_LAND_LIMIT_GROWTH = 'group_land_limit_growth'
 NEWS_POST = 'news'
@@ -48,15 +50,70 @@ class KickedFromGroupNotification(NotificationDefinition):
 
     name = KICKED_FROM_GROUP
     schema = Schema({
+        Required('group_name'): All(basestring, Length(min=1)),
+        Optional('kicker_uuid'): All(basestring, Length(min=32, max=32))
+    })
+
+    def get_html_description(self, data):
+        group_name = data['group_name']
+        kicker_uuid = data.get('kicker_uuid')
+
+        if kicker_uuid:
+            kicker = Player.query.filter_by(uuid=kicker_uuid).first()
+
+            return Markup('You were kicked from the group <a href="%s">%s</a> by <a href="%s">%s</a>' % (
+                url_for('group', name=group_name),
+                group_name,
+                url_for('player', username=kicker.username),
+                kicker.displayname_html,
+            ))
+        else:
+            return Markup('You were automatically kicked from the group <a href="%s">%s</a> after being offline too long' % (
+                url_for('group', name=group_name), group_name
+            ))
+
+
+class GroupKickImminentNotification(NotificationDefinition):
+
+    name = GROUP_KICK_IMMINENT
+    schema = Schema({
         Required('group_name'): All(basestring, Length(min=1))
     })
 
     def get_html_description(self, data):
         group_name = data['group_name']
 
-        return Markup('You were kicked from the group <a href="%s">%s</a>' % (
-            url_for('group', name=group_name), group_name
+        return Markup('You will be automatically kicked from your group <a href="%s">%s</a> in <b>one</b> day if you don\'t join the server!' % (
+            url_for('group', name=group_name),
+            group_name
         ))
+
+
+class GroupDestroyedNotification(NotificationDefinition):
+
+    name = GROUP_DESTROYED
+    schema = Schema({
+        Required('group_name'): All(basestring, Length(min=1)),
+        Optional('destroyer_uuid'): All(basestring, Length(min=32, max=32))
+    })
+
+    def get_html_description(self, data):
+        group_name = data['group_name']
+
+        destroyer_uuid = data.get('destroyer_uuid')
+
+        if destroyer_uuid:
+            destroyer = Player.query.filter_by(uuid=destroyer_uuid).first()
+
+            return Markup('Your group %s was destroyed by <a href="%s">%s</a>' % (
+                group_name,
+                url_for('player', username=destroyer.username),
+                destroyer.displayname_html,
+            ))
+        else:
+            return Markup('Your group %s was automatically destroyed' % (
+                group_name
+            ))
 
 
 class NewGroupMemberNotification(NotificationDefinition):
