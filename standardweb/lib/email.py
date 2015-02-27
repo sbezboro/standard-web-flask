@@ -155,7 +155,7 @@ def send_news_post_email(user, notification):
 
     notifications_url = url_for('notifications', _external=True)
     forum_topic_url = url_for('forum_topic', topic_id=post.topic_id, _external=True)
-    unsubscribe_link = notifications.generate_unsubscribe_link(user, 'news')
+    unsubscribe_link = notifications.generate_unsubscribe_link(user, notifications.NEWS_POST)
 
     text_body, html_body = _render_email('news_post', to_email, {
         'post_body': post.id,
@@ -186,7 +186,7 @@ def send_subscribed_topic_post_email(user, notification):
     notifications_url = url_for('notifications', _external=True)
     forum_post_url = url_for('forum_post', post_id=post_id, _external=True)
     unsubscribe_topic_url = url_for('forum_topic_unsubscribe', topic_id=topic.id, _external=True)
-    unsubscribe_url = notifications.generate_unsubscribe_link(user, 'subscribed_thread_post')
+    unsubscribe_url = notifications.generate_unsubscribe_link(user, notifications.SUBSCRIBED_TOPIC_POST)
 
     text_body, html_body = _render_email('subscribed_topic_post', to_email, {
         'username': user.get_username(),
@@ -199,6 +199,35 @@ def send_subscribed_topic_post_email(user, notification):
     })
 
     send_email(to_email, '[Standard Survival] New reply in the topic "%s"' % topic.name, text_body, html_body)
+
+
+@notification_email(notifications.GROUP_KICK_IMMINENT)
+def send_group_kick_imminent_email(user, notification):
+    to_email = user.email
+
+    if not to_email:
+        return
+
+    group_name = notification.data['group_name']
+
+    group_url = url_for('group', name=group_name, _external=True)
+    notifications_url = url_for('notifications', _external=True)
+    unsubscribe_url = notifications.generate_unsubscribe_link(user, notifications.GROUP_KICK_IMMINENT)
+
+    text_body, html_body = _render_email('group_kick_imminent', to_email, {
+        'username': user.get_username(),
+        'group_name': group_name,
+        'group_url': group_url,
+        'unsubscribe_url': unsubscribe_url,
+        'notifications_url': notifications_url
+    })
+
+    send_email(
+        to_email,
+        '[Standard Survival] Watch out! You are about to be kicked from your group!',
+        text_body,
+        html_body
+    )
 
 
 def send_notification_email(user, notification):

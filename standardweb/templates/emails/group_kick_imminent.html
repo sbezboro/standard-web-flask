@@ -1,0 +1,8 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    <h3>Hey {{ username }}!</h3>
+    <p>We haven't seen you on the server in a while :( Just a friendly reminder:</p>
+    <p>You will be automatically kicked from your group <a href="{{ group_url }}">{{ group_name }}</a> if you don't join the server in <b>one</b> day!</p>
+    <br>
+{% endblock %}

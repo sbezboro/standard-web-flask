@@ -12,6 +12,7 @@ from standardweb import app, db
 from standardweb.models import Player, User, ForumPost, Notification
 
 
+NEW_MESSAGE = 'new_message'
 KICKED_FROM_GROUP = 'kicked_from_group'
 GROUP_KICK_IMMINENT = 'group_kick_imminent'
 GROUP_DESTROYED = 'group_destroyed'
@@ -21,6 +22,15 @@ NEWS_POST = 'news'
 SUBSCRIBED_TOPIC_POST = 'subscribed_thread_post'
 
 NOTIFICATION_DEFINITIONS = {}
+NOTIFICATION_DESCRIPTIONS = {
+    NEW_MESSAGE: 'When I get a new message',
+    KICKED_FROM_GROUP: 'When I am kicked from my group',
+    GROUP_KICK_IMMINENT: 'When I am about to be automatically kicked from my group',
+    GROUP_DESTROYED: 'When my group is destroyed',
+    NEWS_POST: 'When there is a new post in a topic I\'m subscribed to',
+    SUBSCRIBED_TOPIC_POST: 'When there is a news post'
+}
+NOTIFICATION_NAMES = frozenset(NOTIFICATION_DESCRIPTIONS.keys())
 
 
 class InvalidNotificationError(RuntimeError):

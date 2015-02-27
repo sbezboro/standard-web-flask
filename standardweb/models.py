@@ -1,6 +1,7 @@
 import binascii
 from datetime import datetime, timedelta
 import hashlib
+from operator import attrgetter
 import os
 from pbkdf2 import pbkdf2_bin
 import re
@@ -152,6 +153,8 @@ class User(db.Model, Base):
         )
 
     def get_notification_preferences(self, create=True, can_commit=True):
+        from standardweb.lib import notifications
+
         preferences = NotificationPreference.query.filter_by(
             user=self
         ).all()
@@ -161,7 +164,7 @@ class User(db.Model, Base):
             for preference in preferences:
                 active_preference_names.add(preference.name)
 
-            missing_preference_names = NotificationPreference.NOTIFICATION_NAMES - active_preference_names
+            missing_preference_names = notifications.NOTIFICATION_NAMES - active_preference_names
             for name in missing_preference_names:
                 preference = NotificationPreference(
                     user=self,
@@ -175,7 +178,7 @@ class User(db.Model, Base):
             if can_commit:
                 db.session.commit()
 
-        return preferences
+        return sorted(preferences, key=attrgetter('name'))
 
     def get_notification_preference(self, type, create=True, can_commit=True):
         preference = NotificationPreference.query.filter_by(
@@ -768,18 +771,6 @@ class AuditLog(db.Model, Base):
 
 
 class NotificationPreference(db.Model, Base):
-    NOTIFICATIONS = (
-        ('new_message', 'When I get a new message'),
-        ('subscribed_thread_post', 'When there is a new post in a topic I\'m subscribed to'),
-        ('news', 'When there is a news post')
-    )
-
-    NOTIFICATION_NAMES = frozenset([x[0] for x in NOTIFICATIONS])
-
-    NOTIFICATION_DESCRIPTION_MAP = {
-        x[0]: x[1] for x in NOTIFICATIONS
-    }
-
     __tablename__ = 'notification_preference'
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
@@ -791,7 +782,8 @@ class NotificationPreference(db.Model, Base):
 
     @property
     def description(self):
-        return NotificationPreference.NOTIFICATION_DESCRIPTION_MAP[self.name]
+        from standardweb.lib import notifications
+        return notifications.NOTIFICATION_DESCRIPTIONS[self.name]
 
 
 class ForumProfile(db.Model, Base):

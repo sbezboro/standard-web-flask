@@ -1,0 +1,9 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+Hey {{ username }}!
+
+We haven't seen you on the server in a while :( Just a friendly reminder:
+You will be automatically kicked from your group {{ group_name }} if you don't join the server in one day!
+
+{% endblock %}
