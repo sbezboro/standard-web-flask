@@ -6,6 +6,7 @@ from webassets.script import CommandLineEnvironment
 from werkzeug import script
 
 from standardweb import app
+from standardweb.assets import env as assets_env
 
 
 CODE_DIR = '/home/deploy/standard-web-flask'
@@ -41,7 +42,7 @@ def build_assets():
     log.addHandler(logging.StreamHandler())
     log.setLevel(logging.DEBUG)
 
-    cmdenv = CommandLineEnvironment(env, log)
+    cmdenv = CommandLineEnvironment(assets_env, log)
     cmdenv.build()
 
 
