@@ -1,0 +1,12 @@
+{% extends 'emails/base.txt' %}
+
+{% block content %}
+Hey {{ username }}!
+
+{% if destroyer %}
+Your group {{ group_name }} was destroyed by {{ destroyer.displayname }}!
+{% else %}
+Your group {{ group_name }} was automatically destroyed!
+{% endif %}
+
+{% endblock %}

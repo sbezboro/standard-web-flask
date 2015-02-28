@@ -9,7 +9,7 @@ from sqlalchemy.orm import joinedload
 
 from standardweb import app
 from standardweb.lib import notifications
-from standardweb.models import EmailToken, User, ForumPost
+from standardweb.models import EmailToken, User, ForumPost, Player
 from standardweb.tasks.email import send_email as send_email_task
 
 
@@ -157,7 +157,7 @@ def send_news_post_email(user, notification):
     forum_topic_url = url_for('forum_topic', topic_id=post.topic_id, _external=True)
     unsubscribe_link = notifications.generate_unsubscribe_link(user, notifications.NEWS_POST)
 
-    text_body, html_body = _render_email('news_post', to_email, {
+    text_body, html_body = _render_email('notifications/news_post', to_email, {
         'post_body': post.id,
         'post_body_html': post.body_html,
         'topic_url': forum_topic_url,
@@ -188,7 +188,7 @@ def send_subscribed_topic_post_email(user, notification):
     unsubscribe_topic_url = url_for('forum_topic_unsubscribe', topic_id=topic.id, _external=True)
     unsubscribe_url = notifications.generate_unsubscribe_link(user, notifications.SUBSCRIBED_TOPIC_POST)
 
-    text_body, html_body = _render_email('subscribed_topic_post', to_email, {
+    text_body, html_body = _render_email('notifications/subscribed_topic_post', to_email, {
         'username': user.get_username(),
         'post_body': post.body,
         'post_body_html': post.body_html,
@@ -214,7 +214,7 @@ def send_group_kick_imminent_email(user, notification):
     notifications_url = url_for('notifications', _external=True)
     unsubscribe_url = notifications.generate_unsubscribe_link(user, notifications.GROUP_KICK_IMMINENT)
 
-    text_body, html_body = _render_email('group_kick_imminent', to_email, {
+    text_body, html_body = _render_email('notifications/group_kick_imminent', to_email, {
         'username': user.get_username(),
         'group_name': group_name,
         'group_url': group_url,
@@ -225,6 +225,44 @@ def send_group_kick_imminent_email(user, notification):
     send_email(
         to_email,
         '[Standard Survival] Watch out! You are about to be kicked from your group!',
+        text_body,
+        html_body
+    )
+
+
+@notification_email(notifications.GROUP_DESTROYED)
+def send_group_destroyed_email(user, notification):
+    to_email = user.email
+
+    if not to_email:
+        return
+
+    group_name = notification.data['group_name']
+    destroyer_uuid = notification.data.get('destroyer_uuid')
+
+    destroyer = None
+    destroyer_url = None
+    if destroyer_uuid:
+        destroyer = Player.query.filter_by(uuid=destroyer_uuid).first()
+        destroyer_url = url_for('player', username=destroyer.username)
+
+    group_url = url_for('group', name=group_name, _external=True)
+    notifications_url = url_for('notifications', _external=True)
+    unsubscribe_url = notifications.generate_unsubscribe_link(user, notifications.GROUP_DESTROYED)
+
+    text_body, html_body = _render_email('notifications/group_destroyed', to_email, {
+        'username': user.get_username(),
+        'group_name': group_name,
+        'group_url': group_url,
+        'destroyer': destroyer,
+        'destroyer_url': destroyer_url,
+        'unsubscribe_url': unsubscribe_url,
+        'notifications_url': notifications_url
+    })
+
+    send_email(
+        to_email,
+        '[Standard Survival] Your group was destroyed!',
         text_body,
         html_body
     )

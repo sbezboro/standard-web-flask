@@ -1,0 +1,11 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    <h3>Hey {{ username }}!</h3>
+    {% if destroyer %}
+        <p>Your group {{ group_name }} was destroyed by {{ destroyer.displayname_html|safe }}!</p>
+    {% else %}
+        <p>Your group {{ group_name }} was automatically destroyed!</p>
+    {% endif %}
+    <br>
+{% endblock %}
