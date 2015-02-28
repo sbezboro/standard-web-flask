@@ -22,15 +22,7 @@ NEWS_POST = 'news'
 SUBSCRIBED_TOPIC_POST = 'subscribed_thread_post'
 
 NOTIFICATION_DEFINITIONS = {}
-NOTIFICATION_DESCRIPTIONS = {
-    NEW_MESSAGE: 'When I get a new message',
-    KICKED_FROM_GROUP: 'When I am kicked from my group',
-    GROUP_KICK_IMMINENT: 'When I am about to be automatically kicked from my group',
-    GROUP_DESTROYED: 'When my group is destroyed',
-    NEWS_POST: 'When there is a new post in a topic I\'m subscribed to',
-    SUBSCRIBED_TOPIC_POST: 'When there is a news post'
-}
-NOTIFICATION_NAMES = frozenset(NOTIFICATION_DESCRIPTIONS.keys())
+NOTIFICATION_NAMES = set()
 
 
 class InvalidNotificationError(RuntimeError):
@@ -41,7 +33,9 @@ class NotificationDefinition(object):
 
     name = None
     schema = None
-    should_notify_ingame = False
+    can_notify_ingame = False
+    setting_category = 'general'
+    setting_description = None
 
     def __init__(self):
         if not self.name:
@@ -50,10 +44,24 @@ class NotificationDefinition(object):
         if not self.schema:
             raise NotImplementedError('Notification must define a schema')
 
-        NOTIFICATION_DEFINITIONS[self.name] = self
+        if not self.setting_description:
+            raise NotImplementedError('Notification must define a setting_description')
 
     def get_html_description(self, data):
         raise NotImplementedError('Notification must implement an html description')
+
+
+# Fake definition for messages as they are similar but separate from real notifications
+class NewMessageNotification(NotificationDefinition):
+    name = NEW_MESSAGE
+    schema = Schema({})
+    can_notify_ingame = True
+    setting_category = 'messages'
+    setting_description = 'When I get a new message'
+
+    def get_html_description(self, data):
+        # doesn't show up in the notifications area of the site
+        return None
 
 
 class KickedFromGroupNotification(NotificationDefinition):
@@ -63,6 +71,8 @@ class KickedFromGroupNotification(NotificationDefinition):
         Required('group_name'): All(basestring, Length(min=1)),
         Optional('kicker_uuid'): All(basestring, Length(min=32, max=32))
     })
+    setting_category = 'groups'
+    setting_description = 'When I am kicked from my group'
 
     def get_html_description(self, data):
         group_name = data['group_name']
@@ -89,6 +99,8 @@ class GroupKickImminentNotification(NotificationDefinition):
     schema = Schema({
         Required('group_name'): All(basestring, Length(min=1))
     })
+    setting_category = 'groups'
+    setting_description = 'When I am about to be automatically kicked from my group'
 
     def get_html_description(self, data):
         group_name = data['group_name']
@@ -106,6 +118,8 @@ class GroupDestroyedNotification(NotificationDefinition):
         Required('group_name'): All(basestring, Length(min=1)),
         Optional('destroyer_uuid'): All(basestring, Length(min=32, max=32))
     })
+    setting_category = 'groups'
+    setting_description = 'When my group is destroyed'
 
     def get_html_description(self, data):
         group_name = data['group_name']
@@ -125,7 +139,7 @@ class GroupDestroyedNotification(NotificationDefinition):
                 group_name
             ))
 
-
+"""
 class NewGroupMemberNotification(NotificationDefinition):
 
     name = NEW_GROUP_MEMBER
@@ -134,6 +148,7 @@ class NewGroupMemberNotification(NotificationDefinition):
         Required('player_uuid'): All(basestring, Length(min=32, max=32)),
         Required('inviter_uuid'): All(basestring, Length(min=32, max=32))
     })
+    setting_description = 'When a new memeber joins my group'
 
     def get_html_description(self, data):
         group_name = data['group_name']
@@ -160,6 +175,7 @@ class GroupLandLimitGrowthNotification(NotificationDefinition):
         Required('amount'): Any(long, int),
         Required('new_limit'): Any(long, int)
     })
+    setting_description = 'When my group gains new land'
 
     def get_html_description(self, data):
         group_name = data['group_name']
@@ -172,6 +188,7 @@ class GroupLandLimitGrowthNotification(NotificationDefinition):
             amount,
             new_limit
         ))
+"""
 
 
 class NewsPostNotification(NotificationDefinition):
@@ -180,6 +197,9 @@ class NewsPostNotification(NotificationDefinition):
     schema = Schema({
         Required('post_id'): Any(long, int)
     })
+    can_notify_ingame = True
+    setting_category = 'forums'
+    setting_description = 'When there is a new post in a topic I\'m subscribed to'
 
     def get_html_description(self, data):
         post_id = data['post_id']
@@ -200,6 +220,9 @@ class SubscribedTopicPostNotification(NotificationDefinition):
     schema = Schema({
         Required('post_id'): Any(long, int)
     })
+    can_notify_ingame = True
+    setting_category = 'forums'
+    setting_description = 'When there is a news post'
 
     def get_html_description(self, data):
         post_id = data['post_id']
@@ -237,7 +260,13 @@ for name, value in globals().items():
         and issubclass(value, NotificationDefinition)
         and value != NotificationDefinition
     ):
-        value()
+        definiton = value()
+        NOTIFICATION_DEFINITIONS[definiton.name] = definiton
+        NOTIFICATION_NAMES.add(definiton.name)
+
+
+def get_setting_description(type):
+    return NOTIFICATION_DEFINITIONS[type].setting_description
 
 
 def validate_notification(type, data):

@@ -783,7 +783,12 @@ class NotificationPreference(db.Model, Base):
     @property
     def description(self):
         from standardweb.lib import notifications
-        return notifications.NOTIFICATION_DESCRIPTIONS[self.name]
+        return notifications.get_setting_description(self.name)
+
+    @property
+    def definition(self):
+        from standardweb.lib import notifications
+        return notifications.NOTIFICATION_DEFINITIONS[self.name]
 
 
 class ForumProfile(db.Model, Base):

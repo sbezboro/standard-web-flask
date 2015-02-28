@@ -27,17 +27,29 @@
                 <th class="checkbox">By email</th>
                 <th class="checkbox">In-game</th>
             </tr>
-            {% for preference in preferences %}
+            {% for category, preferences in grouped_preferences.iteritems() %}
+                {% for preference in preferences %}
+                    <tr>
+                        <td>
+                            {{ preference.description }}
+                        </td>
+                        <td class="checkbox">
+                            <input type="checkbox" name="{{ preference.name }}_email"
+                            {{ 'checked=checked' if preference.email }}>
+                        </td>
+                        <td class="checkbox">
+                            {% if preference.definition.can_notify_ingame %}
+                                <input type="checkbox" name="{{ preference.name }}_ingame"
+                                {{ 'checked=checked' if preference.ingame }}>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                {% endfor %}
                 <tr>
-                    <td>
-                        {{ preference.description }}
-                    </td>
-                    <td class="checkbox">
-                        <input type="checkbox" name="{{ preference.name }}_email" {{ 'checked=checked' if preference.email }}>
-                    </td>
-                    <td class="checkbox">
-                        <input type="checkbox" name="{{ preference.name }}_ingame" {{ 'checked=checked' if preference.ingame }}>
-                    </td>
+                    <th>&nbsp;</th>
                 </tr>
             {% endfor %}
         </table>
