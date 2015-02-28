@@ -15,7 +15,7 @@ def notify(notification_id):
         realtime.unread_notification_count(user)
         email.send_notification_email(user, notification)
 
-    if notification.should_notify_ingame and player:
+    if notification.can_notify_ingame and player:
         api.new_notification(player, notification)
 
 

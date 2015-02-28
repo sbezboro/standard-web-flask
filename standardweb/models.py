@@ -704,8 +704,8 @@ class Notification(db.Model, Base):
         return self.definition.get_html_description(self.data)
 
     @property
-    def should_notify_ingame(self):
-        return self.definition.should_notify_ingame
+    def can_notify_ingame(self):
+        return self.definition.can_notify_ingame
 
 
 class AccessLog(db.Model, Base):
