@@ -59,7 +59,9 @@
       $.ajax({
         url: '/notifications/read/' + notificationId,
         type: 'POST'
-      })
+      });
+
+      return false;
     });
 
     $window.scroll(function() {

@@ -933,12 +933,12 @@
     margin-left: 0;
 }
 
-.forum-form-section input[type='text'] {
+.forum-form-section .control-group input[type='text'] {
     margin-top: 0;
     width: 30%;
 }
 
-.forum-form-section input[type='text'].big {
+.forum-form-section .control-group input[type='text'].big {
     width: 50%;
 }
 

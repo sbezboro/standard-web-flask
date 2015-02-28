@@ -36,7 +36,7 @@ def make_celery(app):
     TaskBase = celery.Task
 
     # don't wrap tasks with app contexts in development
-    # since the tasks are run inline
+    # since the tasks are run synchronously
     if app.config.get('CELERY_ALWAYS_EAGER'):
         class ContextTask(TaskBase):
             abstract = True
