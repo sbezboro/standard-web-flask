@@ -1,5 +1,9 @@
+import logging
+
 from fabric.api import abort, run, local, cd, env, roles, execute, prefix
 import requests
+from webassets.script import CommandLineEnvironment
+from werkzeug import script
 
 from standardweb import app
 
@@ -17,15 +21,32 @@ env.roledefs = {
 
 
 def deploy():
-    local("git pull")
+    execute(_update_and_restart_services)
+    _rollbar_record_deploy()
 
-    execute(update_and_restart_services)
 
-    rollbar_record_deploy()
+def serve():
+    from flask_debugtoolbar import DebugToolbarExtension
+    DebugToolbarExtension(app)
+
+    app.run(host='0.0.0.0', threaded=True)
+
+
+def shell():
+    script.make_shell(lambda: {'app': app}, use_ipython=True)()
+
+
+def build_assets():
+    log = logging.getLogger('webassets')
+    log.addHandler(logging.StreamHandler())
+    log.setLevel(logging.DEBUG)
+
+    cmdenv = CommandLineEnvironment(env, log)
+    cmdenv.build()
 
 
 @roles('web')
-def update_and_restart_services():
+def _update_and_restart_services():
     with cd(CODE_DIR):
         with prefix('source %s/bin/activate' % ENV_DIR):
             run("git pull")
@@ -34,14 +55,14 @@ def update_and_restart_services():
             if result.failed:
                 abort('Could not install required packages. Aborting.')
 
-            run('python app.py assets')
+            run('fab build_assets')
 
             run('supervisorctl restart %s' % WEB_SERVICE)
             run('supervisorctl restart %s' % TASK_SERVICE)
             run('supervisorctl restart %s' % SCHEDULE_SERVICE)
 
 
-def rollbar_record_deploy():
+def _rollbar_record_deploy():
     access_token = app.config['ROLLBAR_ACCESS_TOKEN']
     environment = 'production'
 
