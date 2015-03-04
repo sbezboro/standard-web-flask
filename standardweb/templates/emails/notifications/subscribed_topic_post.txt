@@ -2,7 +2,7 @@
 
 {% block content %}
 Hi {{ username }}!
-There was a new reply in a topic you are subscribed to:
+{% if post_player %}{{ post_player.displayname }}{% else %}{{ post_username }}{% endif %} just posted a new reply in a topic you are subscribed to:
 
 {{ post_body }}
 

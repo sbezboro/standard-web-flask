@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 from flask import flash
 from flask import g
-from flask import make_response
 from flask import redirect
 from flask import request
 from flask import render_template

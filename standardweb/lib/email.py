@@ -108,7 +108,7 @@ def send_new_message_email(user, message):
 
     from_player_url = None
     if from_user.player:
-        from_player_url = url_for('player', username=from_username, _external=True)
+        from_player_url = url_for('player', username=from_user.player.uuid, _external=True)
 
     unsubscribe_link = notifications.generate_unsubscribe_link(user, 'new_message')
 
@@ -179,12 +179,17 @@ def send_subscribed_topic_post_email(user, notification):
 
     post = ForumPost.query.options(
         joinedload(ForumPost.topic)
+    ).options(
+        joinedload(ForumPost.user)
+        .joinedload(User.player)
     ).get(post_id)
 
     topic = post.topic
+    player = post.user.player
 
     notifications_url = url_for('notifications', _external=True)
     forum_post_url = url_for('forum_post', post_id=post_id, _external=True)
+    post_player_url = url_for('player', username=player.uuid, _external=True) if player else None
     unsubscribe_topic_url = url_for('forum_topic_unsubscribe', topic_id=topic.id, _external=True)
     unsubscribe_url = notifications.generate_unsubscribe_link(user, notifications.SUBSCRIBED_TOPIC_POST)
 
@@ -193,6 +198,9 @@ def send_subscribed_topic_post_email(user, notification):
         'post_body': post.body,
         'post_body_html': post.body_html,
         'post_url': forum_post_url,
+        'post_username': post.user.get_username(),
+        'post_player': player,
+        'post_player_url': post_player_url,
         'unsubscribe_topic_url': unsubscribe_topic_url,
         'unsubscribe_url': unsubscribe_url,
         'notifications_url': notifications_url
@@ -230,6 +238,44 @@ def send_group_kick_imminent_email(user, notification):
     )
 
 
+@notification_email(notifications.KICKED_FROM_GROUP)
+def send_kicked_from_group_email(user, notification):
+    to_email = user.email
+
+    if not to_email:
+        return
+
+    group_name = notification.data['group_name']
+    kicker_uuid = notification.data.get('kicker_uuid')
+
+    kicker = None
+    kicker_url = None
+    if kicker_uuid:
+        kicker = Player.query.filter_by(uuid=kicker_uuid).first()
+        kicker_url = url_for('player', username=kicker.uuid, _external=True)
+
+    group_url = url_for('group', name=group_name, _external=True)
+    notifications_url = url_for('notifications', _external=True)
+    unsubscribe_url = notifications.generate_unsubscribe_link(user, notifications.KICKED_FROM_GROUP)
+
+    text_body, html_body = _render_email('notifications/kicked_from_group', to_email, {
+        'username': user.get_username(),
+        'group_name': group_name,
+        'group_url': group_url,
+        'kicker': kicker,
+        'kicker_url': kicker_url,
+        'unsubscribe_url': unsubscribe_url,
+        'notifications_url': notifications_url
+    })
+
+    send_email(
+        to_email,
+        '[Standard Survival] You were kicked from your group!',
+        text_body,
+        html_body
+    )
+
+
 @notification_email(notifications.GROUP_DESTROYED)
 def send_group_destroyed_email(user, notification):
     to_email = user.email
@@ -244,16 +290,14 @@ def send_group_destroyed_email(user, notification):
     destroyer_url = None
     if destroyer_uuid:
         destroyer = Player.query.filter_by(uuid=destroyer_uuid).first()
-        destroyer_url = url_for('player', username=destroyer.username)
+        destroyer_url = url_for('player', username=destroyer.uuid, _external=True)
 
-    group_url = url_for('group', name=group_name, _external=True)
     notifications_url = url_for('notifications', _external=True)
     unsubscribe_url = notifications.generate_unsubscribe_link(user, notifications.GROUP_DESTROYED)
 
     text_body, html_body = _render_email('notifications/group_destroyed', to_email, {
         'username': user.get_username(),
         'group_name': group_name,
-        'group_url': group_url,
         'destroyer': destroyer,
         'destroyer_url': destroyer_url,
         'unsubscribe_url': unsubscribe_url,

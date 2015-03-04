@@ -1,0 +1,12 @@
+{% extends 'emails/base.txt' %}
+
+{% block content %}
+Hey {{ username }}!
+
+{% if kicker %}
+You were kicked from the group {{ group_name }} by {{ kicker.displayname }}!
+{% else %}
+You were automatically kicked from the group {{ group_name }}!
+{% endif %}
+
+{% endblock %}

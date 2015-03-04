@@ -2,7 +2,14 @@
 
 {% block content %}
     <h3>Hi {{ username }}!</h3>
-    <p>There was a new reply in a topic you are subscribed to:</p>
+    <p>
+        {% if post_player %}
+            <a href="{{ post_player_url }}">{{ post_player.displayname_html|safe }}</a>
+        {% else %}
+            {{ post_username }}
+        {% endif %}
+        just posted a new reply in a topic you are subscribed to:
+    </p>
     <div style="margin-left: 20px; max-width: 900px">
         <p>{{ post_body_html|safe }}</p>
     </div>

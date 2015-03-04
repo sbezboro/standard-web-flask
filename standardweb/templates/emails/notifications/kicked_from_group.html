@@ -1,0 +1,11 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    <h3>Hey {{ username }}!</h3>
+    {% if kicker %}
+        <p>You were kicked from the group <a href="{{ group_url }}">{{ group_name }}</a> by <a href="{{ kicker_url }}">{{ kicker.displayname_html|safe }}</a>!</p>
+    {% else %}
+        <p>You were automatically kicked from the group <a href="{{ group_url }}">{{ group_name }}</a>!</p>
+    {% endif %}
+    <br>
+{% endblock %}

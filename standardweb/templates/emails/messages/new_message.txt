@@ -10,5 +10,6 @@ You just received a new message from {{ from_username }}:
 
 
 See the full conversation at: {{ conversation_url }}
+You can reply to this email to quickly reply to the message.
 
 {% endblock %}
