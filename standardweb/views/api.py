@@ -304,17 +304,20 @@ def past_usernames():
 
 @server_api
 def join_server():
-    url = url_for('messages', _external=True)
+    messages_url = url_for('messages', _external=True)
+    notifications_url = url_for('notifications', _external=True)
     uuid = request.form.get('uuid')
 
     player = Player.query.filter_by(uuid=uuid).first()
 
+    num_new_notifications = 0
     num_new_messages = 0
     from_uuids = set()
     no_user = True
 
     if player:
         no_user = not player.user
+        no_user = True
 
         messages = Message.query.options(
             joinedload(Message.from_user)
@@ -325,18 +328,27 @@ def join_server():
         )
 
         for message in messages:
-            player = message.from_user.player
-            if player:
-                from_uuids.add(player.uuid)
+            from_player = message.from_user.player
+            if from_player:
+                from_uuids.add(from_player.uuid)
 
             num_new_messages += 1
+
+        num_new_notifications = Notification.query.filter_by(
+            player=player,
+            seen_at=None
+        ).count()
 
     return jsonify({
         'err': 0,
         'player_messages': {
             'num_new_messages': num_new_messages,
             'from_uuids': list(from_uuids),
-            'url': url
+            'url': messages_url
+        },
+        'player_notifications': {
+            'num_new_notifications': num_new_notifications,
+            'url': notifications_url
         },
         'no_user': no_user
     })
@@ -547,6 +559,7 @@ def message_reply():
                 to_user = User.query.options(
                     joinedload(User.player)
                 ).get(reply_to_user_id)
+
                 from_user = User.query.options(
                     joinedload(User.player)
                 ).get(reply_from_user_id)
