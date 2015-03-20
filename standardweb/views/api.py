@@ -317,7 +317,6 @@ def join_server():
 
     if player:
         no_user = not player.user
-        no_user = True
 
         messages = Message.query.options(
             joinedload(Message.from_user)
