@@ -207,6 +207,21 @@
     StandardWeb.refreshFromnow();
 
     $('.placeholder').placeholder();
-    $('.tooltip').tipsy();
+
+    $('.tooltip').each(function() {
+      var $elem = $(this);
+      var opts = {};
+
+      var i;
+      var props = ['gravity', 'offset'];
+      for (i = 0; i < props.length; ++i) {
+        var propValue = $elem.data('tooltip-' + props[i]);
+        if (propValue) {
+          opts[props[i]] = propValue;
+        }
+      }
+
+      $elem.tipsy(opts);
+    });
   });
 })(window, document, $);

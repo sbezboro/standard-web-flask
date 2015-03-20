@@ -5,7 +5,7 @@
         </div>
         <div class="col-1-4 align-right">
             {{ notification.timestamp|from_now }}
-            <i class="fa fa-check read"></i>
+            <i class="fa fa-check read {% if not notification.seen_at %}tooltip{% endif %}" data-tooltip-gravity="w" data-tooltip-offset="7" title="Mark as read"></i>
         </div>
     </div>
 {%- endmacro %}
