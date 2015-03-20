@@ -4,6 +4,7 @@ import cgi
 import re
 
 from standardweb import app
+from standardweb.models import AuditLog, ForumTopicSubscription
 
 
 _bbcode_parser = bbcode.Parser(replace_links=False)
@@ -74,6 +75,19 @@ def _render_quote(tag_name, value, options, parent, context):
         return '<blockquote><span class="quote-username">%s</span>%s</blockquote>' % (name, value)
 
     return '<blockquote>%s</blockquote>' % value
+
+
+def subscribe_to_topic(user, topic, commit=True):
+    subscription = ForumTopicSubscription(
+        user=user,
+        topic=topic
+    )
+
+    subscription.save(commit=False)
+
+    AuditLog.create('topic_subscribe', user_id=user.id, data={
+        'topic_id': topic.id
+    }, commit=commit)
 
 
 _bbcode_parser.add_simple_formatter('img', '<img src="%(value)s"/>')

@@ -165,11 +165,12 @@ class NewTopicForm(ImageUploadForm):
     title = TextField('Title', validators=[DataRequired()])
     body = TextAreaField('Body', validators=[DataRequired()])
     notify_all = BooleanField('Notify all users', validators=[Optional()])
-    subscribe = BooleanField('Get emails for replies in this topic', validators=[Optional()])
+    subscribe = BooleanField('Get emailed about replies in this topic', validators=[Optional()])
 
 
 class PostForm(ImageUploadForm):
     body = TextAreaField('Body', validators=[DataRequired()])
+    subscribe = BooleanField('Get emailed about replies in this topic', validators=[Optional()])
 
 
 class MoveTopicForm(BaseForm):

@@ -15,7 +15,7 @@
         <div class="controls">
             {% if subscription %}
                 <a href="{{ url_for('forum_topic_unsubscribe', topic_id=topic.id) }}">Unsubscribe</a>
-            {% else %}
+            {% elif user and user.email %}
                 <a href="{{ url_for('forum_topic_subscribe', topic_id=topic.id) }}">Subscribe to replies in this topic</a>
             {% endif %}
         </div>
@@ -157,6 +157,16 @@
                         <fieldset>
                             {{ render_field(form.body, vertical=True) }}
                             {{ render_field(form.image, vertical=True) }}
+
+                            {% if not subscription %}
+                                <div class="control-group checkbox {{ 'disabled' if not user.email }}">
+                                    {% if user.email %}
+                                        {{ form.subscribe() }} {{ form.subscribe.label }}
+                                    {% else %}
+                                        {{ form.subscribe(disabled='disabled') }} {{ form.subscribe.label }} - To enable this option set your email <a href="{{ url_for('profile_settings') }}">here</a>.
+                                    {% endif %}
+                                </div>
+                            {% endif %}
 
                             <div class="control-group">
                                 <div class="control">

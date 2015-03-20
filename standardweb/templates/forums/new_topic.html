@@ -28,11 +28,11 @@
                         </div>
                     {% endif %}
 
-                    <div class="control-group checkbox {{ 'disabled' if not user.email}}">
+                    <div class="control-group checkbox {{ 'disabled' if not user.email }}">
                         {% if user.email %}
                             {{ form.subscribe() }} {{ form.subscribe.label }}
                         {% else %}
-                            {{ form.subscribe(disabled='disabled') }} {{ form.subscribe.label }} <br> To enable this option set your email <a href="{{ url_for('profile_settings') }}">here</a>.
+                            {{ form.subscribe(disabled='disabled') }} {{ form.subscribe.label }} - To enable this option set your email <a href="{{ url_for('profile_settings') }}">here</a>.
                         {% endif %}
                     </div>
 

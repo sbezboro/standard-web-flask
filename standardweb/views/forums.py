@@ -16,6 +16,7 @@ from sqlalchemy.orm import joinedload
 from standardweb import app, db
 from standardweb.forms import MoveTopicForm, PostForm, NewTopicForm, ForumSearchForm
 from standardweb.lib import api
+from standardweb.lib import forums as libforums
 from standardweb.lib import notifications
 from standardweb.lib.notifier import notify_news_post, notify_subscribed_topic_post
 from standardweb.models import (
@@ -283,6 +284,7 @@ def forum_topic(topic_id):
 
         body = form.body.data
         image = form.image.data
+        subscribe = form.subscribe.data
 
         last_post = topic.last_post
         if last_post.body == body and last_post.user_id == user.id:
@@ -306,6 +308,9 @@ def forum_topic(topic_id):
         if image:
             if not ForumAttachment.create_attachment(post.id, image, commit=True):
                 flash('There was a problem with the upload', 'error')
+
+        if subscribe:
+            libforums.subscribe_to_topic(user, topic, commit=True)
 
         api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=False)
 
@@ -458,16 +463,7 @@ def new_topic(forum_id):
             notify_news_post(post)
 
         if subscribe:
-            subscription = ForumTopicSubscription(
-                user=user,
-                topic=topic
-            )
-
-            subscription.save(commit=False)
-
-            AuditLog.create('topic_subscribe', user_id=user.id, data={
-                'topic_id': topic.id
-            }, commit=True)
+            libforums.subscribe_to_topic(user, topic, commit=True)
 
         api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=True)
 
@@ -798,16 +794,7 @@ def forum_topic_subscribe(topic_id):
     if subscription:
         flash('You are already subscribed to this topic.', 'warning')
     else:
-        subscription = ForumTopicSubscription(
-            user=user,
-            topic=topic
-        )
-
-        subscription.save(commit=False)
-
-        AuditLog.create('topic_subscribe', user_id=user.id, data={
-            'topic_id': topic.id
-        }, commit=True)
+        libforums.subscribe_to_topic(user, topic, commit=True)
 
         flash('Subscribed successfully! You will be notified when someone replies.', 'success')
 
