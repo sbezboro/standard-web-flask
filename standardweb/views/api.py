@@ -496,32 +496,6 @@ def contact_query():
         'contacts': contacts
     })
 
-@api_func
-def mark_messages_read():
-    user = g.user
-    if not user:
-        return jsonify({
-            'err': 1,
-            'message': 'Must be logged in'
-        })
-
-    other_user_id = request.form.get('other_user_id')
-
-    Message.query.filter_by(
-        from_user_id=other_user_id,
-        to_user=user
-    ).update({
-        'seen_at': datetime.utcnow()
-    })
-
-    db.session.commit()
-
-    realtime.unread_message_count(user)
-
-    return jsonify({
-        'err': 0
-    })
-
 
 @api_func
 def message_reply():

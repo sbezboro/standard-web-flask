@@ -1,13 +1,16 @@
 from datetime import datetime, timedelta
 
-from flask import abort
-from flask import after_this_request
-from flask import flash
-from flask import g
-from flask import render_template
-from flask import redirect
-from flask import request
-from flask import url_for
+from flask import (
+    abort,
+    after_this_request,
+    flash,
+    g,
+    jsonify,
+    render_template,
+    redirect,
+    request,
+    url_for
+)
 from markupsafe import Markup
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
@@ -168,6 +171,35 @@ def new_message():
     }
 
     return render_template('messages/index.html', **template_vars)
+
+
+@app.route('/messages/mark_read', methods=['POST'])
+@login_required()
+def read_message():
+    user = g.user
+    if not user:
+        return jsonify({
+            'err': 1,
+            'message': 'Must be logged in'
+        })
+
+    other_user_id = request.form.get('other_user_id')
+
+    Message.query.filter_by(
+        from_user_id=other_user_id,
+        to_user=user,
+        seen_at=None
+    ).update({
+        'seen_at': datetime.utcnow()
+    })
+
+    db.session.commit()
+
+    realtime.unread_message_count(user)
+
+    return jsonify({
+        'err': 0
+    })
 
 
 def get_contact_list(user):

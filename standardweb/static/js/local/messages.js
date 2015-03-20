@@ -113,7 +113,7 @@
           StandardWeb.refreshFromnow($newMessage);
 
           $.ajax({
-            url: '/api/v1/mark_messages_read',
+            url: '/messages/mark_read',
             type: 'POST',
             data: {other_user_id: fromUserId}
           });
