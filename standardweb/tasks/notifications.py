@@ -1,7 +1,11 @@
+from datetime import datetime, timedelta
+
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
-from standardweb import celery
+
+from standardweb import celery, db, app
 from standardweb.lib import api, email, notifications, realtime
-from standardweb.models import Notification, User, ForumPost, ForumTopicSubscription
+from standardweb.models import ForumPost, ForumTopicSubscription, Notification, Player, PlayerStats, User
 
 
 @celery.task()
@@ -21,15 +25,30 @@ def notify(notification_id):
 
 @celery.task()
 def notify_news_post_all(forum_post_id):
-    users = User.query.filter(
-        User.email != None
-    )
+    # Create notifications for the players active in the past month or all users with valid emails
+    recipients = db.session.query(
+        Player.id, User.id
+    ).outerjoin(
+        User
+    ).join(
+        PlayerStats
+    ).filter(
+        or_(
+            and_(
+                PlayerStats.server_id == app.config.get('MAIN_SERVER_ID'),
+                PlayerStats.last_seen > datetime.utcnow() - timedelta(days=30)
+            ),
+            User.email != None
+        )
+    ).distinct(
+        Player.id, User.id
+    ).all()
 
-    for user in users:
+    for player_id, user_id in recipients:
         Notification.create(
             notifications.NEWS_POST,
-            user_id=user.id,
-            player_id=user.player_id,
+            user_id=user_id,
+            player_id=player_id,
             post_id=forum_post_id
         )
 
