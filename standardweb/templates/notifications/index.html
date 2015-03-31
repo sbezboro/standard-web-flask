@@ -32,5 +32,7 @@
         {% if oldest_id %}
             StandardWeb.notifications.oldestId = {{ oldest_id }};
         {% endif %}
+
+        mixpanel.track('notifications page view');
     </script>
 {% endblock %}
