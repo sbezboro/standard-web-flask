@@ -791,21 +791,4 @@
         padding: 0;
         font-size: 8px;
     }
-
-    .player-servers .server-sidebar {
-        display: none;
-    }
-
-    .player-servers .server-details {
-        margin-left: 0;
-        width: 100%;
-    }
-
-    .player-section .server-details .stat {
-        width: 100%;
-    }
-
-    .player-section .server-details .stat-name {
-        margin-left: 20px;
-    }
 }
