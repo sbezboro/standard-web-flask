@@ -4,11 +4,7 @@ import os
 import time
 import uuid
 
-from flask import abort
-from flask import g
-from flask import request
-from flask import session
-from flask import url_for
+from flask import abort, g, redirect, request, session, url_for
 import rollbar
 
 from standardweb import app
@@ -53,6 +49,17 @@ def csrf_protect():
 
                 csrf.regenerate_token()
                 abort(403)
+
+
+@app.before_request
+def force_auth_ssl():
+    # minimize MITM by making sure logged in sessions are secure after first non-secure request
+    if (
+        g.user and
+        app.config.get('SSL_REDIRECTION') and
+        not request.is_secure
+    ):
+        return redirect(request.url.replace('http://', 'https://'))
 
 
 @app.before_request
