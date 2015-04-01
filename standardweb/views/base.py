@@ -134,8 +134,8 @@ def player(username, server_id=None):
         )
     }
 
-    if len(username) == 32:
-        player = Player.query.filter_by(uuid=username).first()
+    if len(username) in (32, 36):
+        player = Player.query.filter_by(uuid=username.replace('-', '')).first()
         if player:
             return redirect(url_for('player', username=player.username,
                                     server_id=app.config['MAIN_SERVER_ID']))

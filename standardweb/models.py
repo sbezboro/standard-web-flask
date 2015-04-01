@@ -5,6 +5,7 @@ from operator import attrgetter
 import os
 from pbkdf2 import pbkdf2_bin
 import re
+import uuid
 
 from flask import json
 from flask import url_for
@@ -296,6 +297,10 @@ class Player(db.Model, Base):
         return list(set([
             log.data['old_name'] for log in logs
         ]))
+
+    @property
+    def display_uuid(self):
+        return str(uuid.UUID(self.uuid))
 
 
 class PlayerStats(db.Model, Base):

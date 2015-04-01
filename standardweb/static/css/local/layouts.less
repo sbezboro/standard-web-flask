@@ -1,6 +1,10 @@
 @import 'media';
 @import 'mixins';
 
+.grid.flush [class*='col-'] {
+    padding-right: 0;
+}
+
 [class*='col-'] {
   .box-sizing(border-box);
 

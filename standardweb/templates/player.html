@@ -19,8 +19,13 @@
     <div class="container">
         {% include 'includes/flash_messages.html' %}
         {% if player %}
-        <div class="player-section">
-            <div class="player-header">
+        <div class="border-section player-section">
+            <div class="section-header">
+                <div class="pull-right">
+                    {% if user and player.user != user %}
+                        <a class="btn btn-lite" href="{{ url_for('messages', username=player.username) }}">Send Message</a>
+                    {% endif %}
+                </div>
                 {{ player.username|face_large }}
                 <div class="player-detail">
                     <h2>
@@ -31,28 +36,26 @@
                             ({{ player.username }})
                         </h3>
                     {% endif %}
-                </div>
-                <div class="messaging">
-                    {% if user and player.user != user %}
-                        <a class="btn btn-lite" href="{{ url_for('messages', username=player.username) }}">Send Message</a>
-                    {% endif %}
+                    <div class="player-uuid">
+                        {{ player.display_uuid }}
+                    </div>
                 </div>
             </div>
-            <div class="player-global-stats">
+            <div class="section-inner">
                 <h4>Global stats</h4>
-                <div class="stat">
+                <div class="section-stat">
                     <div class="stat-name">Total time played</div>
                     <div class="stat-value">
                         {{ total_time }}
                     </div>
                 </div>
-                <div class="stat">
+                <div class="section-stat">
                     <div class="stat-name">First seen</div>
                     <div class="stat-value">
                         {{ first_ever_seen|from_now }}
                     </div>
                 </div>
-                <div class="stat">
+                <div class="section-stat">
                     <div class="stat-name">Last seen</div>
                     <div class="stat-value">
                         {% if online_now %}
@@ -66,7 +69,7 @@
                     {% with profile = player.user.forum_profile, last_post = profile.last_post %}
                         {% if profile and profile.post_count and last_post %}
                             <br>
-                            <div class="stat">
+                            <div class="section-stat">
                                 <div class="stat-name">Forum posts</div>
                                 <div class="stat-value">
                                     <a href="{{ url_for('forum_search', user_id=player.user.id) }}">
@@ -74,7 +77,7 @@
                                     </a>
                                 </div>
                             </div>
-                            <div class="stat">
+                            <div class="section-stat">
                                 <div class="stat-name">Last post</div>
                                 <div class="stat-value">
                                     <a href="{{ last_post.url }}">
@@ -89,7 +92,7 @@
                 {% with past_usernames = player.past_usernames %}
                     {% if past_usernames %}
                         <br>
-                        <div class="stat">
+                        <div class="section-stat">
                             <div class="stat-name">Past usernames</div>
                             <div class="stat-value">
                                 {{ past_usernames|join(', ') }}
@@ -100,20 +103,20 @@
 
                 {% if player.titles %}
                     <br>
-                    <div class="stat">
+                    <div class="section-stat">
                         <div class="stat-name">Titles</div>
                             <div class="stat-value">
                                 {% for title in player.titles %}
-                                    <span class="title">{{ title.name }}</span>
+                                    <span class="player-title">{{ title.name }}</span>
                                 {% endfor %}
                             </div>
                         </div>
                 {% endif %}
             </div>
         </div>
-        <div class="player-section">
-            <div class="player-servers">
-                <div class="server-sidebar">
+        <div class="border-section player-section">
+            <div class="section-sidebar-area">
+                <div class="sidebar">
                     <ul>
                         {% for s in servers %}
                             <a href="{{ url_for('player', server_id=s.id, username=player.username) }}">
@@ -123,145 +126,67 @@
                     </ul>
                 </div>
                 {% if server_stats %}
-                    <div class="server-details">
+                    <div class="sidebar-details server-details">
                         <h4>Server stats</h4>
-                        <div class="stat">
-                            <div class="stat-name">Rank</div>
-                            <div class="stat-value">
-                                {{ server_stats.rank }}
+                        <div class="grid flush">
+                            <div class="section-stat col-1-2">
+                                <div class="stat-name">Rank</div>
+                                <div class="stat-value">
+                                    {{ server_stats.rank }}
+                                </div>
                             </div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-name">Time played</div>
-                            <div class="stat-value">
-                                {{ server_stats.time_spent }}
+                            <div class="section-stat col-1-2">
+                                <div class="stat-name">Time played</div>
+                                <div class="stat-value">
+                                    {{ server_stats.time_spent }}
+                                </div>
                             </div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-name">Group</div>
-                            <div class="stat-value">
-                                {% if server_stats.group %}
-                                <a href="{{ url_for('group', server_id=server.id, name=server_stats.group.name) }}">
-                                    {{ server_stats.group.name }}
-                                </a>
-                                {% else %}
-                                none
-                                {% endif %}
+                            <div class="section-stat col-1-2">
+                                <div class="stat-name">Group</div>
+                                <div class="stat-value">
+                                    {% if server_stats.group %}
+                                    <a href="{{ url_for('group', server_id=server.id, name=server_stats.group.name) }}">
+                                        {{ server_stats.group.name }}
+                                    </a>
+                                    {% else %}
+                                    none
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-name">PVP logs</div>
-                            <div class="stat-value">
-                                {{ server_stats.pvp_logs }}
+                            <div class="section-stat col-1-2">
+                                <div class="stat-name">PVP logs</div>
+                                <div class="stat-value">
+                                    {{ server_stats.pvp_logs }}
+                                </div>
                             </div>
                         </div>
                         {% if server.id != 1 %}
                             <h4>Ore discoveries</h4>
-                            {% for type, count in server_stats.ore_counts %}
-                                <div class="stat">
-                                    <div class="stat-name">{{ type }}</div>
-                                    <div class="stat-value">
-                                        {{ count }}
+                            <div class="grid flush">
+                                {% for type, count in server_stats.ore_counts %}
+                                    <div class="section-stat col-1-2">
+                                        <div class="stat-name">{{ type }}</div>
+                                        <div class="stat-value">
+                                            {{ count }}
+                                        </div>
                                     </div>
-                                </div>
-                            {% endfor %}
+                                {% endfor %}
+                            </div>
                         {% endif %}
                         <h4>Combat</h4>
-                        <div class="stat">
-                            <div class="stat-name">PVP kills</div>
-                            <div class="stat-value">
-                                <b>{{ combat_stats.pvp_kill_count }}</b>
-                            </div>
-                            <div class="other-stat">
-                                {% for kill in combat_stats.pvp_kills %}
-                                    <div class="stat-name {% if loop.index >= 10 %}hidden{% endif %}">
-                                        <a href="{{ url_for('player', server_id=server.id, username=kill.player.username) }}">
-                                            {{ kill.player.username|face_thumb(scaled_size=12) }}
-                                            {{ kill.player.displayname_html|safe }}
-                                        </a>
-                                    </div>
-                                    <div class="stat-value {% if loop.index >= 10 %}hidden{% endif %}">
-                                        {{ kill.count }}
-                                    </div>
-                                {% endfor %}
-                                {% if combat_stats.pvp_kills|length > 10 %}
-                                    <div class="stat-name load-all">
-                                        <a href="#">show all...</a>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-name">PVP deaths</div>
-                            <div class="stat-value">
-                                <b>{{ combat_stats.pvp_death_count }}</b>
-                            </div>
-                            <div class="other-stat">
-                                {% for death in combat_stats.pvp_deaths %}
-                                    <div class="stat-name {% if loop.index >= 10 %}hidden{% endif %}">
-                                        <a href="{{ url_for('player', server_id=server.id, username=death.player.username) }}">
-                                            {{ death.player.username|face_thumb(scaled_size=12) }}
-                                            {{ death.player.displayname_html|safe }}
-                                        </a>
-                                    </div>
-                                    <div class="stat-value {% if loop.index >= 10 %}hidden{% endif %}">
-                                        {{ death.count }}
-                                    </div>
-                                {% endfor %}
-                                {% if combat_stats.pvp_deaths|length > 10 %}
-                                    <div class="stat-name load-all">
-                                        <a href="#">show all...</a>
-                                    </div>
-                                {% endif %}
-                            </div>
+                        <div class="grid flush">
+                            {{ render_combat_stats('PVP kills', combat_stats.pvp_kill_count, combat_stats.pvp_kills) }}
+                            {{ render_combat_stats('PVP deaths', combat_stats.pvp_death_count, combat_stats.pvp_deaths) }}
                         </div>
                         <br>
                         <br>
-                        <div class="stat">
-                            <div class="stat-name">Other kills</div>
-                            <div class="stat-value">
-                                <b>{{ combat_stats.other_kill_count }}</b>
-                            </div>
-                            <div class="other-stat">
-                                {% for kill in combat_stats.other_kills %}
-                                    <div class="stat-name {% if loop.index >= 10 %}hidden{% endif %}">
-                                        {{ kill.type }}
-                                    </div>
-                                    <div class="stat-value {% if loop.index >= 10 %}hidden{% endif %}">
-                                        {{ kill.count }}
-                                    </div>
-                                {% endfor %}
-                                {% if combat_stats.other_kills|length > 10 %}
-                                    <div class="stat-name load-all">
-                                        <a href="#">show all...</a>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-name">Other deaths</div>
-                            <div class="stat-value">
-                                <b>{{ combat_stats.other_death_count }}</b>
-                            </div>
-                            <div class="other-stat">
-                                {% for death in combat_stats.other_deaths %}
-                                    <div class="stat-name {% if loop.index >= 10 %}hidden{% endif %}">
-                                        {{ death.type }}
-                                    </div>
-                                    <div class="stat-value {% if loop.index >= 10 %}hidden{% endif %}">
-                                        {{ death.count }}
-                                    </div>
-                                {% endfor %}
-                                {% if combat_stats.other_deaths|length > 10 %}
-                                    <div class="stat-name load-all">
-                                        <a href="#">show all...</a>
-                                    </div>
-                                {% endif %}
-                            </div>
+                        <div class="grid flush">
+                            {{ render_combat_stats('Other kills', combat_stats.other_kill_count, combat_stats.other_kills) }}
+                            {{ render_combat_stats('Other deaths', combat_stats.other_death_count, combat_stats.other_deaths) }}
                         </div>
                     </div>
                 {% else %}
-                    <div class="server-details no-data">
+                    <div class="sidebar-details server-details no-data">
                         <h3>No record of {{ player.displayname|safe }} on this server</h3>
                     </div>
                 {% endif %}
@@ -275,10 +200,44 @@
     <script>
         $(document).ready(function() {
             $('.load-all').on('click', function() {
-                $(this).closest('.other-stat').find('.hidden').removeClass('hidden');
+                $(this).siblings('.other.hidden').removeClass('hidden');
                 $(this).addClass('hidden');
                 return false;
             });
         });
     </script>
 {% endblock %}
+
+{% macro render_combat_stats(label, count, values) -%}
+    <div class="col-1-2">
+        <div class="section-stat">
+            <div class="stat-name">{{ label }}</div>
+            <div class="stat-value">
+                <b>{{ count }}</b>
+            </div>
+        </div>
+        {% for value in values %}
+            <div class="section-stat other {% if loop.index >= 10 %}hidden{% endif %}">
+                <div class="stat-name">
+                    {% if value.player %}
+                        <a href="{{ url_for('player', server_id=server.id, username=value.player.username) }}">
+                            {{ value.player.username|face_thumb(scaled_size=12) }}
+                            {{ value.player.displayname_html|safe }}
+                        </a>
+                    {% else %}
+                        {{ value.type }}
+                    {% endif %}
+                </div>
+                <div class="stat-value">
+                    {{ value.count }}
+                </div>
+            </div>
+        {% endfor %}
+        <div class="clearfix"></div>
+        {% if values|length > 10 %}
+            <div class="load-all">
+                <a href="#">show all...</a>
+            </div>
+        {% endif %}
+    </div>
+{%- endmacro %}

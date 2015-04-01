@@ -1,0 +1,88 @@
+@import '../media';
+@import '../mixins';
+
+.player-section {
+  margin-top: 40px;
+  font-size: 13px;
+
+  .section-header .player-detail {
+    display: inline-block;
+    margin-left: 10px;
+    vertical-align: top;
+
+    h2 {
+      margin: 0;
+      vertical-align: top;
+    }
+
+    h3 {
+      margin: 5px 0 0 0;
+      vertical-align: top;
+      color: #777;
+      font-size: 17px;
+    }
+
+    .player-uuid {
+      color: #aaa;
+      margin-top: 5px;
+    }
+  }
+
+  .server-details {
+    h4 {
+      border-bottom: 1px solid #d8d8d8;
+      padding: 20px 20px 7px 20px;
+    }
+
+    &.no-data {
+      color: #aaa;
+      padding: 85px 0;
+      text-align: center;
+    }
+
+    .section-stat {
+      .stat-name {
+        margin-left: 70px;
+        width: 170px;
+
+        @media @tablet, @mobile {
+          margin-left: 20px;
+          width: 150px
+        }
+      }
+
+      &.other {
+        clear: both;
+        margin-bottom: 0;
+
+        .stat-name {
+          font-weight: normal;
+
+          a {
+            color: #545454;
+
+            &:hover {
+              color: #AAA;
+            }
+          }
+        }
+      }
+    }
+
+    .load-all {
+      margin-left: 142px;
+
+      @media @tablet, @mobile {
+      margin-left: 80px;
+      }
+
+      a {
+        color: #999;
+
+        &:hover {
+          color: #ccc;
+        }
+      }
+    }
+  }
+}
