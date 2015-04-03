@@ -25,6 +25,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'standardweb.jobs.backup.db_backup',
         'schedule': crontab(minute=0, hour=12)  # 4AM PST
     },
+    'username-checks': {
+        'task': 'standardweb.jobs.usernames.schedule_checks',
+        'schedule': crontab(minute=0, hour=8)  # 12AM PST
+    }
 }
 
 ASSETS_DEBUG = False

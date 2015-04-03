@@ -13,9 +13,11 @@ def lookup_usernames(usernames):
         'Content-Type': 'application/json'
     }
 
-    resp = requests.post('https://api.mojang.com/profiles/page/1',
-                         data=data,
-                         headers=headers)
+    resp = requests.post(
+        'https://api.mojang.com/profiles/page/1',
+        data=data,
+        headers=headers
+    )
 
     return resp.json()["profiles"]
 
@@ -27,3 +29,11 @@ def lookup_username(username):
         return result[0]['id']
 
     return None
+
+
+def lookup_latest_username_by_uuid(uuid):
+    resp = requests.get(
+        'https://api.mojang.com/user/profiles/%s/names' % uuid
+    )
+
+    return resp.json()[-1]['name']

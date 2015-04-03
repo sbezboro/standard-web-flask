@@ -11,7 +11,7 @@ from standardweb.lib import api
 from standardweb.lib.constants import *
 from standardweb.models import (
     Group, PlayerStats, GroupInvite, Player, AuditLog, PlayerActivity, IPTracking,
-    ServerStatus, MojangStatus, Server, Title
+    ServerStatus, MojangStatus, Server
 )
 
 
