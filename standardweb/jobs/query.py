@@ -7,7 +7,7 @@ from sqlalchemy import not_
 from sqlalchemy.orm import joinedload
 
 from standardweb import app, celery, db
-from standardweb.lib import api
+from standardweb.lib import api, minecraft_uuid
 from standardweb.lib.constants import *
 from standardweb.models import (
     Group, PlayerStats, GroupInvite, Player, AuditLog, PlayerActivity, IPTracking,
@@ -151,17 +151,17 @@ def _query_server(server, mojang_status):
 
         if player:
             if player.username != username:
-                AuditLog.create(
-                    AuditLog.PLAYER_RENAME,
-                    player_id=player.id,
-                    old_name=player.username,
-                    new_name=username,
-                    commit=False
-                )
-
-                player.username = username
+                player.set_username(username)
                 player.save(commit=False)
         else:
+            # catch case if player renames to an existing username in the db, look up
+            # existing player's current username since it must be different now
+            existing_username_player = Player.query.filter_by(username=username).first()
+            if existing_username_player:
+                new_username = minecraft_uuid.lookup_latest_username_by_uuid(uuid)
+                existing_username_player.set_username(new_username)
+                existing_username_player.save(commit=False)
+
             player = Player(username=username, uuid=uuid)
             player.save(commit=False)
         

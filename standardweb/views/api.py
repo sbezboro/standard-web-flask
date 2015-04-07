@@ -34,7 +34,7 @@ from standardweb.models import (
 
 
 # Base API function decorator that auto creates url rules for API endpoints.
-def api_func(function):
+def base_api_func(function):
 
     @wraps(function)
     def decorator(*args, **kwargs):
@@ -55,7 +55,7 @@ def api_func(function):
 
 # API function decorator for any api operation exposed to a Minecraft server.
 # This access must be authorized by server-id/secret-key pair combination.
-def server_api(function):
+def server_api_func(function):
 
     @wraps(function)
     def decorator(*args, **kwargs):
@@ -74,12 +74,12 @@ def server_api(function):
         
         return function(*args, **kwargs)
 
-    api_func(decorator)
+    base_api_func(decorator)
     
     return decorator
 
 
-@server_api
+@server_api_func
 def log_death():
     type = request.form.get('type')
     victim_uuid = request.form.get('victim_uuid')
@@ -108,7 +108,7 @@ def log_death():
     })
 
 
-@server_api
+@server_api_func
 def log_kill():
     type = request.form.get('type')
     killer_uuid = request.form.get('killer_uuid')
@@ -131,7 +131,7 @@ def log_kill():
     })
 
 
-@server_api
+@server_api_func
 def log_ore_discovery():
     uuid = request.form.get('uuid')
     type = request.form.get('type')
@@ -159,7 +159,7 @@ def log_ore_discovery():
     })
 
 
-@server_api
+@server_api_func
 def register():
     uuid = request.form.get('uuid')
     email = request.form.get('email')
@@ -208,7 +208,7 @@ def register():
     })
 
 
-@server_api
+@server_api_func
 def rank_query():
     username = request.args.get('username')
     uuid = request.args.get('uuid')
@@ -291,18 +291,23 @@ def rank_query():
     return jsonify(retval)
 
 
-@server_api
+@server_api_func
 def past_usernames():
     uuid = request.args.get('uuid')
 
     player = Player.query.filter_by(uuid=uuid).first()
 
+    if player:
+        return jsonify({
+            'past_usernames': player.past_usernames
+        })
+
     return jsonify({
-        'past_usernames': player.past_usernames
+        'past_usernames': []
     })
 
 
-@server_api
+@server_api_func
 def join_server():
     messages_url = url_for('messages', _external=True)
     notifications_url = url_for('notifications', _external=True)
@@ -353,7 +358,7 @@ def join_server():
     })
 
 
-@server_api
+@server_api_func
 def leave_server():
     username = request.form.get('username')
 
@@ -371,7 +376,7 @@ def leave_server():
     })
 
 
-@server_api
+@server_api_func
 def audit_log():
     body = request.json
 
@@ -405,7 +410,7 @@ def audit_log():
     })
 
 
-@server_api
+@server_api_func
 def new_notification():
     body = request.json
 
@@ -447,7 +452,7 @@ def new_notification():
     })
 
 
-@api_func
+@base_api_func
 def servers():
     servers = [{
         'id': server.id,
@@ -461,7 +466,7 @@ def servers():
     })
 
 
-@api_func
+@base_api_func
 def contact_query():
     query = request.args.get('query')
 
@@ -497,7 +502,7 @@ def contact_query():
     })
 
 
-@api_func
+@base_api_func
 def message_reply():
     api_key = app.config['MAILGUN_API_KEY']
 

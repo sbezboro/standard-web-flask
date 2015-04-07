@@ -75,15 +75,7 @@ def check_uuids(player_uuids):
             return
 
         if actual_username != player.username:
-            AuditLog.create(
-                AuditLog.PLAYER_RENAME,
-                player_id=player.id,
-                old_name=player.username,
-                new_name=actual_username,
-                commit=False
-            )
-
-            player.username = actual_username
+            player.set_username(actual_username)
             player.save(commit=False)
 
             num_changed += 1

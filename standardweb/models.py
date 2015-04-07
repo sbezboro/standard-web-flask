@@ -302,6 +302,17 @@ class Player(db.Model, Base):
     def display_uuid(self):
         return str(uuid.UUID(self.uuid))
 
+    def set_username(self, new_username):
+        AuditLog.create(
+            AuditLog.PLAYER_RENAME,
+            player_id=self.id,
+            old_name=self.username,
+            new_name=new_username,
+            commit=False
+        )
+
+        self.username = new_username
+
 
 class PlayerStats(db.Model, Base):
     __tablename__ = 'playerstats'
