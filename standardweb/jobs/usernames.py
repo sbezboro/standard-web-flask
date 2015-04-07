@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
-import rollbar
+import requests
 
 from sqlalchemy.sql import func
+import rollbar
 
-from standardweb import celery, db
+from standardweb import app, celery, db
 from standardweb.lib import minecraft_uuid
 from standardweb.models import AuditLog, Player, PlayerStats
 
@@ -37,17 +38,16 @@ def schedule_checks():
         func.max(PlayerStats.last_seen) < datetime.utcnow() - timedelta(days=1)
     ).order_by(Player.id)
 
+    rollbar.report_message('Checking %d uuids for username changes' % query.count(), level='info')
+
     i = 0
-
-    rollbar.report_message('Checking %d uuids for username changes' % query.count())
-
-    # group uuid checks in groups of 100 every minute
+    # group uuid checks in groups of 100 every 100 seconds
     for rows in paged_query(query):
         player_uuids = [x.uuid for x in rows]
 
         check_uuids.apply_async(
             args=(player_uuids,),
-            countdown=i * 60
+            countdown=i * 100
         )
 
         i += 1
@@ -59,11 +59,20 @@ def check_uuids(player_uuids):
 
     for uuid in player_uuids:
         player = Player.query.filter_by(uuid=uuid).first()
+        stats = PlayerStats.query.filter_by(player=player, server_id=app.config.get('MAIN_SERVER_ID'))
+
+        if stats.last_seen > datetime.utcnow() - timedelta(days=1):
+            # ignore players that have joined since the job started
+            continue
 
         try:
             actual_username = minecraft_uuid.lookup_latest_username_by_uuid(uuid)
-        except Exception:
-            continue
+        except requests.RequestException as e:
+            rollbar.report_message('Exception looking up uuid, skipping group', level='warning', extra_data={
+                'num_changed': num_changed,
+                'exception': unicode(e)
+            })
+            return
 
         if actual_username != player.username:
             AuditLog.create(
@@ -81,6 +90,6 @@ def check_uuids(player_uuids):
 
     db.session.commit()
 
-    rollbar.report_message('Finished checking uuid group', extra_data={
+    rollbar.report_message('Finished checking uuid group', level='info', extra_data={
         'num_changed': num_changed
     })

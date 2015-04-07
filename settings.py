@@ -17,15 +17,15 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['application/json']
 
 CELERYBEAT_SCHEDULE = {
-    'minute-query': {
+    'minute_query': {
         'task': 'standardweb.jobs.query.minute_query',
         'schedule': crontab()
     },
-    'db-backup': {
+    'db_backup': {
         'task': 'standardweb.jobs.backup.db_backup',
         'schedule': crontab(minute=0, hour=12)  # 4AM PST
     },
-    'username-checks': {
+    'schedule_checks': {
         'task': 'standardweb.jobs.usernames.schedule_checks',
         'schedule': crontab(minute=0, hour=8)  # 12AM PST
     }

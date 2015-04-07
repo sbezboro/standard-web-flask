@@ -98,6 +98,7 @@ import assets
 
 import jobs.query
 import jobs.backup
+import jobs.usernames
 
 import middleware
 import models
