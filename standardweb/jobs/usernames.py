@@ -59,9 +59,11 @@ def check_uuids(player_uuids):
 
     for uuid in player_uuids:
         player = Player.query.filter_by(uuid=uuid).first()
-        stats = PlayerStats.query.filter_by(player=player, server_id=app.config.get('MAIN_SERVER_ID'))
+        stats = PlayerStats.query.filter_by(
+            player=player, server_id=app.config.get('MAIN_SERVER_ID')
+        ).first()
 
-        if stats.last_seen > datetime.utcnow() - timedelta(days=1):
+        if stats and stats.last_seen > datetime.utcnow() - timedelta(days=1):
             # ignore players that have joined since the job started
             continue
 
