@@ -76,6 +76,12 @@ def check_uuids(player_uuids):
             })
             return
 
+        if not actual_username:
+            rollbar.report_message('Error getting actual username, skipping', level='warning', extra_data={
+                'uuid': uuid
+            })
+            continue
+
         if actual_username != player.username:
             player.set_username(actual_username)
             player.save(commit=False)

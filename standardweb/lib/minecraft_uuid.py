@@ -36,4 +36,10 @@ def lookup_latest_username_by_uuid(uuid):
         'https://api.mojang.com/user/profiles/%s/names' % uuid
     )
 
-    return resp.json()[-1]['name']
+    if resp.status_code == 200:
+        data = resp.json()
+
+        if data and isinstance(data, list):
+            return data[-1]['name']
+
+    return None
