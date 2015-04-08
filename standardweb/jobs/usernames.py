@@ -6,7 +6,7 @@ import rollbar
 
 from standardweb import app, celery, db
 from standardweb.lib import minecraft_uuid
-from standardweb.models import AuditLog, Player, PlayerStats
+from standardweb.models import Player, PlayerStats
 
 
 def paged_query(query, limit=None):

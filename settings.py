@@ -16,6 +16,8 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['application/json']
 
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 31556940}
+
 CELERYBEAT_SCHEDULE = {
     'minute_query': {
         'task': 'standardweb.jobs.query.minute_query',
@@ -27,7 +29,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'schedule_checks': {
         'task': 'standardweb.jobs.usernames.schedule_checks',
-        'schedule': crontab(minute=0, hour=8)  # 12AM PST
+        'schedule': crontab(minute=0, hour=8)  # 12AM PST on Sunday
     }
 }
 
