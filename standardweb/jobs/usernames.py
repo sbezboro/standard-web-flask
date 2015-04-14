@@ -38,19 +38,16 @@ def schedule_checks():
         func.max(PlayerStats.last_seen) < datetime.utcnow() - timedelta(days=1)
     ).order_by(Player.id)
 
-    rollbar.report_message('Checking %d uuids for username changes' % query.count(), level='info')
+    rollbar.report_message('Scheduling %d uuids for username change checks' % query.count(), level='info')
 
-    i = 0
-    # group uuid checks in groups of 100 every 100 seconds
-    for rows in paged_query(query):
+    # group uuid checks in groups of 10 every minute
+    for i, rows in enumerate(paged_query(query)):
         player_uuids = [x.uuid for x in rows]
 
         check_uuids.apply_async(
             args=(player_uuids,),
-            countdown=i * 100
+            countdown=i * 60
         )
-
-        i += 1
 
 
 @celery.task()
