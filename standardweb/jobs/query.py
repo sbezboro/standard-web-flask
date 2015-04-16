@@ -10,7 +10,7 @@ from standardweb import app, celery, db
 from standardweb.lib import api, minecraft_uuid
 from standardweb.lib.constants import *
 from standardweb.models import (
-    Group, PlayerStats, GroupInvite, Player, AuditLog, PlayerActivity, IPTracking,
+    Group, PlayerStats, GroupInvite, Player, PlayerActivity, IPTracking,
     ServerStatus, MojangStatus, Server
 )
 
