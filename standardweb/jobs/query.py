@@ -18,8 +18,6 @@ from standardweb.models import (
 def _handle_groups(server, server_groups):
     server_group_uids = [x['uid'] for x in server_groups]
 
-    import pdb; pdb.set_trace()
-
     if not server_group_uids:
         return
 
