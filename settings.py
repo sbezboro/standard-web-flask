@@ -29,7 +29,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'schedule_checks': {
         'task': 'standardweb.jobs.usernames.schedule_checks',
-        'schedule': crontab(minute=0, hour=15, day_of_week=3)  # 7AM PST on Monday
+        'schedule': crontab(minute=0, hour=15, day_of_week=4)  # 7AM PST on Monday
     }
 }
 

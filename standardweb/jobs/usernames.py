@@ -40,13 +40,13 @@ def schedule_checks():
 
     rollbar.report_message('Scheduling %d uuids for username change checks' % query.count(), level='info')
 
-    # group uuid checks in groups of 10 every minute
-    for i, rows in enumerate(paged_query(query)):
+    # group uuid checks in groups of 20 every two minutes
+    for i, rows in enumerate(paged_query(query, limit=20)):
         player_uuids = [x.uuid for x in rows]
 
         check_uuids.apply_async(
             args=(player_uuids,),
-            countdown=i * 60
+            countdown=i * 120
         )
 
 
