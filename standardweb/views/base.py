@@ -22,9 +22,9 @@ from standardweb.lib import leaderboards as libleaderboards
 from standardweb.lib import player as libplayer
 from standardweb.lib import server as libserver
 from standardweb.models import Server, ServerStatus, Player, User
-from standardweb.views import redirect_old_url
 from standardweb.views.decorators.auth import login_required
 from standardweb.views.decorators.cache import last_modified
+from standardweb.views.decorators.redirect import redirect_route
 
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
@@ -107,6 +107,7 @@ def player_graph(server_id=None):
     return jsonify(graph_data)
 
 
+@redirect_route('/forum/user/<username>/')
 @app.route('/player/<username>')
 @app.route('/<int:server_id>/player/<username>')
 def player(username, server_id=None):
@@ -229,6 +230,8 @@ def _face_last_modified(username, size=16):
         return None
 
 
+@redirect_route('/faces/<username>.png')
+@redirect_route('/faces/<int:size>/<username>.png')
 @app.route('/face/<username>.png')
 @app.route('/face/<int:size>/<username>.png')
 @last_modified(_face_last_modified)
@@ -353,8 +356,3 @@ def page_not_found(e):
 @app.errorhandler(500)
 def server_error(e):
     return render_template('500.html'), 500
-
-
-redirect_old_url('/faces/<username>.png', 'face', lambda username: {'username': username})
-redirect_old_url('/faces/<int:size>/<username>.png', 'face', lambda size, username: {'size': size, 'username': username},
-                 append='1')

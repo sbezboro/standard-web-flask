@@ -23,14 +23,16 @@ from standardweb.models import (
     ForumCategory, Forum, ForumPost, ForumTopic, User, ForumPostTracking, ForumAttachment,
     PlayerStats, AuditLog, ForumBan, ForumTopicSubscription
 )
-from standardweb.views import redirect_old_url
 from standardweb.views.decorators.auth import login_required
+from standardweb.views.decorators.redirect import redirect_route
 
 
 TOPICS_PER_PAGE = 40
 POSTS_PER_PAGE = 20
 
 
+@redirect_route('/forum/')
+@redirect_route('/forum/misc/')
 @app.route('/forums')
 def forums():
     categories = ForumCategory.query.options(
@@ -74,6 +76,8 @@ def forums():
     return render_template('forums/index.html', **retval)
 
 
+@redirect_route('/forum/search/')
+@redirect_route('/forum/users/')
 @app.route('/forums/search')
 def forum_search():
     all_categories = ForumCategory.query.options(
@@ -186,6 +190,7 @@ def forum_search():
     return render_template('forums/search.html', **retval)
 
 
+@redirect_route('/forum/<int:forum_id>/')
 @app.route('/forum/<int:forum_id>')
 def forum(forum_id):
     forum = Forum.query.options(
@@ -252,6 +257,9 @@ def forum(forum_id):
     return render_template('forums/forum.html', **retval)
 
 
+@redirect_route('/forum/topic/<int:topic_id>/')
+@redirect_route('/forum/topic/<int:topic_id>/post/add/')
+@redirect_route('/forum/feeds/topic/<int:topic_id>/')
 @app.route('/forums/topic/<int:topic_id>', methods=['GET', 'POST'])
 def forum_topic(topic_id):
     topic = ForumTopic.query.options(
@@ -389,6 +397,7 @@ def forum_topic(topic_id):
     return render_template('forums/topic.html', **retval)
 
 
+@redirect_route('/forum/post/<int:post_id>/')
 @app.route('/forums/post/<int:post_id>')
 def forum_post(post_id):
     post = ForumPost.query.get(post_id)
@@ -827,12 +836,3 @@ def forum_topic_unsubscribe(topic_id):
         flash('You weren\'t subscribed to the topic', 'warning')
 
     return redirect(topic.url)
-
-
-redirect_old_url('/forum/', 'forums')
-redirect_old_url('/forum/<int:forum_id>/', 'forum', lambda forum_id: {'forum_id': forum_id})
-redirect_old_url('/forum/topic/<int:topic_id>/', 'forum_topic', lambda topic_id: {'topic_id': topic_id})
-redirect_old_url('/forum/topic/<int:topic_id>/post/add/', 'forum_topic', lambda topic_id: {'topic_id': topic_id},
-                  append='1')
-redirect_old_url('/forum/post/<int:post_id>/', 'forum_post', lambda post_id: {'post_id': post_id})
-redirect_old_url('/forum/user/<username>/', 'player', lambda username: {'username': username})
