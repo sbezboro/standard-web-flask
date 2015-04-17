@@ -343,7 +343,7 @@ def admin(server_id=None):
 
 @app.errorhandler(403)
 def forbidden(e):
-    rollbar.report_message('403', request=request)
+    rollbar.report_message('Forbidden', request=request)
     return render_template('403.html'), 403
 
 
