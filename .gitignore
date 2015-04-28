@@ -2,6 +2,7 @@
 *.pot
 *.pyc
 *.un~
+.idea/
 local_settings.py
 .DS_Store
 celerybeat.pid
