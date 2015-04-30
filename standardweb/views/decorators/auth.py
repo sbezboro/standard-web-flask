@@ -1,12 +1,13 @@
 from functools import wraps
 
-from flask import flash, g, redirect, request, url_for
+from flask import abort, flash, g, redirect, request, url_for
 
 
-def login_required(show_message=True):
+def login_required(show_message=True, only_admin=False):
     """
     Decorator that will redirect the user to the login page
-    if they aren't logged in.
+    if they aren't logged in. Raises a 403 if the view requires
+    an admin and the user isn't an admin
     """
     def decorator(func):
         @wraps(func)
@@ -20,6 +21,9 @@ def login_required(show_message=True):
                     next = request.path
 
                 return redirect(url_for('login', next=next))
+
+            if only_admin and not g.user.admin:
+                abort(403)
 
             return func(*args, **kwargs)
 
