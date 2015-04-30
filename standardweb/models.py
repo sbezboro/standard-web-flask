@@ -313,6 +313,15 @@ class Player(db.Model, Base):
 
         self.username = new_username
 
+    def adjust_time_spent(self, server, adjustment, commit=True):
+        stat = PlayerStats.query.filter_by(
+            player=self,
+            server=server
+        ).first()
+
+        if stat:
+            stat.adjust_time_spent(adjustment, commit=commit)
+
 
 class PlayerStats(db.Model, Base):
     __tablename__ = 'playerstats'
@@ -348,6 +357,19 @@ class PlayerStats(db.Model, Base):
                 PlayerStats.player_id != self.player_id
             ).all()
         ) + 1
+
+    def adjust_time_spent(self, adjustment, commit=True):
+        self.time_spent += adjustment
+        self.save(commit=False)
+
+        AuditLog.create(
+            AuditLog.PLAYER_TIME_ADJUSTMENT,
+            server_id=self.server_id,
+            player_id=self.player_id,
+            adjustment=adjustment,
+            commit=commit
+        )
+
 
 class Server(db.Model, Base):
     __tablename__ = 'server'
@@ -765,6 +787,7 @@ class AuditLog(db.Model, Base):
         )
     )
 
+    PLAYER_TIME_ADJUSTMENT = 'player_time_adjustment'
     PLAYER_RENAME = 'player_rename'
 
     @classmethod
