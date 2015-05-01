@@ -90,7 +90,7 @@ def adjust_player_time(server_id, uuid):
     if not adjustment:
         abort(400)
 
-    player.adjust_time_spent(server, adjustment, commit=True)
+    player.adjust_time_spent(server, adjustment, reason='manual', commit=True)
 
     return jsonify({
         'err': 0

@@ -313,14 +313,14 @@ class Player(db.Model, Base):
 
         self.username = new_username
 
-    def adjust_time_spent(self, server, adjustment, commit=True):
+    def adjust_time_spent(self, server, adjustment, reason=None, commit=True):
         stat = PlayerStats.query.filter_by(
             player=self,
             server=server
         ).first()
 
         if stat:
-            stat.adjust_time_spent(adjustment, commit=commit)
+            stat.adjust_time_spent(adjustment, reason=reason, commit=commit)
 
 
 class PlayerStats(db.Model, Base):
@@ -358,7 +358,7 @@ class PlayerStats(db.Model, Base):
             ).all()
         ) + 1
 
-    def adjust_time_spent(self, adjustment, commit=True):
+    def adjust_time_spent(self, adjustment, reason=None, commit=True):
         self.time_spent += adjustment
         self.save(commit=False)
 
@@ -367,6 +367,7 @@ class PlayerStats(db.Model, Base):
             server_id=self.server_id,
             player_id=self.player_id,
             adjustment=adjustment,
+            reason=reason,
             commit=commit
         )
 
