@@ -1,9 +1,11 @@
-from flask import abort, redirect, render_template, url_for
+from flask import abort, jsonify, redirect, render_template, request, url_for
 from sqlalchemy.orm import joinedload
 
 from standardweb import app
+from standardweb.lib import helpers as h
 from standardweb.lib import player as libplayer
 from standardweb.models import Server, Player, User
+from standardweb.views.decorators.auth import login_required
 from standardweb.views.decorators.redirect import redirect_route
 
 
@@ -70,3 +72,26 @@ def player(username, server_id=None):
     retval.update(data)
 
     return render_template(template, **retval)
+
+
+@login_required(only_admin=True)
+@app.route('/<int:server_id>/player/<uuid>/adjust_time', methods=['POST'])
+def adjust_player_time(server_id, uuid):
+    server = Server.query.get(server_id)
+    if not server:
+        abort(404)
+
+    player = Player.query.filter_by(uuid=uuid).first()
+    if not player:
+        abort(404)
+
+    adjustment = h.to_int(request.form.get('adjustment'))
+
+    if not adjustment:
+        abort(400)
+
+    player.adjust_time_spent(server, adjustment, commit=True)
+
+    return jsonify({
+        'err': 0
+    })

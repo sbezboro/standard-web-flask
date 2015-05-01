@@ -40,3 +40,13 @@ def strip_ansi(text):
 
 def is_valid_email(email):
     return _email_pat.match(email)
+
+
+def to_int(value):
+    if value is None:
+        return None
+
+    try:
+        return int(value)
+    except ValueError:
+        return None

@@ -460,6 +460,48 @@ ul.soft-list {
   }
 }
 
+.modal-dialog {
+  &:before {
+    content: "";
+    display: block;
+    background: rgba(0, 0, 0, 0.6);
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 10;
+  }
+
+  .dialog-inner {
+    background: #fefefe;
+    border: #888 solid 1px;
+    font-size: 14px;
+    margin-left: -200px;
+    position: fixed;
+    left: 50%;
+    top: 30%;
+    z-index: 11;
+    width: 360px;
+
+    a.close {
+      color: #ccc;
+      float: right;
+      margin: 10px;
+
+      &:hover {
+        color: #666;
+      }
+    }
+
+    .dialog-content {
+      padding: 20px;
+    }
+
+    .dialog-footer {
+      background: #ddd;
+      padding: 10px;
+    }
+  }
+}
+
 .btn {
   .gradient(@white, #e1e1e1);
   display: inline-block;

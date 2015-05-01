@@ -10,7 +10,6 @@ from standardweb.forms import (
     ProfileSettingsForm,
     ChangePasswordForm
 )
-from standardweb.lib import notifications
 from standardweb.lib.email import send_verify_email
 from standardweb.lib.notifications import verify_unsubscribe_request
 from standardweb.models import EmailToken, User, AuditLog

@@ -22,6 +22,7 @@ js = Bundle(
         'js/local/base.js',
         'js/local/chat.js',
         'js/local/console.js',
+        'js/local/dialog.js',
         'js/local/graph.js',
         'js/local/messages.js',
         'js/local/notifications.js',

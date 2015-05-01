@@ -139,6 +139,9 @@
                                 <div class="stat-name">Time played</div>
                                 <div class="stat-value">
                                     {{ server_stats.time_spent }}
+                                    {% if user and user.admin %}
+                                        <a href="#" class="adjust-time"><i class="fa fa-pencil"></i></a>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="section-stat col-1-2">
@@ -197,15 +200,35 @@
         {% endif %}
     </div>
 
-    <script>
-        $(document).ready(function() {
-            $('.load-all').on('click', function() {
-                $(this).siblings('.other.hidden').removeClass('hidden');
-                $(this).addClass('hidden');
-                return false;
+    {% if player %}
+        <script>
+            $(document).ready(function() {
+                $('.load-all').on('click', function() {
+                    $(this).siblings('.other.hidden').removeClass('hidden');
+                    $(this).addClass('hidden');
+                    return false;
+                });
+
+                $('.adjust-time').on('click', function() {
+                    var dialog = new StandardWeb.InputDialog('Adjust player time', 'Adjustment:', 'minutes');
+                    dialog.positiveCallback = function(inputValue) {
+                        $.ajax({
+                            url: "{{ url_for('adjust_player_time', server_id=server.id, uuid=player.uuid) }}",
+                            type: 'POST',
+                            data: {adjustment: inputValue},
+                            success: function() {
+                                dialog.close();
+                                location.reload();
+                            }
+                        });
+                    };
+
+                    dialog.show();
+                    return false;
+                });
             });
-        });
-    </script>
+        </script>
+    {% endif %}
 {% endblock %}
 
 {% macro render_combat_stats(label, count, values) -%}
