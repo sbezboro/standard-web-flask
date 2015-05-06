@@ -135,6 +135,18 @@ def _handle_groups(server, server_groups):
     db.session.commit()
 
 
+def _avoid_duplicate_username(username, uuid):
+    # catch case if player on the server has renamed to an existing username in the db,
+    # look up existing player's current username since it must be different now
+    existing_username_player = Player.query.filter_by(username=username).first()
+    if existing_username_player:
+        new_username = minecraft_uuid.lookup_latest_username_by_uuid(uuid)
+        existing_username_player.set_username(new_username)
+        existing_username_player.save(commit=False)
+
+        db.session.flush()
+
+
 def _query_server(server, mojang_status):
     server_status = api.get_server_status(server) or {}
     
@@ -151,24 +163,23 @@ def _query_server(server, mojang_status):
 
         if player:
             if player.username != username:
+                _avoid_duplicate_username(username, uuid)
+
                 player.set_username(username)
                 player.save(commit=False)
         else:
-            # catch case if player renames to an existing username in the db, look up
-            # existing player's current username since it must be different now
-            existing_username_player = Player.query.filter_by(username=username).first()
-            if existing_username_player:
-                new_username = minecraft_uuid.lookup_latest_username_by_uuid(uuid)
-                existing_username_player.set_username(new_username)
-                existing_username_player.save(commit=False)
+            _avoid_duplicate_username(username, uuid)
 
             player = Player(username=username, uuid=uuid)
             player.save(commit=False)
         
         online_player_ids.append(player.id)
 
-        last_activity = PlayerActivity.query.filter_by(server=server, player=player)\
-            .order_by(PlayerActivity.timestamp.desc()).first()
+        last_activity = PlayerActivity.query.filter_by(
+            server=server, player=player
+        ).order_by(
+            PlayerActivity.timestamp.desc()
+        ).first()
         
         # if the last activity for this player is an 'exit' activity (or there isn't an activity),
         # create a new 'enter' activity since they just joined this minute
