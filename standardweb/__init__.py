@@ -121,3 +121,4 @@ import views.messages
 import views.notifications
 import views.player
 import views.settings
+import views.static_files
