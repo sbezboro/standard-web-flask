@@ -1,0 +1,11 @@
+{
+  "name": "standard-web-flask",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sbezboro/stanard-web-flask.git"
+  },
+  "dependencies": {
+    "browserify": "^10.1.0"
+  }
+}

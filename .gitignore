@@ -12,4 +12,5 @@ standardweb/faces/*/*
 env/
 gen/
 standardweb/attachments
+node_modules/
 .webassets-cache/
