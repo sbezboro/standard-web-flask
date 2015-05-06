@@ -47,5 +47,6 @@ six==1.9.0
 SQLAlchemy==1.0.0
 voluptuous==0.8.7
 webassets==0.10.1
+webassets-browserify==1.0.2
 Werkzeug==0.10.4
 WTForms==2.0.2
