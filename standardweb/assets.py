@@ -1,8 +1,11 @@
 from flask.ext.assets import Bundle, Environment
+from webassets.filter import register_filter
+from webassets_browserify import Browserify
 
 from standardweb import app
 
 
+register_filter(Browserify)
 env = Environment(app)
 
 js = Bundle(
@@ -27,7 +30,9 @@ js = Bundle(
         'js/local/messages.js',
         'js/local/notifications.js',
         'js/local/realtime.js',
-        'js/local/site.js'
+        'js/local/site.js',
+        filters='browserify',
+        depends='js/**/*.js',
     ),
     filters='uglifyjs',
     output='js/gen/all.min.js'

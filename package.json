@@ -6,6 +6,7 @@
     "url": "https://github.com/sbezboro/stanard-web-flask.git"
   },
   "dependencies": {
-    "browserify": "^10.1.0"
+    "browserify": "^10.1.0",
+    "react": "^0.13.2"
   }
 }
