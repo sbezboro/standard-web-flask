@@ -52,6 +52,10 @@ def _update_and_restart_services():
         with prefix('source %s/bin/activate' % ENV_DIR):
             run("git pull")
 
+            result = run("npm install --quiet")
+            if result.failed:
+                abort('Could not install required node modules. Aborting.')
+
             result = run("pip install -r requirements.txt --quiet")
             if result.failed:
                 abort('Could not install required packages. Aborting.')
