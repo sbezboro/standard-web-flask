@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from celery.schedules import crontab
+from kombu import Exchange, Queue
 
 
 DEBUG = False
@@ -15,6 +16,16 @@ CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_DEFAULT_QUEUE = 'default'
+CELERY_QUEUES = (
+    Queue('default', Exchange('default'), routing_key='default'),
+    Queue('minute_query', Exchange('minute_query'), routing_key='minute_query'),
+)
+CELERY_ROUTES = {
+    'standardweb.jobs.query.minute_query': {
+        'queue': 'minute_query'
+    }
+}
 
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 31556940}
 

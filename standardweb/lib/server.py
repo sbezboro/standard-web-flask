@@ -90,7 +90,7 @@ def get_player_graph_data(server, granularity=15, start_date=None, end_date=None
         ServerStatus.server == server,
         ServerStatus.timestamp >= start_date,
         ServerStatus.timestamp <= end_date
-    ).group_by('1').order_by(
+    ).group_by('timestamp').order_by(
         ServerStatus.timestamp
     ).all()
 
