@@ -18,16 +18,10 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_DEFAULT_QUEUE = 'default'
 CELERY_QUEUES = (
+    Queue('celery', Exchange('celery'), routing_key='celery'),  # TODO: remove
     Queue('default', Exchange('default'), routing_key='default'),
     Queue('minute_query', Exchange('minute_query'), routing_key='minute_query'),
 )
-CELERY_ROUTES = {
-    'standardweb.jobs.query.minute_query': {
-        'queue': 'minute_query'
-    }
-}
-
-BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 31556940}
 
 CELERYBEAT_SCHEDULE = {
     'minute_query': {
@@ -40,9 +34,17 @@ CELERYBEAT_SCHEDULE = {
     },
     'schedule_checks': {
         'task': 'standardweb.jobs.usernames.schedule_checks',
-        'schedule': crontab(minute=0, hour=15, day_of_week=4)  # 7AM PST on Monday
+        'schedule': crontab(minute=0, hour=15, day_of_week=4)  # 7AM PST on Wednesday
     }
 }
+
+CELERY_ROUTES = {
+    'standardweb.jobs.query.minute_query': {
+        'queue': 'minute_query'
+    }
+}
+
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 31556940}
 
 ASSETS_DEBUG = False
 ASSETS_AUTO_BUILD = False
