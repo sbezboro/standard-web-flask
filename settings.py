@@ -36,7 +36,6 @@ CELERYBEAT_SCHEDULE = {
 ASSETS_DEBUG = False
 ASSETS_AUTO_BUILD = False
 UGLIFYJS_EXTRA_ARGS = ['-c', '-m']
-BROWSERIFY_BIN = 'node_modules/browserify/bin/cmd.js'
 
 FLASK_ASSETS_USE_CDN = True
 CDN_DOMAIN = 'd2rpyddsvhacm5.cloudfront.net'
