@@ -4,8 +4,9 @@ from datetime import timedelta
 import math
 import time
 
-from sqlalchemy.orm import joinedload
 from sqlalchemy import func
+from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.expression import alias, label
 from standardweb import db
 
 from standardweb.lib import api
@@ -84,13 +85,18 @@ def get_player_graph_data(server, granularity=15, start_date=None, end_date=None
     start_date = start_date or end_date - timedelta(days=7)
 
     result = db.session.query(
-        func.round((func.unix_timestamp(ServerStatus.timestamp) - time.timezone) / (granularity * 60)),
+        label(
+            'granular_timestamp',
+            func.round(
+                (func.unix_timestamp(ServerStatus.timestamp) - time.timezone) / (granularity * 60)
+            ),
+        ),
         func.avg(ServerStatus.player_count)
     ).filter(
         ServerStatus.server == server,
         ServerStatus.timestamp >= start_date,
         ServerStatus.timestamp <= end_date
-    ).group_by('timestamp').order_by(
+    ).group_by('granular_timestamp').order_by(
         ServerStatus.timestamp
     ).all()
 
