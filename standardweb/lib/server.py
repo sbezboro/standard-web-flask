@@ -86,7 +86,7 @@ def get_player_graph_data(server, granularity=15, start_date=None, end_date=None
 
     result = db.session.query(
         label(
-            'granular_timestamp',
+            'timestamp_group',
             func.round(
                 (func.unix_timestamp(ServerStatus.timestamp) - time.timezone) / (granularity * 60)
             ),
@@ -96,7 +96,7 @@ def get_player_graph_data(server, granularity=15, start_date=None, end_date=None
         ServerStatus.server == server,
         ServerStatus.timestamp >= start_date,
         ServerStatus.timestamp <= end_date
-    ).group_by('granular_timestamp').order_by(
+    ).group_by('timestamp_group').order_by(
         ServerStatus.timestamp
     ).all()
 
