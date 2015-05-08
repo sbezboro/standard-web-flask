@@ -21,6 +21,7 @@ CELERY_QUEUES = (
     Queue('celery', Exchange('celery'), routing_key='celery'),  # TODO: remove
     Queue('default', Exchange('default'), routing_key='default'),
     Queue('minute_query', Exchange('minute_query'), routing_key='minute_query'),
+    Queue('check_uuids', Exchange('check_uuids'), routing_key='check_uuids'),
 )
 
 CELERYBEAT_SCHEDULE = {
@@ -41,6 +42,9 @@ CELERYBEAT_SCHEDULE = {
 CELERY_ROUTES = {
     'standardweb.jobs.query.minute_query': {
         'queue': 'minute_query'
+    },
+    'standardweb.jobs.usernames.schedule_checks': {
+        'queue': 'check_uuids'
     }
 }
 
