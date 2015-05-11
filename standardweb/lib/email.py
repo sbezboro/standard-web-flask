@@ -158,7 +158,7 @@ def send_news_post_email(user, notification):
     unsubscribe_link = notifications.generate_unsubscribe_link(user, notifications.NEWS_POST)
 
     text_body, html_body = _render_email('notifications/news_post', to_email, {
-        'post_body': post.id,
+        'post_body': post.body,
         'post_body_html': post.body_html,
         'topic_url': forum_topic_url,
         'unsubscribe_url': unsubscribe_link,
