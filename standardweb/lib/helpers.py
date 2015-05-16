@@ -1,6 +1,11 @@
+import re
+
 from ansi2html import Ansi2HTMLConverter
 
-import re
+from standardweb import db
+from standardweb.lib import minecraft_uuid
+from standardweb.models import Player
+
 
 _ansi_converter = Ansi2HTMLConverter()
 _ansi_pat = re.compile(r'\x1b[^m]*m')
@@ -50,3 +55,16 @@ def to_int(value):
         return int(value)
     except ValueError:
         return None
+
+
+def avoid_duplicate_username(username, uuid, allow_flush=True):
+    # catch case if player on the server has renamed to an existing username in the db,
+    # look up existing player's current username since it must be different now
+    existing_username_player = Player.query.filter_by(username=username).first()
+    if existing_username_player:
+        new_username = minecraft_uuid.lookup_latest_username_by_uuid(uuid)
+        existing_username_player.set_username(new_username)
+        existing_username_player.save(commit=False)
+
+        if allow_flush:
+            db.session.flush()

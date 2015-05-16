@@ -5,6 +5,7 @@ from sqlalchemy.sql import func
 import rollbar
 
 from standardweb import app, celery, db
+from standardweb.lib import helpers as h
 from standardweb.lib import minecraft_uuid
 from standardweb.models import Player, PlayerStats
 
@@ -80,6 +81,8 @@ def check_uuids(player_uuids):
             continue
 
         if actual_username != player.username:
+            h.avoid_duplicate_username(actual_username, uuid)
+
             player.set_username(actual_username)
             player.save(commit=False)
 

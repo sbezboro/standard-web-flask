@@ -7,7 +7,8 @@ from sqlalchemy import not_
 from sqlalchemy.orm import joinedload
 
 from standardweb import app, celery, db
-from standardweb.lib import api, minecraft_uuid
+from standardweb.lib import api
+from standardweb.lib import helpers as h
 from standardweb.lib.constants import *
 from standardweb.models import (
     Group, PlayerStats, GroupInvite, Player, PlayerActivity, IPTracking,
@@ -135,18 +136,6 @@ def _handle_groups(server, server_groups):
     db.session.commit()
 
 
-def _avoid_duplicate_username(username, uuid):
-    # catch case if player on the server has renamed to an existing username in the db,
-    # look up existing player's current username since it must be different now
-    existing_username_player = Player.query.filter_by(username=username).first()
-    if existing_username_player:
-        new_username = minecraft_uuid.lookup_latest_username_by_uuid(uuid)
-        existing_username_player.set_username(new_username)
-        existing_username_player.save(commit=False)
-
-        db.session.flush()
-
-
 def _query_server(server, mojang_status):
     server_status = api.get_server_status(server) or {}
     
@@ -163,12 +152,12 @@ def _query_server(server, mojang_status):
 
         if player:
             if player.username != username:
-                _avoid_duplicate_username(username, uuid)
+                h.avoid_duplicate_username(username, uuid)
 
                 player.set_username(username)
                 player.save(commit=False)
         else:
-            _avoid_duplicate_username(username, uuid)
+            h.avoid_duplicate_username(username, uuid)
 
             player = Player(username=username, uuid=uuid)
             player.save(commit=False)
