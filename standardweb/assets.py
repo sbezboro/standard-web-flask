@@ -1,58 +1,84 @@
 from flask.ext.assets import Bundle, Environment
+from react.jsx import JSXTransformer
+from webassets.filter import Filter, register_filter
 
 from standardweb import app
 
 
+class React(Filter):
+    name = 'react'
+    max_debug_level = None
+
+    def output(self, _in, out, **kw):
+        content = _in.read()
+        transformer = JSXTransformer()
+        js = transformer.transform_string(content)
+        out.write(js)
+
+register_filter(React)
 env = Environment(app)
 
-js = Bundle(
-    Bundle(
-        'js/thirdparty/jquery-1.8.3.min.js',
-        'js/thirdparty/jquery.flot.min.js',
-        'js/thirdparty/jquery.placeholder.min.js',
-        'js/thirdparty/jquery.tipsy.min.js',
-        'js/thirdparty/jquery.sceditor.min.js',
-        'js/thirdparty/jquery.sceditor.bbcode.min.js',
-        'js/thirdparty/moment.min.js',
-        'js/thirdparty/socket.io.min.js',
-        'js/thirdparty/soundmanager2.min.js',
-        'js/thirdparty/ZeroClipboard.min.js'
+bundles = {
+    'css_all': Bundle(
+        Bundle(
+            'css/lib/font-awesome.min.css',
+            'css/lib/tipsy.css',
+            'css/lib/bbcode.css',
+        ),
+        Bundle(
+            'css/local/ansi.less',
+            'css/local/base.less',
+            'css/local/colors.less',
+            'css/local/fonts.less',
+            'css/local/layouts.less',
+            'css/local/media.less',
+            'css/local/mixins.less',
+            'css/local/pages/*.less',
+            'css/local/style.css',
+        ),
+        filters='less',
+        output='css/gen/all.min.css'
     ),
-    Bundle(
-        'js/local/base.js',
-        'js/local/chat.js',
-        'js/local/console.js',
-        'js/local/dialog.js',
-        'js/local/graph.js',
-        'js/local/messages.js',
-        'js/local/notifications.js',
-        'js/local/realtime.js',
-        'js/local/site.js',
+    'js_lib': Bundle(
+        'js/lib/jquery-1.8.3.min.js',
+        'js/lib/jquery.flot.min.js',
+        'js/lib/jquery.placeholder.min.js',
+        'js/lib/jquery.tipsy.min.js',
+        'js/lib/jquery.sceditor.min.js',
+        'js/lib/jquery.sceditor.bbcode.min.js',
+        'js/lib/moment.min.js',
+        'js/lib/react-with-addons.min.js',
+        'js/lib/socket.io.min.js',
+        'js/lib/soundmanager2.min.js',
+        'js/lib/ZeroClipboard.min.js',
+        filters='uglifyjs',
+        output='js/gen/lib.min.js'
     ),
-    filters='uglifyjs',
-    output='js/gen/all.min.js'
-)
+    'js_base': Bundle(
+        Bundle(
+            'js/local/base.js',
+            'js/local/chat.js',
+            'js/local/dialog.js',
+            'js/local/graph.js',
+            'js/local/messages.js',
+            'js/local/notifications.js',
+            'js/local/realtime.js',
+            'js/local/site.js',
+            filters='uglifyjs',
+            output='js/gen/local.min.js'
+        ),
+        Bundle(
+            'js/local/react/mixins/*.jsx',
+            'js/local/react/*.jsx',
+            filters='react',
+            output='js/gen/react.build.js'
+        )
+    ),
+    'js_admin': Bundle(
+        'js/local/pages/admin.js',
+        filters='uglifyjs',
+        output='js/gen/admin.min.js'
+    )
+}
 
-css = Bundle(
-    Bundle(
-        'css/thirdparty/font-awesome.min.css',
-        'css/thirdparty/tipsy.css',
-        'css/thirdparty/bbcode.css',
-    ),
-    Bundle(
-        'css/local/ansi.less',
-        'css/local/base.less',
-        'css/local/colors.less',
-        'css/local/fonts.less',
-        'css/local/layouts.less',
-        'css/local/media.less',
-        'css/local/mixins.less',
-        'css/local/pages/*.less',
-        'css/local/style.css',
-    ),
-    filters='less',
-    output='css/gen/all.min.css'
-)
-
-env.register('js_all', js)
-env.register('css_all', css)
+env.register(bundles)

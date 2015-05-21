@@ -4,6 +4,12 @@
 
 {% block select_admin %}selected{% endblock %}
 
+{% block js %}
+    {% assets "js_admin" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+{% endblock %}
+
 {% block content %}
     <div class="nav-header">
       <div class="inner">
@@ -16,74 +22,14 @@
         </ul>
       </div>
     </div>
-    <div class="sub-header">
-      <ul>
-        <li>
-          <div>Players <span class="player-count">-</span></div>
-        </li>
-        <li>
-          <div>TPS <span class="tps">-</span></div>
-        </li>
-        <li>
-          <div>Load <span class="load">-</span></div>
-        </li>
-      </ul>
-    </div>
-    <div class="admin-panel">
-      <div class="admin-right">
-        <div class="players"></div>
-        <div class="users"></div>
-      </div>
-      <div class="detail" style="display: none;">
-        <div class="detail-inner">
-          <a class="close" href="#">x</a>
-          <img class="face"/>
-          <a class="link" target="_blank">
-            <h3 class="display-name"></h3>
-          </a>
-          <div class="username"></div>
-          <br>
-          <div class="stats">
-            <div>
-              <b>Rank</b>
-              <span class="rank"></span>
-            </div>
-            <div>
-              <b>Time Spent</b>
-              <span class="time-spent"></span>
-            </div>
-            <div>
-              <b>IP Address</b>
-              <span class="ip"></span>
-            </div>
-          </div>
-          <div class="stats">
-            <div>
-              <b>Health</b>
-              <span class="health"></span>
-            </div>
-            <div>
-              <b>Location</b>
-              <span class="location"></span>
-            </div>
-            <div>
-              <b>Titles</b>
-              <span class="titles"></span>
-            </div>
-          </div>
-          <div class="options">
-            <a class="btn donator" href="#">Set Donator</a><br>
-          </div>
-        </div>
-      </div>
-      <div class="admin-left">
-        <input class="console-notification" type="checkbox" checked/>
-        <div class="console"></div>
-        <input class="console-textbox" type="text">
-      </div>
-    </div>
-    
+    <div id="admin-panel"></div>
+
     <script type="text/javascript">
-        StandardWeb.console.serverId = {{ server.id }};
+        StandardWeb.admin.serverId = {{ server.id }};
+
+        React.render(
+            React.createElement(StandardWeb.reactComponents.AdminPanel),
+            document.getElementById('admin-panel')
+        );
     </script>
 {% endblock %}

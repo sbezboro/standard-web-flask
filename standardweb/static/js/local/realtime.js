@@ -10,6 +10,7 @@
       this.rtsBaseUrl = rtsBaseUrl;
       this.rtsPrefix = rtsPrefix;
     },
+
     subscribe: function (channel, extra, callback) {
       if (!callback) {
         callback = extra;
@@ -25,7 +26,7 @@
         callback = null;
       } else {
         socket = io(this.rtsBaseUrl + '/' + channel, {
-          path: rtsPrefix + '/socket.io'
+          path: this.rtsPrefix + '/socket.io'
         });
 
         socket.on('connect', function () {
@@ -80,6 +81,7 @@
     }
   };
 
+  // TODO: everything below will be removed once ported over to React
   var ServerStream = function($outputArea, $textbox, serverId, source) {
     this.socket = null;
 
@@ -302,151 +304,6 @@
     }
   };
 
-  var ConsoleStream = function($outputArea, $textbox, serverId) {
-    ServerStream.call(this, $outputArea, $textbox, serverId, 'console');
-
-    this.allPlayers = {};
-
-    this.maxLines = 4000;
-
-    this.addChatMention('server', 'background:#A0A');
-    // A player messaging console
-    this.addRegexMention('-&gt; me');
-
-    $textbox.keydown(function() {
-      if ($textbox.val().length >= 53) {
-        $textbox.addClass('len-warn');
-      } else {
-        $textbox.removeClass('len-warn');
-      }
-    });
-
-    this.socketInitialized = function() {
-      var html;
-
-      this.socket.on('console', function(data) {
-        if (data.line) {
-          this.addOutputLine(data.line);
-        } else if (data.batch) {
-          this.addOutputLines(data.batch);
-        }
-      }.bind(this));
-
-      // Update server status display
-      this.socket.on('server-status', function(data) {
-        var players = data.players;
-        var numPlayers = data.numPlayers;
-        var maxPlayers = data.maxPlayers;
-        var load = data.load;
-        var tps = data.tps;
-
-        players = players.sort(function(a, b) {
-          a = (a.nickname ? a.nickname : a.username);
-          b = (b.nickname ? b.nickname : b.username);
-
-          if (a.toLowerCase() < b.toLowerCase()) return -1;
-          if (a.toLowerCase() > b.toLowerCase()) return 1;
-          return 0;
-        });
-
-        var playersHtml = '';
-        for (var i = 0; i < players.length; ++i) {
-          var username = players[i].username;
-          this.allPlayers[username] = players[i];
-
-          var nicknameAnsi = players[i].nicknameAnsi;
-
-          var displayName = nicknameAnsi ? nicknameAnsi : username;
-
-          html = [
-            '<a href="#">',
-              '<div class="player" username="' + username + '">',
-                '<img class="face-thumb" src="/face/16/' + username + '.png">',
-                '<span class="ansi-container">' + displayName + '</span>',
-                '<span class="rank">#' + players[i].rank + '</span>',
-              '</div>',
-            '</a>'
-          ].join('');
-
-          playersHtml += html;
-        }
-
-        $('.players').html(playersHtml);
-        $('.player-count').text(numPlayers + '/' + maxPlayers);
-        $('.load').text(load);
-        $('.tps').text(tps);
-
-        if (this.onUpdate && typeof this.onUpdate === 'function') {
-          this.onUpdate();
-        }
-      }.bind(this));
-
-      this.socket.on('chat-users', function(data) {
-        var users = data.users;
-
-        html = '<b>Chat user count: ' + users.length + '</b>';
-
-        var i;
-        for (i = 0; i < users.length; ++i) {
-          var username = users[i].username;
-          var address = users[i].address;
-          var type = users[i].type;
-          var active = users[i].active;
-
-          if (username == 'Server') {
-            html += [
-              '<div class="user">',
-                 username + ' [' + type + ']',
-              '</div>'
-            ].join('');
-          } else if (username) {
-            html += [
-              '<div class="user">',
-                '<a href="/player/' + username + '">',
-                  '<span><img class="face-thumb" src="/face/16/' + username + '.png">' + username + '</span>',
-                  active ? '<img src="' + StandardWeb.cdnDomain + '/static/images/online.png">': ' ',
-                '</a>- ' + address,
-               '</div>'
-            ].join('');
-          } else {
-            html += [
-              '<div class="user">',
-                'Anonymous',
-                active ? '<img src="' + StandardWeb.cdnDomain + '/static/images/online.png">': ' ',
-                '- ' + address,
-              '</div>'
-            ].join('');
-          }
-        }
-
-        $('.users').html(html);
-      });
-    }.bind(this);
-
-    this.messageEntered = function(socket, input) {
-      var data = {};
-
-      if (input[0] == "/") {
-        data = {
-          command: input.substring(1, input.length)
-        }
-      } else {
-        data = {
-          message: input
-        }
-      }
-
-      socket.emit('console-input', data);
-      $textbox.removeClass('len-warn');
-    };
-
-    this.setDonator = function(username) {
-      this.socket.emit('set-donator', {
-        username: username
-      });
-    }
-  };
-
   var ChatStream = function($outputArea, $textbox, serverId) {
     ServerStream.call(this, $outputArea, $textbox, serverId, 'chat');
 
@@ -537,9 +394,7 @@
     this.renderPlayerTable([], 90);
   };
 
-  ConsoleStream.prototype = Object.create(ServerStream.prototype);
   ChatStream.prototype = Object.create(ServerStream.prototype);
 
-  StandardWeb.realtime.ConsoleStream = ConsoleStream;
   StandardWeb.realtime.ChatStream = ChatStream;
 })(window, document, $);

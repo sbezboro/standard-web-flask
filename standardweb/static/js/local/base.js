@@ -32,6 +32,9 @@
     username: null,
     nickname: null,
     cdnDomain: null,
+    reactComponents: {},
+    reactMixins: {},
+    sounds: {},
 
     refreshFromnow: function($rootElement) {
       $rootElement = $rootElement || document;
@@ -57,6 +60,27 @@
         }
       });
     },
+
+    loadSound: function(id, path) {
+      return soundManager.createSound({
+        id: id,
+        url: path
+      });
+    },
+
+    loadSounds: function() {
+      soundManager.setup({
+        url: '/static/flash/',
+        flashVersion: 9,
+        debugMode: false,
+        preferFlash: false,
+
+        onready: function() {
+          StandardWeb.sounds.mentionSound = StandardWeb.loadSound('mention', '/static/sound/mention.wav');
+        }
+      });
+    },
+
     on: function(channel, event, callback) {
       this.subscribe(channel, function(error, socket) {
         socket.on(event, function(data) {
@@ -64,6 +88,7 @@
         });
       });
     },
+
     setCSRFToken: function(token) {
       $.ajaxSetup({
         beforeSend: function(xhr, settings) {

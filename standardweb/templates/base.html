@@ -41,7 +41,10 @@
         </script>
         <!-- end Mixpanel -->
 
-        {% assets "js_all" %}
+        {% assets "js_lib" %}
+            <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+        {% endassets %}
+        {% assets "js_base" %}
             <script type="text/javascript" src="{{ ASSET_URL }}"></script>
         {% endassets %}
 
@@ -85,7 +88,32 @@
             <noscript><img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?ev=6018722527894&amp;cd[value]=0.00&amp;cd[currency]=CAD&amp;noscript=1" /></noscript>
         {% endif %}
 
-        {% block script_files %}{% endblock %}
+        {% if user %}
+            <script type="application/javascript">
+                StandardWeb.userId = {{ user.id }};
+                StandardWeb.username = '{{ user.get_username() }}';
+            </script>
+
+            {% if user.player %}
+                <script type="application/javascript">
+                    StandardWeb.playerId = {{ user.player_id }};
+                    StandardWeb.nickname = '{{ user.player.nickname }}';
+                </script>
+            {% endif %}
+        {% endif %}
+
+        <script type="application/javascript">
+            StandardWeb.cdnDomain = '{{ cdn_domain }}';
+
+            var rtsAuthData = {{ rts_auth_data|tojson|safe }};
+            var rtsBaseUrl = '{{ rts_base_url }}';
+            var rtsPrefix = '{{ rts_prefix }}';
+
+            StandardWeb.realtime.init(rtsAuthData, rtsBaseUrl, rtsPrefix);
+            StandardWeb.setCSRFToken('{{ session["csrf_token"] }}');
+        </script>
+
+        {% block js %}{% endblock %}
     </head>
 
     <body>
@@ -155,32 +183,9 @@
                 <div class="clearfix"></div>
             </div>
         </div>
+
         <div class="content">
             {% block content %}{% endblock %}
         </div>
-
-        {% if user %}
-            <script type="application/javascript">
-                StandardWeb.userId = {{ user.id }};
-                StandardWeb.username = '{{ user.get_username() }}';
-            </script>
-            {% if user.player %}
-                <script type="application/javascript">
-                    StandardWeb.playerId = {{ user.player_id }};
-                    StandardWeb.nickname = '{{ user.player.nickname }}';
-                </script>
-            {% endif %}
-        {% endif %}
-
-        <script type="application/javascript">
-            StandardWeb.cdnDomain = '{{ cdn_domain }}';
-
-            var rtsAuthData = {{ rts_auth_data|tojson|safe }};
-            var rtsBaseUrl = '{{ rts_base_url }}';
-            var rtsPrefix = '{{ rts_prefix }}';
-
-            StandardWeb.realtime.init(rtsAuthData, rtsBaseUrl, rtsPrefix);
-            StandardWeb.setCSRFToken('{{ session["csrf_token"] }}');
-        </script>
     </body>
 </html>
