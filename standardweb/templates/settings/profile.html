@@ -4,6 +4,12 @@
 
 {% from 'includes/forms.html' import render_field %}
 
+{% block js %}
+    <script type="application/javascript">
+        mixpanel.track('profile settings page view');
+    </script>
+{% endblock %}
+
 {% block settings_content %}
     <form method="POST" action="{{ url_for('profile_settings') }}">
         {{ form.hidden_tag() }}
@@ -32,7 +38,4 @@
             </div>
         </div>
     </form>
-    <script type="application/javascript">
-        mixpanel.track('profile settings page view');
-    </script>
 {% endblock %}

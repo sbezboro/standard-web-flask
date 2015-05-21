@@ -15,6 +15,39 @@
 {% endblock %}
 
 {% block select_player %}{% if user.username == username %}selected{% endif %}{% endblock %}
+
+{% block js %}
+    {% if player %}
+        <script type="application/javascript">
+            $(document).ready(function() {
+                $('.load-all').on('click', function() {
+                    $(this).siblings('.other.hidden').removeClass('hidden');
+                    $(this).addClass('hidden');
+                    return false;
+                });
+
+                $('.adjust-time').on('click', function() {
+                    var dialog = new StandardWeb.InputDialog('Adjust player time', 'Adjustment:', 'minutes');
+                    dialog.positiveCallback = function(inputValue) {
+                        $.ajax({
+                            url: "{{ url_for('adjust_player_time', server_id=server.id, uuid=player.uuid) }}",
+                            type: 'POST',
+                            data: {adjustment: inputValue},
+                            success: function() {
+                                dialog.close();
+                                location.reload();
+                            }
+                        });
+                    };
+
+                    dialog.show();
+                    return false;
+                });
+            });
+        </script>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     <div class="container">
         {% include 'includes/flash_messages.html' %}
@@ -199,36 +232,6 @@
             <h2>No record of {{ username or 'that player'}} having played on any server</h2>
         {% endif %}
     </div>
-
-    {% if player %}
-        <script>
-            $(document).ready(function() {
-                $('.load-all').on('click', function() {
-                    $(this).siblings('.other.hidden').removeClass('hidden');
-                    $(this).addClass('hidden');
-                    return false;
-                });
-
-                $('.adjust-time').on('click', function() {
-                    var dialog = new StandardWeb.InputDialog('Adjust player time', 'Adjustment:', 'minutes');
-                    dialog.positiveCallback = function(inputValue) {
-                        $.ajax({
-                            url: "{{ url_for('adjust_player_time', server_id=server.id, uuid=player.uuid) }}",
-                            type: 'POST',
-                            data: {adjustment: inputValue},
-                            success: function() {
-                                dialog.close();
-                                location.reload();
-                            }
-                        });
-                    };
-
-                    dialog.show();
-                    return false;
-                });
-            });
-        </script>
-    {% endif %}
 {% endblock %}
 
 {% macro render_combat_stats(label, count, values) -%}

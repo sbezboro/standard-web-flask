@@ -69,10 +69,10 @@ bundles = {
             'js/local/react/mixins/*.jsx',
             'js/local/react/*.jsx',
             filters='react',
-            output='js/gen/react.build.js'
+            output='js/gen/react.build.js'  # required for dev
         ),
         filters='uglifyjs',
-        output='js/gen/local.min.js'
+        output='js/gen/base.min.js'
     ),
     'js_admin': Bundle(
         'js/local/pages/admin.js',

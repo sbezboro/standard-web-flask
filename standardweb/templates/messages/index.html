@@ -4,6 +4,15 @@
 
 {% from 'messages/includes/message_row.html' import message_row %}
 
+{% block js %}
+    <script type="application/javascript">
+        StandardWeb.messages.active = true;
+        {% if other_user_id %}
+            StandardWeb.messages.otherUserId = {{ other_user_id }};
+        {% endif %}
+    </script>
+{% endblock %}
+
 {% block content %}
     <div class="container">
         {% include 'includes/flash_messages.html' %}
@@ -79,11 +88,4 @@
             </div>
         </div>
     </div>
-
-    <script type="application/javascript">
-        StandardWeb.messages.active = true;
-        {% if other_user_id %}
-            StandardWeb.messages.otherUserId = {{ other_user_id }};
-        {% endif %}
-    </script>
 {% endblock %}

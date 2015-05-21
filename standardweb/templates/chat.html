@@ -4,6 +4,12 @@
 
 {% block select_chat %}selected{% endblock %}
 
+{% block js %}
+  <script type="application/javascript">
+    StandardWeb.chat.serverId = {{ server.id }};
+  </script>
+{% endblock %}
+
 {% block content %}
     <div class="nav-header">
       <div class="inner">
@@ -32,9 +38,5 @@
       {% endif %}
       <table class="players-table">
       </table>
-      
-      <script type="text/javascript">
-          StandardWeb.chat.serverId = {{ server.id }};
-      </script>
     </div>
 {% endblock %}
