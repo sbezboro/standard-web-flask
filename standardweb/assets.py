@@ -64,15 +64,15 @@ bundles = {
             'js/local/notifications.js',
             'js/local/realtime.js',
             'js/local/site.js',
-            filters='uglifyjs',
-            output='js/gen/local.min.js'
         ),
         Bundle(
             'js/local/react/mixins/*.jsx',
             'js/local/react/*.jsx',
             filters='react',
             output='js/gen/react.build.js'
-        )
+        ),
+        filters='uglifyjs',
+        output='js/gen/local.min.js'
     ),
     'js_admin': Bundle(
         'js/local/pages/admin.js',
