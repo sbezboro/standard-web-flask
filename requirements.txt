@@ -34,7 +34,9 @@ ply==3.4
 pyasn1==0.1.7
 pycparser==2.10
 pycrypto==2.6.1
+PyExecJS==1.1.0
 pyOpenSSL==0.15.1
+PyReact==0.5.2
 python-dateutil==2.3
 python-memcached==1.53
 pytz==2015.2
