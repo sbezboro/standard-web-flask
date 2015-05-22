@@ -45,7 +45,7 @@
       this.setState({muted: !this.state.muted});
     },
 
-    handleInput: function(input) {
+    handleInputEntered: function(input) {
       var data = {};
 
       if (input[0] == "/") {
@@ -55,6 +55,9 @@
       }
 
       this.state.socket.emit('console-input', data);
+
+      this.addHistory(input);
+      this.setState({inputValue: ''});
     },
 
     handlePlayerSelected: function(player) {
@@ -140,8 +143,12 @@
             status={this.state.status}
             selectedPlayer={this.state.selectedPlayer}
             muted={this.state.muted}
+            inputValue={this.state.inputValue}
             onMuteToggle={this.handleMuteToggle}
-            onInput={this.handleInput}
+            onInputChange={this.handleInputChange}
+            onHistoryUp={this.handleHistoryUp}
+            onHistoryDown={this.handleHistoryDown}
+            onInputEntered={this.handleInputEntered}
           />
           {this.state.selectedPlayer ? (
             <PlayerDetail player={this.state.selectedPlayer}
@@ -166,11 +173,25 @@
       this.props.onMuteToggle();
     },
 
+    handleInputChange: function(e) {
+      this.props.onInputChange(e.target.value);
+      e.preventDefault();
+    },
+
+    handleInputKeyDown: function(e) {
+      if (e.keyCode == 38) { // Up key
+        this.props.onHistoryUp();
+        e.preventDefault();
+      } else if (e.keyCode == 40) { // Down key
+        this.props.onHistoryDown();
+        e.preventDefault();
+      }
+    },
+
     handleInputKeyUp: function(e) {
-      if (e.keyCode == 13) { // Enter
-        var input = React.findDOMNode(this.refs.inputText);
-        this.props.onInput(input.value);
-        input.value = '';
+      if (e.keyCode == 13 && e.target.value) { // Enter
+        this.props.onInputEntered(e.target.value);
+        e.preventDefault();
       }
     },
 
@@ -190,7 +211,9 @@
           <div className="console"></div>
           <input className="console-textbox"
             type="text"
-            ref="inputText"
+            value={this.props.inputValue}
+            onChange={this.handleInputChange}
+            onKeyDown={this.handleInputKeyDown}
             onKeyUp={this.handleInputKeyUp}
             disabled={this.props.status !== 'connected'}/>
         </div>

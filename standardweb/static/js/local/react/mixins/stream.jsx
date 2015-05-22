@@ -5,6 +5,8 @@
     mentions: [],
     nextMentionSoundTime: 0,
     focused: true,
+    commandIndex: -1,
+    commandHistory: [],
 
     addOutputLine: function(line) {
       return this.addOutputLines([line]);
@@ -32,6 +34,29 @@
       } else {
         callback();
       }
+    },
+
+    addHistory: function(input) {
+      this.commandHistory.unshift(input);
+      this.commandIndex = -1;
+    },
+
+    handleHistoryUp: function() {
+      if (this.commandIndex < this.commandHistory.length - 1) {
+        this.commandIndex++;
+        this.setState({inputValue: this.commandHistory[this.commandIndex]});
+      }
+    },
+
+    handleHistoryDown: function() {
+      if (this.commandIndex > -1) {
+        this.commandIndex--;
+        this.setState({inputValue: this.commandHistory[this.commandIndex]});
+      }
+    },
+
+    handleInputChange: function(inputValue) {
+      this.setState({inputValue: inputValue});
     },
 
     trimTopLines: function(num) {
