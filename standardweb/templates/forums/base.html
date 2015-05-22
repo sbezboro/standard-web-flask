@@ -25,55 +25,54 @@
 {% block js %}
     {{ super() }}
     <script type="application/javascript">
-        $(document).ready(function() {
-            window.sceditor = $(".post-form textarea").sceditor({
-                plugins: "bbcode",
-                toolbar: 'bold,italic,underline,strike|size,color,removeformat|code,quote|image,link,youtube|emoticon|source',
-                resizeWidth: false,
-                emoticonsRoot: StandardWeb.cdnDomain + "/static/images/forums/emoticons/",
-                style: "{{ url_for('static', filename='css/lib/bbcode-editor.css') }}",
-                width: '100%',
-                emoticons: {
-                    dropdown: {
-                        ':)': 'smile.png',
-                        ':D': 'grin.png',
-                        ':(': 'sad.png',
-                        ":'(": 'cwy.png',
-                        '8-)': 'cool.png',
-                        '<3': 'heart.png',
-                        ':O': 'shocked.png',
-                        ':P': 'tongue.png',
-                        ';)': 'wink.png'
-                    },
-                    more: {
-                        ':angel:': 'angel.png',
-                        ':angry:': 'angry.png',
-                        ':ermm:': 'ermm.png',
-                        ':alien:': 'alien.png',
-                        ':blink:': 'blink.png',
-                        ':blush:': 'blush.png',
-                        ':cheerful:': 'cheerful.png',
-                        ':devil:': 'devil.png',
-                        ':dizzy:': 'dizzy.png',
-                        ':getlost:': 'getlost.png',
-                        ':happy:': 'happy.png',
-                        ':kissing:': 'kissing.png',
-                        ':ninja:': 'ninja.png',
-                        ':pinch:': 'pinch.png',
-                        ':pouty:': 'pouty.png',
-                        ':sick:': 'sick.png',
-                        ':sideways:': 'sideways.png',
-                        ':silly:': 'silly.png',
-                        ':sleeping:': 'sleeping.png',
-                        ':unsure:': 'unsure.png',
-                        ':woot:': 'w00t.png',
-                        ':wassat:': 'wassat.png'
-                    }
+        window.sceditor = $(".post-form textarea").sceditor({
+            plugins: "bbcode",
+            toolbar: 'bold,italic,underline,strike|size,color,removeformat|code,quote|image,link,youtube|emoticon|source',
+            resizeWidth: false,
+            emoticonsRoot: StandardWeb.cdnDomain + "/static/images/forums/emoticons/",
+            style: "{{ url_for('static', filename='css/lib/bbcode-editor.css') }}",
+            width: '100%',
+            emoticons: {
+                dropdown: {
+                    ':)': 'smile.png',
+                    ':D': 'grin.png',
+                    ':(': 'sad.png',
+                    ":'(": 'cwy.png',
+                    '8-)': 'cool.png',
+                    '<3': 'heart.png',
+                    ':O': 'shocked.png',
+                    ':P': 'tongue.png',
+                    ';)': 'wink.png'
+                },
+                more: {
+                    ':angel:': 'angel.png',
+                    ':angry:': 'angry.png',
+                    ':ermm:': 'ermm.png',
+                    ':alien:': 'alien.png',
+                    ':blink:': 'blink.png',
+                    ':blush:': 'blush.png',
+                    ':cheerful:': 'cheerful.png',
+                    ':devil:': 'devil.png',
+                    ':dizzy:': 'dizzy.png',
+                    ':getlost:': 'getlost.png',
+                    ':happy:': 'happy.png',
+                    ':kissing:': 'kissing.png',
+                    ':ninja:': 'ninja.png',
+                    ':pinch:': 'pinch.png',
+                    ':pouty:': 'pouty.png',
+                    ':sick:': 'sick.png',
+                    ':sideways:': 'sideways.png',
+                    ':silly:': 'silly.png',
+                    ':sleeping:': 'sleeping.png',
+                    ':unsure:': 'unsure.png',
+                    ':woot:': 'w00t.png',
+                    ':wassat:': 'wassat.png'
                 }
-            }).sceditor('instance');
-            if (window.sceditor.sourceMode) {
-                window.sceditor.sourceMode(true);
             }
-        });
+        }).sceditor('instance');
+
+        if (window.sceditor.sourceMode) {
+            window.sceditor.sourceMode(true);
+        }
     </script>
 {% endblock %}

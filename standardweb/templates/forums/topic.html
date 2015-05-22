@@ -230,18 +230,16 @@
 {% block js %}
     {{ super() }}
     <script type="application/javascript">
-        $(document).ready(function() {
-            $('.reply').on('click', function(e) {
-                var content = $(this).closest('.post-details').siblings('.post-content').attr('data-bbcode');
-                var username = $(this).closest('.post-details').siblings('.post-author').attr('data-username');
+        $('.reply').on('click', function(e) {
+            var content = $(this).closest('.post-details').siblings('.post-content').attr('data-bbcode');
+            var username = $(this).closest('.post-details').siblings('.post-author').attr('data-username');
 
-                window.sceditor.val(window.sceditor.val() + '[quote=' + username + ']\n' + content + '[/quote]');
-                window.sceditor.focus();
+            window.sceditor.val(window.sceditor.val() + '[quote=' + username + ']\n' + content + '[/quote]');
+            window.sceditor.focus();
 
-                $(document).scrollTop($(document).height());
+            $(document).scrollTop($(document).height());
 
-                return false;
-            });
+            return false;
         });
     </script>
 {% endblock %}

@@ -26,11 +26,9 @@
     <script type="text/javascript">
         StandardWeb.admin.serverId = {{ server.id }};
 
-        $(document).ready(function() {
-            React.render(
-                React.createElement(StandardWeb.reactComponents.AdminPanel),
-                document.getElementById('admin-panel')
-            );
-        });
+        React.render(
+            React.createElement(StandardWeb.reactComponents.AdminPanel),
+            document.getElementById('admin-panel')
+        );
     </script>
 {% endblock %}
