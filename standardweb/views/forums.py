@@ -25,6 +25,7 @@ from standardweb.models import (
 )
 from standardweb.views.decorators.auth import login_required
 from standardweb.views.decorators.redirect import redirect_route
+from standardweb.views.decorators.referrers import reject_external_referrers
 
 
 TOPICS_PER_PAGE = 40
@@ -775,6 +776,7 @@ def forum_ban():
 
 
 @app.route('/attachment/<hash>')
+@reject_external_referrers()
 def forum_attachment(hash):
     attachment = ForumAttachment.query.filter_by(hash=hash).first()
     if not attachment:

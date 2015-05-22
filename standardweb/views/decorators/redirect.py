@@ -1,3 +1,5 @@
+from functools import wraps
+
 from flask import redirect, url_for
 
 from standardweb import app
@@ -5,6 +7,7 @@ from standardweb import app
 
 def redirect_route(old_rule):
     def decorator(func):
+        @wraps(func)
         def redirector(**route_kw):
             return redirect(url_for(func.__name__, **route_kw), 301)
 

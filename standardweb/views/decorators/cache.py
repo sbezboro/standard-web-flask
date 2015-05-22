@@ -10,8 +10,8 @@ def last_modified(last_modified_func):
     the provided last_modified_func for the request returns a date
     older than the 'If-Modified-Since' request header.
     """
-    def decorator(f):
-        @wraps(f)
+    def decorator(func):
+        @wraps(func)
         def wrapped(*args, **kwargs):
             if_modified_since = request.headers.get('If-Modified-Since')
 
@@ -25,7 +25,7 @@ def last_modified(last_modified_func):
                     response.status_code = 304
                     return response
 
-            resp = f(*args, **kwargs)
+            resp = func(*args, **kwargs)
 
             if response_date:
                 resp.last_modified = response_date
