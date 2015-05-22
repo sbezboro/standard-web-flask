@@ -4,24 +4,6 @@
 
 {% from 'includes/forms.html' import render_field %}
 
-{% block js %}
-    <script type="application/javascript">
-        $(document).ready(function() {
-            $('.reply').on('click', function(e) {
-                var content = $(this).closest('.post-details').siblings('.post-content').attr('data-bbcode');
-                var username = $(this).closest('.post-details').siblings('.post-author').attr('data-username');
-
-                window.sceditor.val(window.sceditor.val() + '[quote=' + username + ']\n' + content + '[/quote]');
-                window.sceditor.focus();
-
-                $(document).scrollTop($(document).height());
-
-                return false;
-            });
-        });
-    </script>
-{% endblock %}
-
 {% block forum_content %}
     <div class="breadcrumbs">
         <a href="{{ url_for('forums') }}">Forums</a> &rarr;
@@ -244,3 +226,22 @@
         </div>
     {% endif %}
 {%- endmacro %}
+
+{% block js %}
+    {{ super() }}
+    <script type="application/javascript">
+        $(document).ready(function() {
+            $('.reply').on('click', function(e) {
+                var content = $(this).closest('.post-details').siblings('.post-content').attr('data-bbcode');
+                var username = $(this).closest('.post-details').siblings('.post-author').attr('data-username');
+
+                window.sceditor.val(window.sceditor.val() + '[quote=' + username + ']\n' + content + '[/quote]');
+                window.sceditor.focus();
+
+                $(document).scrollTop($(document).height());
+
+                return false;
+            });
+        });
+    </script>
+{% endblock %}

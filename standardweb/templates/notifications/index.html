@@ -4,17 +4,6 @@
 
 {% from 'notifications/includes/notification_row.html' import notification_row %}
 
-{% block js %}
-    <script type="application/javascript">
-        StandardWeb.notifications.active = true;
-        {% if oldest_id %}
-            StandardWeb.notifications.oldestId = {{ oldest_id }};
-        {% endif %}
-
-        mixpanel.track('notifications page view');
-    </script>
-{% endblock %}
-
 {% block content %}
     <div class="container">
         {% include 'includes/flash_messages.html' %}
@@ -37,4 +26,16 @@
             {% endif %}
         </div>
     </div>
+{% endblock %}
+
+{% block js %}
+    {{ super() }}
+    <script type="application/javascript">
+        StandardWeb.notifications.active = true;
+        {% if oldest_id %}
+            StandardWeb.notifications.oldestId = {{ oldest_id }};
+        {% endif %}
+
+        mixpanel.track('notifications page view');
+    </script>
 {% endblock %}

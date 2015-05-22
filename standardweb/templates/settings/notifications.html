@@ -16,12 +16,6 @@
     </tr>
 {%- endmacro %}
 
-{% block js %}
-    <script type="application/javascript">
-        mixpanel.track('notification settings page view');
-    </script>
-{% endblock %}
-
 {% block settings_content %}
     <form method="POST" action="{{ url_for('notifications_settings') }}">
         {{ form.hidden_tag() }}
@@ -66,4 +60,11 @@
             </div>
         </div>
     </form>
+{% endblock %}
+
+{% block js %}
+    {{ super() }}
+    <script type="application/javascript">
+        mixpanel.track('notification settings page view');
+    </script>
 {% endblock %}

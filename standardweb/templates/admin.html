@@ -4,21 +4,6 @@
 
 {% block select_admin %}selected{% endblock %}
 
-{% block js %}
-    {% assets "js_admin" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
-
-    <script type="text/javascript">
-        StandardWeb.admin.serverId = {{ server.id }};
-
-        $(document).ready(function() {
-            React.render(
-                React.createElement(StandardWeb.reactComponents.AdminPanel),
-                document.getElementById('admin-panel')
-            );
-        });
-    </script>
-{% endblock %}
-
 {% block content %}
     <div class="nav-header">
       <div class="inner">
@@ -32,4 +17,20 @@
       </div>
     </div>
     <div id="admin-panel"></div>
+{% endblock %}
+
+{% block js %}
+    {{ super() }}
+    {% assets "js_admin" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+
+    <script type="text/javascript">
+        StandardWeb.admin.serverId = {{ server.id }};
+
+        $(document).ready(function() {
+            React.render(
+                React.createElement(StandardWeb.reactComponents.AdminPanel),
+                document.getElementById('admin-panel')
+            );
+        });
+    </script>
 {% endblock %}

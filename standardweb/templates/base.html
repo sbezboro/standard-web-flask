@@ -106,8 +106,6 @@
             StandardWeb.realtime.init(rtsAuthData, rtsBaseUrl, rtsPrefix);
             StandardWeb.setCSRFToken('{{ session["csrf_token"] }}');
         </script>
-
-        {% block js %}{% endblock %}
     </head>
 
     <body>
@@ -182,4 +180,6 @@
             {% block content %}{% endblock %}
         </div>
     </body>
+
+    {% block js %}{% endblock %}
 </html>
