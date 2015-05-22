@@ -234,7 +234,7 @@
             var content = $(this).closest('.post-details').siblings('.post-content').attr('data-bbcode');
             var username = $(this).closest('.post-details').siblings('.post-author').attr('data-username');
 
-            window.sceditor.val(window.sceditor.val() + '[quote=' + username + ']\n' + content + '[/quote]');
+            window.sceditor.val(window.sceditor.val() + '[quote=' + username + ']\n' + content + '[/quote]\n');
             window.sceditor.focus();
 
             $(document).scrollTop($(document).height());
