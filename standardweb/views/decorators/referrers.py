@@ -7,7 +7,7 @@ from standardweb import app
 
 
 VALID_REFERRER_SUBSTRINGS = frozenset((
-    'standardsurvival.com', 'www.google.com'
+    'standardsurvival.com', 'www.google.'
 ))
 
 
