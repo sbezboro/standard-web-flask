@@ -16,9 +16,8 @@ CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_DEFAULT_QUEUE = 'default'
+CELERY_DEFAULT_QUEUE = 'celery'
 CELERY_QUEUES = (
-    Queue('celery', Exchange('celery'), routing_key='celery'),  # TODO: remove
     Queue('default', Exchange('default'), routing_key='default'),
     Queue('minute_query', Exchange('minute_query'), routing_key='minute_query'),
     Queue('check_uuids', Exchange('check_uuids'), routing_key='check_uuids'),
@@ -33,9 +32,9 @@ CELERYBEAT_SCHEDULE = {
         'task': 'standardweb.jobs.backup.db_backup',
         'schedule': crontab(minute=0, hour=12)  # 4AM PST
     },
-    'schedule_checks': {
-        'task': 'standardweb.jobs.usernames.schedule_checks',
-        'schedule': crontab(minute=0, hour=15, day_of_week=4)  # 7AM PST on Wednesday
+    'check_uuids': {
+        'task': 'standardweb.jobs.usernames.check_uuids',
+        'schedule': timedelta(minutes=4)  # Every 4 minutes
     }
 }
 
@@ -47,8 +46,6 @@ CELERY_ROUTES = {
         'queue': 'check_uuids'
     }
 }
-
-BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 31556940}
 
 ASSETS_DEBUG = False
 ASSETS_AUTO_BUILD = False
