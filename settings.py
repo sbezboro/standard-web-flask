@@ -42,7 +42,7 @@ CELERY_ROUTES = {
     'standardweb.jobs.query.minute_query': {
         'queue': 'minute_query'
     },
-    'standardweb.jobs.usernames.schedule_checks': {
+    'standardweb.jobs.usernames.check_uuids': {
         'queue': 'check_uuids'
     }
 }
