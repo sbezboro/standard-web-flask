@@ -1,12 +1,12 @@
+from datetime import timedelta
 import traceback
 
 from celery import Celery
-from flask import Flask
-from flask import g
-from flask import got_request_exception
-from flask import Request
+from celery.schedules import crontab
+from flask import Flask, g, got_request_exception, Request
 from flask.ext.cdn import CDN
 from flask.ext.sqlalchemy import SQLAlchemy
+from kombu import Queue, Exchange
 import rollbar
 from rollbar.contrib.flask import report_exception
 from werkzeug.contrib.cache import MemcachedCache
@@ -32,6 +32,36 @@ def make_celery(app):
     celery = Celery(app.import_name, broker=app.config['CELERY_BROKER_URL'])
 
     celery.conf.update(app.config)
+    celery.conf.update({
+        'CELERY_DEFAULT_QUEUE': 'default',
+        'CELERY_QUEUES': (
+            Queue('default', Exchange('default'), routing_key='default'),
+            Queue('minute_query', Exchange('minute_query'), routing_key='minute_query'),
+            Queue('check_uuids', Exchange('check_uuids'), routing_key='check_uuids'),
+        ),
+        'CELERY_ROUTES': {
+            'standardweb.jobs.query.minute_query': {
+                'queue': 'minute_query'
+            },
+            'standardweb.jobs.usernames.check_uuids': {
+                'queue': 'check_uuids'
+            }
+        },
+        'CELERYBEAT_SCHEDULE': {
+            'minute_query': {
+                'task': 'standardweb.jobs.query.minute_query',
+                'schedule': crontab()
+            },
+            'db_backup': {
+                'task': 'standardweb.jobs.backup.db_backup',
+                'schedule': crontab(minute=0, hour=12)  # 4AM PST
+            },
+            'check_uuids': {
+                'task': 'standardweb.jobs.usernames.check_uuids',
+                'schedule': timedelta(minutes=4)  # Every 4 minutes
+            }
+        }
+    })
 
     TaskBase = celery.Task
 
