@@ -28,6 +28,7 @@
       this.serverId = StandardWeb.admin.serverId;
 
       $(window).resize(this.handleResize);
+
       this.handleResize();
 
       this.connect();
@@ -65,7 +66,12 @@
         player = null;
       }
 
-      this.setState({selectedPlayer: player});
+      var callback;
+      if (this.isAtBottom()) {
+        callback = this.scrollToBottom;
+      }
+
+      this.setState({selectedPlayer: player}, callback);
     },
 
     handleCloseDetail: function() {
@@ -169,6 +175,19 @@
 
   var ConsoleArea = React.createClass({
 
+    componentDidMount: function() {
+      $(document).keypress(this.handleRefocus);
+    },
+
+    handleRefocus: function() {
+      var $focused = $(':focus');
+      var $textbox = $(React.findDOMNode(this.refs.inputTextbox));
+
+      if ($textbox != $focused) {
+        $textbox.focus();
+      }
+    },
+
     handleMuteToggle: function() {
       this.props.onMuteToggle();
     },
@@ -211,6 +230,7 @@
           <div className="console"></div>
           <input className="console-textbox"
             type="text"
+            ref="inputTextbox"
             value={this.props.inputValue}
             onChange={this.handleInputChange}
             onKeyDown={this.handleInputKeyDown}
