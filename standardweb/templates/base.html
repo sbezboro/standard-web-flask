@@ -42,25 +42,25 @@
         {% assets "js_lib" %}<script type="application/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
         {% assets "js_base" %}<script type="application/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
 
-        {% if user %}
+        {% if current_user %}
             <script type="application/javascript">
                 mixpanel.register({
-                    user_id: {{ user.id }}
+                    user_id: {{ current_user.id }}
                 });
-                mixpanel.identify({{ user.id }});
+                mixpanel.identify({{ current_user.id }});
                 mixpanel.people.set({
-                    id: {{ user.id }},
-                    {% if user.email %}'$email': '{{ user.email }}',{% endif %}
-                    '$name': '{{ user.player.username if user.player else user.username }}',
-                    username: '{{ user.player.username if user.player else user.username }}',
-                    '$created': '{{ user.date_joined.isoformat() }}'
+                    id: {{ current_user.id }},
+                    {% if current_user.email %}'$email': '{{ current_user.email }}',{% endif %}
+                    '$name': '{{ current_user.player.username if current_user.player else current_user.username }}',
+                    username: '{{ current_user.player.username if current_user.player else current_user.username }}',
+                    '$created': '{{ current_user.date_joined.isoformat() }}'
                 });
             </script>
         {% endif %}
 
         {% if g.first_login %}
             <script type="application/javascript">
-                mixpanel.alias({{ user.id }});
+                mixpanel.alias({{ current_user.id }});
                 mixpanel.track('account created');
             </script>
 
@@ -82,16 +82,16 @@
             <noscript><img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?ev=6018722527894&amp;cd[value]=0.00&amp;cd[currency]=CAD&amp;noscript=1" /></noscript>
         {% endif %}
 
-        {% if user %}
+        {% if current_user %}
             <script type="application/javascript">
-                StandardWeb.userId = {{ user.id }};
-                StandardWeb.username = '{{ user.get_username() }}';
+                StandardWeb.userId = {{ current_user.id }};
+                StandardWeb.username = '{{ current_user.get_username() }}';
             </script>
 
-            {% if user.player %}
+            {% if current_user.player %}
                 <script type="application/javascript">
-                    StandardWeb.playerId = {{ user.player_id }};
-                    StandardWeb.nickname = '{{ user.player.nickname }}';
+                    StandardWeb.playerId = {{ current_user.player_id }};
+                    StandardWeb.nickname = '{{ current_user.player.nickname }}';
                 </script>
             {% endif %}
         {% endif %}
@@ -122,12 +122,12 @@
                         <li><a class="{% block select_forum %}{% endblock %}" href="{{ url_for('forums') }}">Forums</a></li>
                         <li><a class="{% block select_chat %}{% endblock %}" href="{{ url_for('chat', server_id=server.id if server else None) }}">Live Chat</a></li>
                         <li><a class="{% block select_search %}{% endblock %}" href="{{ url_for('player_search') }}">Player Search</a></li>
-                        {% if user and user.admin %}
+                        {% if current_user and current_user.admin %}
                             <li><a href="{{ url_for('admin', server_id=server.id if server else None) }}">Admin</a></li>
                         {% endif %}
                     </ul>
                     <div class="header-account">
-                        {% if user %}
+                        {% if current_user %}
                             <div class="icons">
                                 <a class="icon messages {% if new_messages %}new{% endif %}" href="{{ url_for('messages') }}" title="Messages">
                                     <i class="fa fa-envelope"></i>
@@ -139,20 +139,20 @@
                                 </a>
                             </div>
                             <div class="dropdown">
-                                {% if user.player %}
+                                {% if current_user.player %}
                                     <a class="{% block select_player %}{% endblock %} toggle" href="#">
-                                        {{ user.player.username|face_thumb }}{{ user.player.username }}
+                                        {{ current_user.player.username|face_thumb }}{{ current_user.player.username }}
                                         <span class="caret"></span>
                                     </a>
                                 {% else %}
                                     <a class="toggle" href="#">
-                                        {{ user.username }}
+                                        {{ current_user.username }}
                                         <span class="caret"></span>
                                     </a>
                                 {% endif %}
                                 <div class="options">
-                                    {% if user.player %}
-                                        <a href="{{ url_for('player', username=user.player.username) }}">
+                                    {% if current_user.player %}
+                                        <a href="{{ url_for('player', username=current_user.player.username) }}">
                                             <i class="fa fa-user"></i><span>Profile</span>
                                         </a>
                                     {% endif %}

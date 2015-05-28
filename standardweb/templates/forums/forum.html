@@ -11,7 +11,7 @@
         {{ pages() }}
         <div class="controls">
             <a href="{{ url_for('forum_search', forum_id=forum.id) }}">Search this forum</a>
-            {% if not forum.locked or not user or user.admin %}
+            {% if not forum.locked or not current_user or current_user.admin %}
                 <a href="{{ url_for('new_topic', forum_id=forum.id) }}" class="btn">New Topic</a>
             {% endif %}
         </div>
@@ -31,7 +31,7 @@
         {{ pages() }}
         <div class="controls">
             <a href="{{ url_for('forum_search', forum_id=forum.id) }}">Search this forum</a>
-            {% if not forum.locked or not user or user.admin %}
+            {% if not forum.locked or not current_user or current_user.admin %}
                 <a href="{{ url_for('new_topic', forum_id=forum.id) }}" class="btn">New Topic</a>
             {% endif %}
         </div>

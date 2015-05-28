@@ -118,7 +118,7 @@ def access_log(response):
 
 @app.context_processor
 def inject_user():
-    return dict(user=g.user)
+    return dict(current_user=g.user)
 
 
 @app.context_processor

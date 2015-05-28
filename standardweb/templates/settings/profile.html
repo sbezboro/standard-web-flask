@@ -9,7 +9,7 @@
         {{ form.hidden_tag() }}
         <div class="control-group">
             <label>Username</label>
-            <div class="control">{{ user.get_username() }}</div>
+            <div class="control">{{ current_user.get_username() }}</div>
         </div>
         {% if player and player.nickname %}
         <div class="control-group">
@@ -18,7 +18,7 @@
         </div>
         {% endif %}
         {{ render_field(form.full_name, placeholder='optional') }}
-        <div class="control-group {{ 'error' if not user.email }}">
+        <div class="control-group {{ 'error' if not current_user.email }}">
             {{ form.email.label }}
             <span class="control-errors">{% if form.email.errors %}{{ form.email.errors[0] }}{% endif %}</span>
             <div class="control">{{ form.email }}</div>

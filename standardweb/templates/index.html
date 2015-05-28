@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="container">
-        {% if user and not user.email %}
+        {% if current_user and not current_user.email %}
             <div class="alert warning">
                 Please set an email address for your account <a href="{{ url_for('profile_settings') }}">here</a>.
                 <a class="close">&times;</a>

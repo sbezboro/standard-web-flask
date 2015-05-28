@@ -14,7 +14,7 @@
     {% endif %}
 {% endblock %}
 
-{% block select_player %}{% if user.username == username %}selected{% endif %}{% endblock %}
+{% block select_player %}{% if current_user.username == username %}selected{% endif %}{% endblock %}
 
 {% block content %}
     <div class="container">
@@ -23,7 +23,7 @@
         <div class="border-section player-section">
             <div class="section-header">
                 <div class="pull-right">
-                    {% if user and player.user != user %}
+                    {% if current_user and player.user != current_user %}
                         <a class="btn btn-lite" href="{{ url_for('messages', username=player.username) }}">Send Message</a>
                     {% endif %}
                 </div>
@@ -140,7 +140,7 @@
                                 <div class="stat-name">Time played</div>
                                 <div class="stat-value">
                                     {{ server_stats.time_spent }}
-                                    {% if user and user.admin %}
+                                    {% if current_user and current_user.admin %}
                                         <a href="#" class="adjust-time"><i class="fa fa-pencil"></i></a>
                                     {% endif %}
                                 </div>

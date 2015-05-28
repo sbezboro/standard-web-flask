@@ -24,7 +24,7 @@
         <div class="chat-area"></div>
         <input id="chat-textbox" type="text" maxlength="80"/>
       </div>
-      {% if not user %}
+      {% if not current_user %}
         <br>
         <div>
           You must be <a href="{{ url_for('login', next=request.path) }}">logged in</a> to the website to be able to chat!

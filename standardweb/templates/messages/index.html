@@ -50,7 +50,7 @@
                         <div class="message-list">
                             {% if messages %}
                                 {% for message in messages %}
-                                    {{ message_row(message, user) }}
+                                    {{ message_row(message, current_user) }}
                                 {% endfor %}
                             {% else %}
                                 <div class="help">
