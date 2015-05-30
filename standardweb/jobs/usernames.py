@@ -74,7 +74,7 @@ def check_uuids():
 
     db.session.commit()
 
-    cache.set(COUNTER_CACHE_NAME, offset + PLAYERS_PER_JOB)
+    cache.set(COUNTER_CACHE_NAME, offset + PLAYERS_PER_JOB, 86400)
 
     rollbar.report_message('Finished checking uuid group', level='info', extra_data={
         'offset': offset,
