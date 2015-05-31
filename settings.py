@@ -1,9 +1,5 @@
 from datetime import timedelta
 
-from celery.schedules import crontab
-from kombu import Exchange, Queue
-
-
 DEBUG = False
 
 WTF_CSRF_ENABLED = False
@@ -16,6 +12,9 @@ CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['application/json']
+
+STATSD_HOST = 'localhost'
+STATSD_PORT = 8125
 
 ASSETS_DEBUG = False
 ASSETS_AUTO_BUILD = False

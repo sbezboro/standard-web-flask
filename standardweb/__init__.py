@@ -9,6 +9,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from kombu import Queue, Exchange
 import rollbar
 from rollbar.contrib.flask import report_exception
+import statsd
 from werkzeug.contrib.cache import MemcachedCache
 from werkzeug.contrib.fixers import ProxyFix
 
@@ -26,6 +27,8 @@ db = SQLAlchemy(app)
 cdn = CDN(app)
 
 cache = MemcachedCache(app.config['MEMCACHED_URLS'])
+
+stats = statsd.StatsClient(host=app.config['STATSD_HOST'], port=app.config['STATSD_PORT'])
 
 
 def make_celery(app):

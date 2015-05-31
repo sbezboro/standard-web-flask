@@ -7,7 +7,7 @@ import uuid
 from flask import abort, g, redirect, request, session, url_for
 import rollbar
 
-from standardweb import app
+from standardweb import app, stats
 from standardweb.lib import csrf
 from standardweb.lib import helpers as h
 from standardweb.models import User
@@ -92,13 +92,15 @@ def access_log(response):
     ):
         return response
 
+    response_time = int(1000 * (time.time() - g._start_time))
+
+    stats.timing('endpoints.%s.%s' % (endpoint, request.method), response_time)
+
     if route and route.startswith('/api'):
         return response
 
     client_uuid = str(session.get('client_uuid'))
     user_id = g.user.id if g.user else None
-
-    request_time = int(1000 * (time.time() - g._start_time))
 
     log_task.apply_async((
         client_uuid,
@@ -108,7 +110,7 @@ def access_log(response):
         request.full_path.rstrip('?'),
         request.referrer,
         response.status_code,
-        request_time,
+        response_time,
         request.headers.get('User-Agent'),
         request.remote_addr
     ))
