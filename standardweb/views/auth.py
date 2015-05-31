@@ -9,7 +9,7 @@ from flask import session
 from flask import url_for
 import rollbar
 
-from standardweb import app
+from standardweb import app, stats
 from standardweb.forms import LoginForm, VerifyEmailForm, ForgotPasswordForm, ResetPasswordForm
 from standardweb.lib.email import send_reset_password
 from standardweb.models import Player, User, EmailToken
@@ -42,11 +42,15 @@ def login():
             user.last_login = datetime.utcnow()
             user.save(commit=True)
 
+            stats.incr('login.success')
+
             flash('Successfully logged in', 'success')
 
             return redirect(next_path or url_for('index'))
         else:
             flash('Invalid username/password combination', 'error')
+
+            stats.incr('login.invalid')
 
             return render_template('login.html', form=form), 401
 
@@ -122,6 +126,8 @@ def create_account(token):
             session.permanent = True
 
             flash('Account created! You are now logged in', 'success')
+
+            stats.incr('account.created')
 
             rollbar.report_message('Account created', level='info', request=request,
                                    extra_data={
