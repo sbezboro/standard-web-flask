@@ -57,7 +57,7 @@ def make_celery(app):
             },
             'db_backup': {
                 'task': 'standardweb.jobs.backup.db_backup',
-                'schedule': crontab(minute=0, hour=12)  # 4AM PST
+                'schedule': crontab(minute=0, hour=10)  # 3AM PST
             },
             'check_uuids': {
                 'task': 'standardweb.jobs.usernames.check_uuids',
