@@ -15,7 +15,7 @@ from markupsafe import Markup
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
-from standardweb import app, db
+from standardweb import app, db, stats
 from standardweb.forms import MessageForm
 from standardweb.lib import realtime
 from standardweb.lib.notifier import notify_new_message
@@ -80,6 +80,8 @@ def messages(username=None):
                 message.save()
 
                 notify_new_message(message)
+
+                stats.incr('messages.created')
 
                 return redirect(url_for('messages', username=username))
 

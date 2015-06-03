@@ -102,6 +102,9 @@ def access_log(response):
     client_uuid = str(session.get('client_uuid'))
     user_id = g.user.id if g.user else None
 
+    if user_id:
+        stats.set('users.online', user_id)
+
     log_task.apply_async((
         client_uuid,
         user_id,

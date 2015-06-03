@@ -13,10 +13,9 @@ import rollbar
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
-from standardweb import app, db
+from standardweb import app, db, stats
 from standardweb.lib import helpers as h
 from standardweb.lib import player as libplayer
-from standardweb.lib import realtime
 from standardweb.lib.csrf import exempt_funcs
 from standardweb.lib.email import (
     send_creation_email,
@@ -551,6 +550,8 @@ def message_reply():
                         user_ip=request.remote_addr
                     )
                     message.save()
+
+                    stats.incr('messages.created')
 
                     notify_new_message(message)
 
