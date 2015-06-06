@@ -17,13 +17,15 @@ SCHEDULE_SERVICE = 'standard-web-celery-beat'
 
 env.user = 'deploy'
 env.roledefs = {
-    'web': ['209.222.7.106']
+    'web': ['209.222.7.106'],
+    'graphite': ['209.222.7.106']
 }
 
 
 def deploy():
     execute(_update_and_restart_services)
     _rollbar_record_deploy()
+    execute(_graphite_record_deploy)
 
 
 def serve():
@@ -86,3 +88,10 @@ def _rollbar_record_deploy():
         print "Deploy recorded successfully."
     else:
         print "Error recording deploy:", resp.text
+
+
+@roles('graphite')
+def _graphite_record_deploy():
+    run('curl -X POST http://%s:%s/events/ -d \'{"tags": "deploy"}\'' % (
+        app.config['GRAPHITE_HOST'], app.config['GRAPHITE_PORT']
+    ))
