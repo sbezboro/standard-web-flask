@@ -444,7 +444,7 @@ def new_topic(forum_id):
         subscribe = form.subscribe.data
 
         last_post = forum.last_post
-        if last_post.body == body and last_post.user_id == user.id:
+        if last_post and last_post.body == body and last_post.user_id == user.id:
             return redirect(last_post.url)
 
         topic = ForumTopic(forum=forum, user=user, name=title)
@@ -722,7 +722,7 @@ def move_topic(topic_id):
         topic.forum.topic_count -= 1
         topic.forum.save(commit=False)
 
-        if not to_forum.last_post and topic.updated > to_forum.last_post.created:
+        if to_forum.last_post and topic.updated > to_forum.last_post.created:
             to_forum.last_post = topic.last_post
 
         to_forum.topic_count += 1
