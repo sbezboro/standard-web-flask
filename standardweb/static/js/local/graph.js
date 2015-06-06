@@ -13,8 +13,8 @@
       var $graph = $(this);
 
       var offset = new Date().getTimezoneOffset() * 1000 * 60;
-      var serverId = 4;
-      var maxPlayers = 72;
+      var serverId = 5;
+      var maxPlayers = 120;
 
       var data = {};
 
