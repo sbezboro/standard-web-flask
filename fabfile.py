@@ -92,6 +92,6 @@ def _rollbar_record_deploy():
 
 @roles('graphite')
 def _graphite_record_deploy():
-    run('echo "events.deploy 1 `date +%%s`" | nc -c %s %s' % (
+    run('echo "events.deploy 1 `date +%%s`" | nc %s %s' % (
         app.config['GRAPHITE_HOST'], app.config['GRAPHITE_PORT']
     ))
