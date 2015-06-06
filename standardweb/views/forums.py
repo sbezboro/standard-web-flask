@@ -722,7 +722,7 @@ def move_topic(topic_id):
         topic.forum.topic_count -= 1
         topic.forum.save(commit=False)
 
-        if topic.updated > to_forum.last_post.created:
+        if not to_forum.last_post and topic.updated > to_forum.last_post.created:
             to_forum.last_post = topic.last_post
 
         to_forum.topic_count += 1
