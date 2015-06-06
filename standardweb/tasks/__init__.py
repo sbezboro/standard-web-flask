@@ -1,1 +1,0 @@
-import celery_statsd
