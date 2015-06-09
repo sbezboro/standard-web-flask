@@ -234,8 +234,7 @@
             value={this.props.inputValue}
             onChange={this.handleInputChange}
             onKeyDown={this.handleInputKeyDown}
-            onKeyUp={this.handleInputKeyUp}
-            disabled={this.props.status !== 'connected'}/>
+            onKeyUp={this.handleInputKeyUp}/>
         </div>
       );
     }
