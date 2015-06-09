@@ -1,4 +1,5 @@
 from datetime import timedelta
+import socket
 import traceback
 
 from celery import Celery
@@ -28,7 +29,10 @@ cdn = CDN(app)
 
 cache = MemcachedCache(app.config['MEMCACHED_URLS'])
 
-stats = statsd.StatsClient(host=app.config['STATSD_HOST'], port=app.config['STATSD_PORT'])
+try:
+    stats = statsd.StatsClient(host=app.config['STATSD_HOST'], port=app.config['STATSD_PORT'])
+except socket.gaierror:
+    stats = statsd.StatsClient()
 
 
 def make_celery(app):
