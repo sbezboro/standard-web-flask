@@ -1,13 +1,8 @@
 from datetime import datetime, timedelta
 
-from flask import flash
-from flask import g
-from flask import redirect
-from flask import request
-from flask import render_template
-from flask import session
-from flask import url_for
+from flask import flash, g, redirect, request, render_template, session, url_for
 import rollbar
+from sqlalchemy import or_
 
 from standardweb import app, stats
 from standardweb.forms import LoginForm, VerifyEmailForm, ForgotPasswordForm, ResetPasswordForm
@@ -26,11 +21,15 @@ def login():
         password = request.form['password']
         next_path = request.form.get('next')
 
+        username = username.strip()
+
         player = Player.query.filter_by(username=username).first()
         if player:
             user = player.user
         else:
-            user = User.query.filter_by(username=username).first()
+            user = User.query.filter(
+                or_(User.username == username, User.email == username)
+            ).first()
 
         if user and user.check_password(password):
             session['user_id'] = user.id

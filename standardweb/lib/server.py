@@ -6,7 +6,7 @@ import time
 
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
-from sqlalchemy.sql.expression import alias, label
+from sqlalchemy.sql.expression import label
 from standardweb import db
 
 from standardweb.lib import api
