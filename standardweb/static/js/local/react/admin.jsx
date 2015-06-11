@@ -59,6 +59,8 @@
 
       this.addHistory(input);
       this.setState({inputValue: ''});
+
+      this.scrollToBottom();
     },
 
     handlePlayerSelected: function(player) {
@@ -120,7 +122,7 @@
 
       this.addChatMention('server', 'background:#A0A');
       // A player messaging console
-      this.addRegexMention('-&gt; me');
+      this.addRegexMention(new RegExp(' -&gt; (.+)>me<'));
 
       this.state.socket.on('console', this.handleConsoleContent);
       this.state.socket.on('server-status', this.handleServerStatus);
