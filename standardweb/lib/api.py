@@ -23,9 +23,7 @@ def api_call(server, type, data=None):
 
     try:
         if data:
-            result = api.call(type, {
-                'data': data
-            })
+            result = api.call(type, data)
         else:
             result = api.call(type)
     except Exception:
@@ -70,8 +68,12 @@ def get_api(host):
     return apis[host]
 
 
-def get_server_status(server):
-    resp = api_call(server, 'server_status')
+def get_server_status(server, minimal=False):
+    data = {
+        'minimal': minimal
+    }
+
+    resp = api_call(server, 'server_status', data=data)
 
     return resp.get('data') if resp else None
 

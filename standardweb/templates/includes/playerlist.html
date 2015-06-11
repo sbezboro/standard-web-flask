@@ -2,14 +2,11 @@
   {% if stats %}
     <b>Ticks per second: {{ stats.tps }}</b><br><br>
     <b>Player count: {{ stats.num_players }} / {{ stats.max_players }}</b><br><br>
-    {% if stats.player_info|length > 0 %}
+    {% if stats.players %}
       <b>Players online:</b>
-      {% for player, rank in stats.player_info %}
+      {% for player in stats.players %}
         <div>
-          {% if rank %}
-            <a class="rank-star" href="/ranking?player={{ player.username }}">{{ rank }}</a>
-          {% endif %}
-          <a href="/player/{{ player.username }}">
+          <a href="/player/{{stats.server_id}}/{{ player.username }}">
             <span>
               {{ player.username|face_thumb }}
               {{ player.displayname_html|safe }}
@@ -19,6 +16,6 @@
       {% endfor %}
     {% endif %}
   {% else %}
-    <b id="error">Uh-oh! The server doesn't appear to be running!</b>
+    <b>Uh-oh! The server doesn't appear to be running!</b>
   {% endif %}
 {% endblock %}
