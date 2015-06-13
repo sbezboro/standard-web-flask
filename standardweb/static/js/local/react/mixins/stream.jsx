@@ -98,6 +98,14 @@
       this.scrollToBottom();
     },
 
+    handleStreamContent: function(data) {
+      if (data.line) {
+        this.addOutputLine(data.line);
+      } else if (data.batch) {
+        this.addOutputLines(data.batch);
+      }
+    },
+
     trimTopLines: function(num) {
       $('li:lt(' + num + ')', this.$outputArea).remove();
     },

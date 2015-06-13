@@ -47,14 +47,6 @@
       this.addOutputLine("Stop typing so fast!");
     },
 
-    handleChatContent: function(data) {
-      if (data.line) {
-        this.addOutputLine(data.line);
-      } else if (data.batch) {
-        this.addOutputLines(data.batch);
-      }
-    },
-
     socketInitialized: function() {
       if (StandardWeb.username) {
         this.addChatMention(StandardWeb.username, 'background:#00ACC4');
@@ -66,7 +58,7 @@
       this.state.socket.on('unauthorized', this.handleUnauthorized);
       this.state.socket.on('connection-spam', this.handleConnectionSpam);
       this.state.socket.on('chat-spam', this.handleChatSpam);
-      this.state.socket.on('chat', this.handleChatContent);
+      this.state.socket.on('chat', this.handleStreamContent);
       this.state.socket.on('server-status', this.handleServerStatus);
     },
 
@@ -133,7 +125,7 @@
       var i;
       for (i = 0; i < this.columns; ++i) {
         cells.push(
-          this.renderCell(i, this.props.players[rowNum + i])
+          this.renderCell(i, this.props.players[(rowNum * this.columns) + i])
         );
       }
 

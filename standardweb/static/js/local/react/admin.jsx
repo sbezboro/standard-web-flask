@@ -72,20 +72,12 @@
       });
     },
 
-    handleConsoleContent: function(data) {
-      if (data.line) {
-        this.addOutputLine(data.line);
-      } else if (data.batch) {
-        this.addOutputLines(data.batch);
-      }
-    },
-
     socketInitialized: function() {
       this.addChatMention('server', 'background:#A0A');
       // A player messaging console
       this.addRegexMention(new RegExp(' -&gt; (.+)>me<'));
 
-      this.state.socket.on('console', this.handleConsoleContent);
+      this.state.socket.on('console', this.handleStreamContent);
       this.state.socket.on('server-status', this.handleServerStatus);
     },
 
