@@ -6,7 +6,7 @@
       <b>Players online:</b>
       {% for player in stats.players %}
         <div>
-          <a href="/player/{{stats.server_id}}/{{ player.username }}">
+          <a href="{{url_for('player', username=player.username, server_id=stats.server_id)}}">
             <span>
               {{ player.username|face_thumb }}
               {{ player.displayname_html|safe }}
