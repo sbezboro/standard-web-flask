@@ -246,7 +246,10 @@
                     $(this).addClass('hidden');
                     return false;
                 });
-
+            });
+        </script>
+        {% if current_user and current_user.admin %}
+            <script type="application/javascript">
                 $('.adjust-time').on('click', function() {
                     var dialog = new StandardWeb.InputDialog('Adjust player time', 'Adjustment:', 'minutes');
                     dialog.positiveCallback = function(inputValue) {
@@ -264,7 +267,7 @@
                     dialog.show();
                     return false;
                 });
-            });
-        </script>
+            </script>
+        {% endif %}
     {% endif %}
 {% endblock %}
