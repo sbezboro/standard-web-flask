@@ -34,6 +34,19 @@
       this.state.socket.emit('chat-input', data);
     },
 
+    handleUnauthorized: function() {
+      this.addOutputLine("ERROR: you are not authorized!");
+    },
+
+    handleConnectionSpam: function() {
+      this.addOutputLine("Stop trying to connect so much!");
+      this.addOutputLine("Try again in a few minutes...");
+    },
+
+    handleChatSpam: function() {
+      this.addOutputLine("Stop typing so fast!");
+    },
+
     handleChatContent: function(data) {
       if (data.line) {
         this.addOutputLine(data.line);
@@ -50,6 +63,9 @@
         this.addChatMention(StandardWeb.nickname, 'background:#00ACC4');
       }
 
+      this.state.socket.on('unauthorized', this.handleUnauthorized);
+      this.state.socket.on('connection-spam', this.handleConnectionSpam);
+      this.state.socket.on('chat-spam', this.handleChatSpam);
       this.state.socket.on('chat', this.handleChatContent);
       this.state.socket.on('server-status', this.handleServerStatus);
     },
