@@ -57,7 +57,6 @@ bundles = {
     'js_base': Bundle(
         Bundle(
             'js/local/base.js',
-            'js/local/chat.js',
             'js/local/dialog.js',
             'js/local/graph.js',
             'js/local/messages.js',
@@ -78,6 +77,11 @@ bundles = {
         'js/local/pages/admin.js',
         filters='uglifyjs',
         output='js/gen/admin.min.js'
+    ),
+    'js_chat': Bundle(
+        'js/local/pages/chat.js',
+        filters='uglifyjs',
+        output='js/gen/chat.min.js'
     )
 }
 

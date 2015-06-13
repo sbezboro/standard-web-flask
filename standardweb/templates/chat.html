@@ -19,25 +19,26 @@
     <div class="container">
       {% include 'includes/flash_messages.html' %}
 
-      <h2>Live Server Chat</h2>
-      <div class="chat-container">
-        <div class="chat-area"></div>
-        <input id="chat-textbox" type="text" maxlength="80"/>
-      </div>
+      <div id="live-chat"></div>
       {% if not current_user %}
         <br>
         <div>
           You must be <a href="{{ url_for('login', next=request.path) }}">logged in</a> to the website to be able to chat!
         </div>
       {% endif %}
-      <table class="players-table">
-      </table>
     </div>
 {% endblock %}
 
 {% block js %}
   {{ super() }}
+  {% assets "js_chat" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+
   <script type="application/javascript">
     StandardWeb.chat.serverId = {{ server.id }};
+
+    React.render(
+      React.createElement(StandardWeb.reactComponents.LiveChat),
+      document.getElementById('live-chat')
+    );
   </script>
 {% endblock %}

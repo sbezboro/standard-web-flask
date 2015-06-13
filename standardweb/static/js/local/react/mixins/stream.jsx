@@ -1,5 +1,6 @@
 (function(window, document, $) {
   StandardWeb.reactMixins.StreamMixin = {
+
     mentionPat: '(&gt;.*|Server<.*?><.*?>] .*|Web Chat].*: .*|To group.*|command:.*)(MENTION_PART)',
     numLines: 0,
     mentions: [],
@@ -36,6 +37,27 @@
       }
     },
 
+    handleServerStatus: function(data) {
+      var players = data.players.sort(function (a, b) {
+        a = (a.nickname ? a.nickname : a.username);
+        b = (b.nickname ? b.nickname : b.username);
+
+        if (a.toLowerCase() < b.toLowerCase()) return -1;
+        if (a.toLowerCase() > b.toLowerCase()) return 1;
+        return 0;
+      });
+
+      this.setState({
+        serverDetails: {
+          numPlayers: data.numPlayers,
+          maxPlayers: data.maxPlayers,
+          load: data.load,
+          tps: data.tps,
+          players: players
+        }
+      });
+    },
+
     addHistory: function(input) {
       this.commandHistory.unshift(input);
       this.commandIndex = -1;
@@ -55,8 +77,25 @@
       }
     },
 
+    handleMuteToggle: function() {
+      if (this.state.muted) {
+        StandardWeb.sounds.mentionSound.play();
+      }
+
+      this.setState({muted: !this.state.muted});
+    },
+
     handleInputChange: function(inputValue) {
       this.setState({inputValue: inputValue});
+    },
+
+    handleInputEntered: function(input) {
+      this.emitInput(input);
+
+      this.addHistory(input);
+      this.setState({inputValue: ''});
+
+      this.scrollToBottom();
     },
 
     trimTopLines: function(num) {
@@ -139,6 +178,7 @@
         }
 
         this.setState({
+          status: 'connected',
           socket: socket
         });
 

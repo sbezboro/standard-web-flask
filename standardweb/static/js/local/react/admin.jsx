@@ -8,7 +8,6 @@
     getInitialState: function() {
       return {
         status: 'connecting',
-        lines: [],
         selectedPlayer: null,
         muted: false,
         serverDetails: {
@@ -38,15 +37,7 @@
       this.$panel.height($(window).height() - this.$panel.offset().top);
     },
 
-    handleMuteToggle: function() {
-      if (this.state.muted) {
-        StandardWeb.sounds.mentionSound.play();
-      }
-
-      this.setState({muted: !this.state.muted});
-    },
-
-    handleInputEntered: function(input) {
+    emitInput: function(input) {
       var data = {};
 
       if (input[0] == "/") {
@@ -56,11 +47,6 @@
       }
 
       this.state.socket.emit('console-input', data);
-
-      this.addHistory(input);
-      this.setState({inputValue: ''});
-
-      this.scrollToBottom();
     },
 
     handlePlayerSelected: function(player) {
@@ -94,32 +80,7 @@
       }
     },
 
-    handleServerStatus: function(data) {
-      var players = data.players.sort(function (a, b) {
-        a = (a.nickname ? a.nickname : a.username);
-        b = (b.nickname ? b.nickname : b.username);
-
-        if (a.toLowerCase() < b.toLowerCase()) return -1;
-        if (a.toLowerCase() > b.toLowerCase()) return 1;
-        return 0;
-      });
-
-      this.setState({
-        serverDetails: {
-          numPlayers: data.numPlayers,
-          maxPlayers: data.maxPlayers,
-          load: data.load,
-          tps: data.tps,
-          players: players
-        }
-      });
-    },
-
     socketInitialized: function() {
-      this.setState({
-        status: 'connected'
-      });
-
       this.addChatMention('server', 'background:#A0A');
       // A player messaging console
       this.addRegexMention(new RegExp(' -&gt; (.+)>me<'));
@@ -147,8 +108,7 @@
               </li>
             </ul>
           </div>
-          <ConsoleArea lines={this.state.lines}
-            status={this.state.status}
+          <ConsoleArea status={this.state.status}
             selectedPlayer={this.state.selectedPlayer}
             muted={this.state.muted}
             inputValue={this.state.inputValue}
@@ -176,45 +136,7 @@
   });
 
   var ConsoleArea = React.createClass({
-
-    componentDidMount: function() {
-      $(document).keypress(this.handleRefocus);
-    },
-
-    handleRefocus: function() {
-      var $focused = $(':focus');
-      var $textbox = $(React.findDOMNode(this.refs.inputTextbox));
-
-      if ($textbox != $focused) {
-        $textbox.focus();
-      }
-    },
-
-    handleMuteToggle: function() {
-      this.props.onMuteToggle();
-    },
-
-    handleInputChange: function(e) {
-      this.props.onInputChange(e.target.value);
-      e.preventDefault();
-    },
-
-    handleInputKeyDown: function(e) {
-      if (e.keyCode == 38) { // Up key
-        this.props.onHistoryUp();
-        e.preventDefault();
-      } else if (e.keyCode == 40) { // Down key
-        this.props.onHistoryDown();
-        e.preventDefault();
-      }
-    },
-
-    handleInputKeyUp: function(e) {
-      if (e.keyCode == 13 && e.target.value) { // Enter
-        this.props.onInputEntered(e.target.value);
-        e.preventDefault();
-      }
-    },
+    mixins: [StandardWeb.reactMixins.StreamAreaMixin],
 
     render: function() {
       var muteTooltip;
