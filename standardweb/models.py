@@ -65,6 +65,14 @@ class Base(object):
         if commit:
             db.session.commit()
 
+    def to_dict(self):
+        result = {}
+
+        for column in self.__table__.columns:
+            result[column.name] = getattr(self, column.name)
+
+        return result
+
     @classmethod
     def factory(cls, **kwargs):
         instance, created = _get_or_create(cls, **kwargs)
@@ -277,6 +285,15 @@ class Player(db.Model, Base):
 
     def __str__(self):
         return self.displayname
+
+    def to_dict(self):
+        result = super(Player, self).to_dict()
+
+        result['nickname_html'] = self.nickname_html
+        result['displayname'] = self.displayname
+        result['displayname_html'] = self.displayname_html
+
+        return result
 
     @property
     def nickname_html(self):
@@ -707,7 +724,7 @@ class Notification(db.Model, Base):
     _definition = None
 
     @classmethod
-    def create(cls, type, data=None, user_id=None, player_id=None, **kw):
+    def create(cls, type, data=None, user_id=None, player_id=None, send_email=True, **kw):
         from standardweb.lib import notifier
 
         if data is None:
@@ -725,7 +742,7 @@ class Notification(db.Model, Base):
         notification.definition
         notification.save(commit=True)
 
-        notifier.notify(notification)
+        notifier.notification_notify(notification, send_email=send_email)
 
         return notification
 

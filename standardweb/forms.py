@@ -164,7 +164,7 @@ class ResetPasswordForm(BaseForm):
 class NewTopicForm(ImageUploadForm):
     title = TextField('Title', validators=[DataRequired()])
     body = TextAreaField('Body', validators=[DataRequired()])
-    notify_all = BooleanField('Notify all users', validators=[Optional()])
+    email_all = BooleanField('Email all users', validators=[Optional()])
     subscribe = BooleanField('Get emailed about replies in this topic', validators=[Optional()])
 
 

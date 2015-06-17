@@ -9,7 +9,7 @@ from standardweb.models import ForumPost, ForumTopicSubscription, Notification, 
 
 
 @celery.task()
-def notify(notification_id):
+def notification_notify_task(notification_id, send_email):
     notification = Notification.query.get(notification_id)
 
     user = notification.user
@@ -17,14 +17,16 @@ def notify(notification_id):
 
     if user:
         realtime.unread_notification_count(user)
-        email.send_notification_email(user, notification)
+
+        if send_email:
+            email.send_notification_email(user, notification)
 
     if notification.can_notify_ingame and player:
         api.new_notification(player, notification)
 
 
 @celery.task()
-def notify_news_post_all(forum_post_id):
+def create_news_post_notifications_task(forum_post_id, email_all):
     # Create notifications for the players active in the past month or all users with valid emails
     recipients = db.session.query(
         Player.id, User.id
@@ -49,12 +51,13 @@ def notify_news_post_all(forum_post_id):
             notifications.NEWS_POST,
             user_id=user_id,
             player_id=player_id,
-            post_id=forum_post_id
+            post_id=forum_post_id,
+            send_email=email_all
         )
 
 
 @celery.task()
-def notify_subscribed_topic_post(forum_post_id):
+def create_subscrobed_post_notifications_task(forum_post_id):
     post = ForumPost.query.get(forum_post_id)
     topic = post.topic
 

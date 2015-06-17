@@ -2,9 +2,9 @@ from standardweb.lib import api
 from standardweb.lib import email
 from standardweb.lib import realtime
 from standardweb.tasks.notifications import (
-    notify as notify_task,
-    notify_news_post_all as notify_news_post_all_task,
-    notify_subscribed_topic_post as notify_subscribed_topic_post_task
+    create_news_post_notifications_task,
+    create_subscrobed_post_notifications_task,
+    notification_notify_task
 )
 
 
@@ -22,19 +22,19 @@ def notify_new_message(message):
         api.new_message(to_player, from_user)
 
 
-def notify(notification):
-    notify_task.apply_async((
-        notification.id,
+def notification_notify(notification, send_email=True):
+    notification_notify_task.apply_async((
+        notification.id, send_email
     ))
 
 
-def notify_news_post(post):
-    notify_news_post_all_task.apply_async((
-        post.id,
+def create_news_post_notifications(post, email_all=True):
+    create_news_post_notifications_task.apply_async((
+        post.id, email_all
     ))
 
 
-def notify_subscribed_topic_post(post):
-    notify_subscribed_topic_post_task.apply_async((
+def create_subscribed_post_notifications(post):
+    create_subscrobed_post_notifications_task.apply_async((
         post.id,
     ))

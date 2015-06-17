@@ -1,7 +1,7 @@
 {% block content %}
 {% endblock %}
 {% if notifications_url %}
-See all notifications here: {{ notifications_url }}
+See all your notifications here: {{ notifications_url }}
 {% endif %}
 
 --

@@ -18,7 +18,7 @@ from standardweb.forms import MoveTopicForm, PostForm, NewTopicForm, ForumSearch
 from standardweb.lib import api
 from standardweb.lib import forums as libforums
 from standardweb.lib import notifications
-from standardweb.lib.notifier import notify_news_post, notify_subscribed_topic_post
+from standardweb.lib.notifier import create_news_post_notifications, create_subscribed_post_notifications
 from standardweb.models import (
     ForumCategory, Forum, ForumPost, ForumTopic, User, ForumPostTracking, ForumAttachment,
     PlayerStats, AuditLog, ForumBan, ForumTopicSubscription
@@ -323,7 +323,7 @@ def forum_topic(topic_id):
 
         api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=False)
 
-        notify_subscribed_topic_post(post)
+        create_subscribed_post_notifications(post)
 
         return redirect(post.url)
 
@@ -440,7 +440,7 @@ def new_topic(forum_id):
         title = form.title.data
         body = form.body.data
         image = form.image.data
-        notify_all = form.notify_all.data
+        email_all = form.email_all.data
         subscribe = form.subscribe.data
 
         last_post = forum.last_post
@@ -469,8 +469,8 @@ def new_topic(forum_id):
             if not ForumAttachment.create_attachment(post.id, image, commit=True):
                 flash('There was a problem with the upload', 'error')
 
-        if user.admin and notify_all:
-            notify_news_post(post)
+        if user.admin and forum.locked:
+            create_news_post_notifications(post, email_all=email_all)
 
         if subscribe:
             libforums.subscribe_to_topic(user, topic, commit=True)
