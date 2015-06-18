@@ -1,21 +1,9 @@
-import pytz
-
-from flask import render_template
-
 from standardweb.tasks.realtime import send_rts_data as send_rts_data_task
 
 
 def new_message(user, message):
-    message_row_html = render_template(
-        'messages/includes/message_row.html',
-        user=user,
-        message=message
-    )
-
     payload = {
-        'date': message.sent_at.replace(tzinfo=pytz.UTC).isoformat(),
-        'message_row_html': message_row_html,
-        'from_user_id': message.from_user_id
+        'message': message.to_dict()
     }
 
     send_rts_data(message.to_user_id, 'messages', 'new', payload)

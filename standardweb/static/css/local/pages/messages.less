@@ -1,0 +1,186 @@
+
+.messages-section {
+  border: 1px solid #ccc;
+  font-size: 13px;
+  color: #666;
+  background: #fefefe;
+
+  input[type="text"],
+  textarea:hover,
+  button:hover,
+  textarea:focus,
+  button:focus {
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  .messages-contacts {
+    width: 200px;
+    float: left;
+    max-height: 75vh;
+    overflow: auto;
+
+    a {
+      color: #222;
+    }
+
+    .contact {
+      display: block;
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+
+      .time {
+        color: #888;
+        font-size: 11px;
+      }
+
+      &:hover {
+        background: #f5f5f5;
+      }
+
+      &.active {
+        background: #eee;
+      }
+
+      &.new {
+        background: #F5F8FF;
+        font-weight: bold;
+
+        &:hover {
+          background: #EDF3FF;
+        }
+      }
+    }
+  }
+
+  .messages-content {
+    background: #eee;
+    border-left: 1px solid #ddd;
+    margin-left: 200px;
+    min-height: 75vh;
+    position: relative;
+
+    .contact-chooser {
+      background: #fff;
+      padding: 16px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    input[type="text"] {
+      width: 500px;
+      border: none;
+      box-sizing: border-box;
+      box-shadow: none;
+      resize: none;
+    }
+
+    .search-results {
+      margin: 0;
+      padding: 0;
+
+      a {
+        color: #666;
+      }
+
+      .contact {
+        background: #fff;
+        padding: 10px;
+        margin: 0;
+        border-bottom: 1px solid #ddd;
+        height: 22px;
+
+        &:hover {
+          background: #f5f5f5;
+        }
+      }
+
+      h4 {
+        color: #D0D0D0;
+        margin: 20px 0 0;
+        padding: 0;
+        text-align: center;
+        font-size: 20px;
+        text-shadow: 1px 1px #C0C0C0;
+      }
+    }
+
+    .message-list {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 44px;
+      padding: 10px;
+      overflow: auto;
+    }
+
+    .help {
+      color: #D0D0D0;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      text-align: center;
+      font-size: 20px;
+      text-shadow: 1px 1px #C0C0C0;
+    }
+
+    .reply {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 44px;
+      background: #fff;
+      box-sizing: border-box;
+      border-top: 1px solid #ddd;
+
+      .textwrapper {
+        width: auto;
+        overflow: hidden;
+      }
+
+      textarea {
+        box-sizing: border-box;
+        resize: none;
+        border: none;
+        padding: 6px;
+        height: 42px;
+        width: 100%;
+      }
+
+      button {
+        display: block;
+        float: right;
+        width: 60px;
+        height: 43px;
+        box-sizing: border-box;
+      }
+    }
+  }
+
+  .message {
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    background: #fff;
+    padding: 10px;
+
+    &.new {
+      background: #F5F8FF;
+    }
+
+    &.self {
+      background: #f3f3f3;
+    }
+
+    h4 {
+      margin: 0 0 10px 0;
+    }
+
+    .time {
+      float: right;
+      font-size: 11px;
+      color: #999;
+    }
+  }
+}

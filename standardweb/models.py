@@ -4,6 +4,7 @@ import hashlib
 from operator import attrgetter
 import os
 from pbkdf2 import pbkdf2_bin
+import pytz
 import re
 import uuid
 
@@ -66,12 +67,7 @@ class Base(object):
             db.session.commit()
 
     def to_dict(self):
-        result = {}
-
-        for column in self.__table__.columns:
-            result[column.name] = getattr(self, column.name)
-
-        return result
+        raise NotImplementedError
 
     @classmethod
     def factory(cls, **kwargs):
@@ -127,6 +123,16 @@ class User(db.Model, Base):
         db.session.commit()
 
         return user
+
+    def to_dict(self):
+        result = {
+            'username': self.username
+        }
+
+        if self.player_id:
+            result['player'] = self.player.to_dict()
+
+        return result
 
     def check_password(self, plaintext_password):
         algorithm, iterations, salt, hash_val = self.password.split('$', 3)
@@ -287,11 +293,14 @@ class Player(db.Model, Base):
         return self.displayname
 
     def to_dict(self):
-        result = super(Player, self).to_dict()
-
-        result['nickname_html'] = self.nickname_html
-        result['displayname'] = self.displayname
-        result['displayname_html'] = self.displayname_html
+        result = {
+            'uuid': self.uuid,
+            'username': self.username,
+            'nickname': self.nickname,
+            'nickname_html': self.nickname_html,
+            'displayname': self.displayname,
+            'displayname_html': self.displayname_html
+        }
 
         return result
 
@@ -696,6 +705,20 @@ class Message(db.Model, Base):
             self.body_html = pat.sub(path, self.body_html)
 
         return super(Message, self).save(commit)
+
+    def to_dict(self):
+        result = {
+            'id': self.id,
+            'sent_at': self.sent_at.replace(tzinfo=pytz.UTC).isoformat(),
+            'seen_at': self.seen_at,
+            'from_user': self.from_user.to_dict(),
+            'body_html': self.body_html
+        }
+
+        if self.to_user:
+            result['to_user'] = self.to_user.to_dict()
+
+        return result
 
 
 class Notification(db.Model, Base):

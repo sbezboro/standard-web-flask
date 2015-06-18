@@ -184,10 +184,6 @@ class ForumSearchForm(BaseForm):
     sort_by = SelectField('Sort by', validators=[Optional()], default='')
 
 
-class MessageForm(BaseForm):
-    text = TextAreaField('Text', validators=[DataRequired()])
-
-
 class ProfileSettingsForm(BaseForm):
     full_name = TextField('Name', validators=[Optional()])
     email = TextField('Email', validators=[DataRequired()])
