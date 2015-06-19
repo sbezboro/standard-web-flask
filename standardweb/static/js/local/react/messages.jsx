@@ -130,7 +130,7 @@
         type: 'POST',
         data: {body: value},
         success: function(data) {
-          if (data.error) {
+          if (data.err) {
             // TODO: show error
           } else {
             var i;
@@ -321,7 +321,9 @@
     },
 
     handleSendMessage: function(value) {
-      return this.props.onSendMessage(value);
+      if (this.props.selectedUsername) {
+        this.props.onSendMessage(value);
+      }
     },
 
     render: function() {
@@ -337,7 +339,7 @@
             <MessageList messages={this.props.messages}
               selectedUsername={this.props.selectedUsername}
             />
-            <ReplyArea onSendMessage={this.handleSendMessage}/>
+            <ReplyArea onSendMessage={this.handleSendMessage} />
           </div>
         );
       }

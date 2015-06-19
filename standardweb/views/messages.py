@@ -2,17 +2,16 @@ from datetime import datetime, timedelta
 import pytz
 
 from flask import (
-    abort,
     after_this_request,
     flash,
     g,
     jsonify,
     render_template,
-    redirect,
     request,
     url_for
 )
 from markupsafe import Markup
+import rollbar
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
@@ -120,7 +119,9 @@ def messages_json(username):
 
     if to_user == user:
         # don't allow user to send messages to themselves
-        return redirect(url_for('messages'))
+        return jsonify({
+            'err': 1
+        })
 
     if to_user:
         to_player = to_user.player
@@ -129,7 +130,10 @@ def messages_json(username):
         to_player = Player.query.filter_by(username=username).first()
 
         if not to_player:
-            abort(404)
+            rollbar.report_message('to_player None', request=request)
+            return jsonify({
+                'err': 1
+            })
 
     if to_user:
         # If the username matches an existing user, use it for the message query
@@ -198,12 +202,17 @@ def send_message(username):
         or_(Player.username == username, User.username == username)
     ).first()
 
-
     if to_user:
         to_player = to_user.player
     else:
         # for cases of messages sent to players with no users created yet
         to_player = Player.query.filter_by(username=username).first()
+
+        if not to_player:
+            rollbar.report_message('to_player None', request=request)
+            return jsonify({
+                'err': 1
+            })
 
     # prevent spam
     recent_messages = Message.query.with_entities(Message.id).filter(
