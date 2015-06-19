@@ -183,7 +183,7 @@
 
     render: function() {
       return (
-        <div className="messages-section">
+        <div className="border-section">
           <ContactList contacts={this.state.contacts}
             selectedUsername={this.state.selectedUsername}
             mode={this.state.mode}

@@ -1,5 +1,6 @@
+@import '../media';
 
-.messages-section {
+.border-section {
   border: 1px solid #ccc;
   font-size: 13px;
   color: #666;
@@ -19,15 +20,30 @@
     float: left;
     max-height: 75vh;
     overflow: auto;
+    white-space: nowrap;
+
+    @media @tablet, @mobile {
+      border-bottom: 1px solid #ddd;
+      float: none;
+      width: 100%;
+    }
 
     a {
       color: #222;
     }
 
     .contact {
+      border-bottom: 1px solid #eee;
       display: block;
       padding: 15px;
-      border-bottom: 1px solid #eee;
+
+      @media @tablet, @mobile {
+        border-right: 1px solid #eee;
+        border-bottom: 0;
+        display: inline-block;
+        float: none;
+        width: 100px;
+      }
 
       .time {
         color: #888;
@@ -60,6 +76,12 @@
     min-height: 75vh;
     position: relative;
 
+    @media @tablet, @mobile {
+      border-left: 0;
+      margin-left: 0;
+      min-height: 400px;
+    }
+
     .contact-chooser {
       background: #fff;
       padding: 16px;
@@ -72,6 +94,10 @@
       box-sizing: border-box;
       box-shadow: none;
       resize: none;
+
+      @media @tablet, @mobile {
+        width: 60%
+      }
     }
 
     .search-results {
@@ -175,6 +201,7 @@
 
     h4 {
       margin: 0 0 10px 0;
+      text-transform: none;
     }
 
     .time {
