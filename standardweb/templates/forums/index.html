@@ -12,8 +12,15 @@
 <div class="clearfix"></div>
 {% for category in categories %}
     <div class="forum-category">
+        <div class="extender category-extender" data-target="category-{{ category.id }}">
+            {% if category.collapsed %}
+                <i class="fa fa-chevron-down"></i>
+            {% else %}
+                <i class="fa fa-chevron-up"></i>
+            {% endif %}
+        </div>
         <h4>{{ category.name }}</h4>
-        <table class="forum-table">
+        <table id="category-{{ category.id }}" class="forum-table" {% if category.collapsed %}style="display: none"{% endif %}>
             {% for forum in category.forums %}
                 {% with active = forum.id in active_forum_ids %}
                 <tr>

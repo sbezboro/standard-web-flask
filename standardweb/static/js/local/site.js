@@ -29,6 +29,15 @@
     $('.extender').on('click', function () {
       var target = '#' + $(this).attr('data-target');
       $(target).toggle();
+
+      var $icon = $('i', this);
+      if ($icon && $icon.length) {
+        if ($icon.hasClass('fa-chevron-up')) {
+          $icon.addClass('fa-chevron-down').removeClass('fa-chevron-up');
+        } else if ($icon.hasClass('fa-chevron-down')) {
+          $icon.addClass('fa-chevron-up').removeClass('fa-chevron-down');
+        }
+      }
     });
 
     $(document).on('click', '.nav-pills a', function () {

@@ -19,7 +19,7 @@
     <div class="clearfix"></div>
     <div class="forum">
         <h4>{{ forum.name }}</h4>
-        <table class="forum-topic-table">
+        <table class="forum-table">
             {% for topic in topics %}
                 {% with active = topic.id in active_topic_ids %}
                     {{ topic_row(topic, topic_page_size, active=active) }}

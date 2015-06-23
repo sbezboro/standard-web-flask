@@ -900,6 +900,7 @@ class ForumCategory(db.Model, Base):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     position = db.Column(db.Integer, default=0)
+    collapsed = db.Column(db.Boolean, default=False)
 
     forums = db.relationship('Forum')
 
