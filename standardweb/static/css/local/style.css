@@ -269,25 +269,3 @@
     width: 200px;
     margin: 0 0 20px;
 }
-
-
-
-
-@media (max-width: 960px) {
-    .player-forum-section {
-        width: 25%;
-        margin-bottom: 14px;
-        float: left;
-        font-size: 15px;
-    }
-    
-    .player-forum-section h3 {
-        margin: 0 0 10px;
-    }
-
-    .players-table {
-        width: 100%;
-        padding: 0;
-        font-size: 8px;
-    }
-}

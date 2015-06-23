@@ -67,7 +67,7 @@
         <div class="forum">
             <h4>Search results</h4>
             {% if num_topics %}
-                <table class="forum-topic-table">
+                <table class="forum-table">
                     {% for topic in topics %}
                         {{ topic_row(topic, page_size, query=query) }}
                     {% endfor %}
