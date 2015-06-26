@@ -62,9 +62,3 @@
     </form>
 {% endblock %}
 
-{% block js %}
-    {{ super() }}
-    <script type="application/javascript">
-        mixpanel.track('notification settings page view');
-    </script>
-{% endblock %}

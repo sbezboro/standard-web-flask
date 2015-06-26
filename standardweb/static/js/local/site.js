@@ -154,8 +154,6 @@
         $elem.tipsy('hide');
         $elem.attr('original-title', 'Copied!');
         $elem.tipsy('show');
-
-        mixpanel.track('address copied');
       });
 
       clipboard.on('mouseover', function(client) {

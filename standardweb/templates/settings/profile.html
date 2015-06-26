@@ -33,10 +33,3 @@
         </div>
     </form>
 {% endblock %}
-
-{% block js %}
-    {{ super() }}
-    <script type="application/javascript">
-        mixpanel.track('profile settings page view');
-    </script>
-{% endblock %}
