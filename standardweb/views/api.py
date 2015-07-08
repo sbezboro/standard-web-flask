@@ -411,6 +411,12 @@ def audit_log():
 
 @server_api_func
 def new_notification():
+    if g.server.id != app.config['MAIN_SERVER_ID']:
+        return jsonify({
+            'err': 1,
+            'message': 'Not main server'
+        })
+
     body = request.json
 
     type = body.get('type')
