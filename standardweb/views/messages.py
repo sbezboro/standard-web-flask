@@ -27,9 +27,10 @@ MESSAGE_THROTTLE_PERIOD = 60  # minutes
 
 
 @app.route('/messages')
+@app.route('/messages/<username>')
 @app.route('/messages/<path:path>')
 @login_required()
-def messages(path=None):
+def messages(username=None, path=None):
     user = g.user
 
     if not user.email:
