@@ -55,17 +55,9 @@ def make_celery(app):
             }
         },
         'CELERYBEAT_SCHEDULE': {
-            'minute_query': {
-                'task': 'standardweb.jobs.query.minute_query',
-                'schedule': crontab()
-            },
-            'db_backup': {
-                'task': 'standardweb.jobs.backup.db_backup',
-                'schedule': crontab(minute=0, hour=10)  # 3AM PST
-            },
             'check_uuids': {
                 'task': 'standardweb.jobs.usernames.check_uuids',
-                'schedule': timedelta(minutes=4)  # Every 4 minutes
+                'schedule': timedelta(minutes=1)  # Every 4 minutes
             }
         }
     })
