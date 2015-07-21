@@ -33,7 +33,7 @@ def _handle_player(player):
 
     if stats and stats.last_seen > datetime.utcnow() - timedelta(days=1):
         # ignore players that have joined since the job started
-        return
+        return False
 
     try:
         actual_username = minecraft_uuid.lookup_latest_username_by_uuid(player.uuid)
@@ -41,19 +41,23 @@ def _handle_player(player):
         rollbar.report_message('Exception looking up uuid, skipping group', level='warning', extra_data={
             'exception': unicode(e)
         })
-        return
+        return False
 
     if not actual_username:
         rollbar.report_message('Error getting actual username, skipping', level='warning', extra_data={
             'uuid': player.uuid
         })
-        return
+        return False
 
     if actual_username != player.username:
         h.avoid_duplicate_username(actual_username, player.uuid)
 
         player.set_username(actual_username)
         player.save(commit=True)
+
+        return True
+
+    return False
 
 
 @celery.task()
@@ -73,7 +77,7 @@ def check_uuids():
 
     for player in players:
         try:
-            _handle_player(player)
+            changed = _handle_player(player)
         except (IntegrityError, OperationalError):
             db.session.rollback()
 
@@ -81,7 +85,8 @@ def check_uuids():
                 'uuid': player.uuid
             })
         else:
-            num_changed += 1
+            if changed:
+                num_changed += 1
 
     cache.set(COUNTER_CACHE_NAME, offset + PLAYERS_PER_JOB, 86400)
 
