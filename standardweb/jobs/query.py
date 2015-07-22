@@ -7,6 +7,7 @@ from sqlalchemy import not_
 from sqlalchemy.orm import joinedload
 
 from standardweb import app, celery, db
+from standardweb import stats as statsd
 from standardweb.lib import api
 from standardweb.lib import helpers as h
 from standardweb.lib.constants import *
@@ -161,6 +162,8 @@ def _query_server(server, mojang_status):
 
             player = Player(username=username, uuid=uuid)
             player.save(commit=False)
+
+            statsd.incr('player.created')
         
         online_player_ids.append(player.id)
 
