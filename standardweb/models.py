@@ -163,7 +163,8 @@ class User(db.Model, Base):
         return len(
             Message.query.with_entities(Message.id).filter_by(
                 to_user=self,
-                seen_at=None
+                seen_at=None,
+                deleted=False
             ).all()
         )
 

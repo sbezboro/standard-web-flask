@@ -327,7 +327,8 @@ def join_server():
             .joinedload(User.player)
         ).filter_by(
             to_player=player,
-            seen_at=None
+            seen_at=None,
+            deleted=False
         )
 
         for message in messages:

@@ -48,7 +48,8 @@ def contacts_json():
     user = g.user
 
     all_messages = Message.query.filter(
-        or_(Message.from_user == user, Message.to_user == user)
+        or_(Message.from_user == user, Message.to_user == user),
+        Message.deleted == False
     ).options(
         joinedload(Message.from_user)
         .joinedload(User.player)
@@ -150,7 +151,8 @@ def messages_json(username):
         )
 
     messages = Message.query.filter(
-        recipient_filter
+        recipient_filter,
+        Message.deleted == False
     ).options(
         joinedload(Message.from_user)
         .joinedload(User.player)
@@ -218,7 +220,8 @@ def send_message(username):
     # prevent spam
     recent_messages = Message.query.with_entities(Message.id).filter(
         Message.from_user == user,
-        Message.sent_at > datetime.utcnow() - timedelta(minutes=MESSAGE_THROTTLE_PERIOD)
+        Message.sent_at > datetime.utcnow() - timedelta(minutes=MESSAGE_THROTTLE_PERIOD),
+        Message.deleted == False
     ).all()
 
     if not app.config['DEBUG'] and len(recent_messages) > MESSAGE_THROTTLE_COUNT:
