@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import pytz
 
 from flask import (
+    abort,
     after_this_request,
     flash,
     g,
@@ -196,6 +197,9 @@ def messages_json(username):
 @login_required()
 def send_message(username):
     user = g.user
+
+    if user.forum_ban:
+        abort(403)
 
     body = request.form.get('body')
 
