@@ -5,6 +5,7 @@ import hmac
 
 from flask import render_template
 from flask import url_for
+import rollbar
 from sqlalchemy.orm import joinedload
 
 from standardweb import app
@@ -321,6 +322,15 @@ def send_notification_email(user, notification):
 
 def send_email(to_email, subject, text_body, html_body, from_email=None):
     if not to_email:
+        return
+
+    if any(x in to_email for x in app.config['BLACKLIST_EMAIL_DOMAINS']):
+        rollbar.report_message('Blacklisted email blocked', level='error', extra_data=dict(
+            to_email=to_email,
+            subject=subject,
+            text_body=text_body,
+            html_body=html_body
+        ))
         return
 
     send_email_task.apply_async((

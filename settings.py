@@ -29,6 +29,8 @@ UGLIFYJS_EXTRA_ARGS = ['-c', '-m']
 FLASK_ASSETS_USE_CDN = True
 CDN_DOMAIN = 'd2rpyddsvhacm5.cloudfront.net'
 
+BLACKLIST_EMAIL_DOMAINS = set([])
+
 try:
     from local_settings import *
 except ImportError:
