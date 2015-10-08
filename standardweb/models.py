@@ -711,7 +711,7 @@ class Message(db.Model, Base):
         result = {
             'id': self.id,
             'sent_at': self.sent_at.replace(tzinfo=pytz.UTC).isoformat(),
-            'seen_at': self.seen_at,
+            'seen_at': self.seen_at.replace(tzinfo=pytz.UTC).isoformat() if self.seen_at else None,
             'from_user': self.from_user.to_dict(),
             'body_html': self.body_html
         }
