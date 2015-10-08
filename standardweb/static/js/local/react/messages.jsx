@@ -106,6 +106,12 @@
           var contact = this.getContact(username);
           this.selectContact(contact);
         }
+      } else {
+        this.setState({
+          selectedUsername: null,
+          mode: 'user',
+          messages: []
+        });
       }
     },
 
