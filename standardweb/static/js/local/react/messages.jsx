@@ -35,6 +35,7 @@
           return;
         }
 
+        socket.on('read', this.handleMessageRead.bind(this));
         socket.on('new', this.handleNewMessage.bind(this));
       }.bind(this));
     },
@@ -143,6 +144,8 @@
       if (contact && contact.new_message) {
         contact.new_message = false;
 
+        this.markThreadRead(this.state.selectedUsername);
+
         this.setState({contacts: this.state.contacts});
       }
     },
@@ -157,18 +160,38 @@
       this.handleContactSelected(contact);
     },
 
-    handleNewMessage: function (data) {
+    handleNewMessage: function(data) {
       StandardWeb.sounds.mentionSound.play();
 
       var message = data.message;
       var messageUsername = message.from_user.username || message.from_user.player.username;
 
       if (messageUsername === this.state.selectedUsername) {
-        this.markThreadRead(messageUsername);
         this.addMessage(message);
       }
 
       this.updateContactFromMessage(messageUsername, message, true);
+    },
+
+    handleMessageRead: function(data) {
+      var readMessage = data.message;
+
+      var messageUsername = readMessage.to_user.username || readMessage.to_user.player.username;
+
+      if (messageUsername === this.state.selectedUsername) {
+        var i;
+        var message;
+
+        for (i = 0; i < this.state.messages.length; ++i) {
+          message = this.state.messages[i];
+
+          if (message.id == readMessage.id) {
+            message.seen_at = readMessage.seen_at;
+            this.setState({messages: this.state.messages});
+            return;
+          }
+        }
+      }
     },
 
     handleSendMessage: function(value) {
@@ -181,9 +204,18 @@
             // TODO: show error
           } else {
             var i;
+            var self;
+            var message;
+
             for (i = 0; i < this.state.messages.length; ++i) {
-              if (!this.state.messages[i].seen_at) {
-                this.state.messages[i].seen_at = new Date();
+              message = this.state.messages[i];
+
+              self = message.from_user.username === StandardWeb.username || (
+                message.from_user.player && message.from_user.player.username === StandardWeb.username
+              );
+
+              if (!self && !message.seen_at) {
+                message.seen_at = new Date();
               }
             }
 
@@ -569,6 +601,7 @@
       var message = this.props.message;
 
       var classes = 'message';
+      var seenSection = '';
       var self = false;
 
       if (message.from_user.username === StandardWeb.username || (
@@ -576,6 +609,14 @@
         )) {
         classes += ' self';
         self = true;
+
+        if (message.seen_at) {
+          seenSection = (
+            <div className="time">
+              <i className="fa fa-check" ></i>
+            </div>
+          );
+        }
       } else if (!message.seen_at) {
         classes += ' new';
       }
@@ -588,6 +629,7 @@
           <MessageFrom fromUser={message.from_user}
             self={self}
           />
+          {seenSection}
           <div className="message-body" dangerouslySetInnerHTML={{__html: message.body_html}}></div>
         </div>
       );

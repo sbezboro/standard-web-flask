@@ -18,7 +18,7 @@ from sqlalchemy.orm import joinedload
 
 from standardweb import app, db, stats
 from standardweb.lib import realtime
-from standardweb.lib.notifier import notify_new_message
+from standardweb.lib.notifier import notify_new_message, notify_message_read
 from standardweb.models import User, Player, Message
 from standardweb.views.decorators.auth import login_required
 
@@ -168,21 +168,14 @@ def messages_json(username):
 
     for message in messages:
         if message.to_user == user and not message.seen_at:
-            Message.query.filter_by(
-                to_user=user,
-                from_user=message.from_user,
-                seen_at=None
-            ).update({
-                'seen_at': datetime.utcnow()
-            })
+            message.seen_at = datetime.utcnow()
+            message.save(commit=False)
 
-            @after_this_request
-            def commit(response):
-                db.session.commit()
-                realtime.unread_message_count(user)
-                return response
+            notify_message_read(message)
 
-            break
+    db.session.commit()
+
+    realtime.unread_message_count(user)
 
     messages = map(lambda x: x.to_dict(), messages)
 
@@ -258,6 +251,7 @@ def send_message(username):
 @login_required()
 def read_message():
     user = g.user
+
     if not user:
         return jsonify({
             'err': 1,
@@ -266,7 +260,7 @@ def read_message():
 
     username = request.form.get('username')
 
-    from_user = User.query.join(Player).filter(
+    from_user = User.query.outerjoin(Player).filter(
         or_(
             User.username == username,
             Player.username == username
@@ -279,13 +273,19 @@ def read_message():
             'message': 'Username not found'
         })
 
-    Message.query.filter_by(
+    messages = Message.query.filter_by(
         from_user_id=from_user.id,
         to_user=user,
         seen_at=None
-    ).update({
-        'seen_at': datetime.utcnow()
-    })
+    )
+
+    now = datetime.utcnow()
+
+    for message in messages:
+        message.seen_at = now
+        message.save(commit=False)
+
+        notify_message_read(message)
 
     db.session.commit()
 

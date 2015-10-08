@@ -1,12 +1,20 @@
 from standardweb.tasks.realtime import send_rts_data as send_rts_data_task
 
 
-def new_message(user, message):
+def new_message(message):
     payload = {
         'message': message.to_dict()
     }
 
     send_rts_data(message.to_user_id, 'messages', 'new', payload)
+
+
+def message_read(message):
+    payload = {
+        'message': message.to_dict()
+    }
+
+    send_rts_data(message.from_user_id, 'messages', 'read', payload)
 
 
 def unread_message_count(user):

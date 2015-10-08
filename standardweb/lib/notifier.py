@@ -14,12 +14,16 @@ def notify_new_message(message):
     to_player = message.to_player
 
     if to_user:
-        realtime.new_message(to_user, message)
+        realtime.new_message(message)
         realtime.unread_message_count(to_user)
         email.send_new_message_email(to_user, message)
 
     if to_player:
         api.new_message(to_player, from_user)
+
+
+def notify_message_read(message):
+    realtime.message_read(message)
 
 
 def notification_notify(notification, send_email=True):
