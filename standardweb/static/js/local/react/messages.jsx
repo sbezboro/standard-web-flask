@@ -60,6 +60,14 @@
       });
     },
 
+    markThreadRead: function(username) {
+      $.ajax({
+        url: '/messages/mark_read',
+        type: 'POST',
+        data: {username: username}
+      });
+    },
+
     handleContacts: function(data) {
       this.setState({
         contacts: data.contacts
@@ -83,13 +91,24 @@
 
       contact.new_message = false;
 
-      window.history.pushState('', '', '/messages/'+ contact.username);
+      window.history.pushState('', '', '/messages/' + contact.username);
+
       this.setState({
         selectedUsername: contact.username,
         mode: 'user',
         contacts: this.state.contacts,
         messages: existingMessages
       });
+    },
+
+    handleReplyKeyDown: function() {
+      var contact = this.getContact(this.state.selectedUsername);
+
+      if (contact && contact.new_message) {
+        contact.new_message = false;
+
+        this.setState({contacts: this.state.contacts});
+      }
     },
 
     handleCreateNewMessage: function() {
@@ -112,16 +131,11 @@
       var messageUsername = message.from_user.username || message.from_user.player.username;
 
       if (messageUsername === this.state.selectedUsername) {
-        $.ajax({
-          url: '/messages/mark_read',
-          type: 'POST',
-          data: {username: messageUsername}
-        });
-
+        this.markThreadRead(messageUsername);
         this.addMessage(message);
       }
 
-      this.updateContactFromMessage(messageUsername, message);
+      this.updateContactFromMessage(messageUsername, message, true);
     },
 
     handleSendMessage: function(value) {
@@ -141,6 +155,7 @@
             }
 
             this.addMessage(data.message);
+            this.updateContactFromMessage(this.state.selectedUsername, data.message, false);
           }
         }.bind(this)
       });
@@ -159,20 +174,20 @@
       return null;
     },
 
-    updateContactFromMessage: function(username, message) {
+    updateContactFromMessage: function(username, message, newMessage) {
       var contact = this.getContact(username);
 
       if (contact) {
           contact.last_message_id = message.id;
           contact.last_message_date = message.sent_at;
-          contact.new_message = true;
+          contact.new_message = newMessage;
       } else {
         contact = {
           user: message.user,
           username: username,
           last_message_id: message.id,
           last_message_date: message.sent_at,
-          new_message: true
+          new_message: newMessage
         };
 
         this.state.contacts.push(contact);
@@ -194,6 +209,7 @@
             mode={this.state.mode}
             messages={this.state.messages}
             onSendMessage={this.handleSendMessage}
+            onReplyKeyDown={this.handleReplyKeyDown}
             onNewMessageToUser={this.handleNewMessageToUser}
           />
         </div>
@@ -326,6 +342,12 @@
       }
     },
 
+    handleReplyKeyDown: function() {
+      if (this.props.selectedUsername) {
+        this.props.onReplyKeyDown();
+      }
+    },
+
     render: function() {
       if (this.props.mode === 'new-message') {
         return (
@@ -339,7 +361,9 @@
             <MessageList messages={this.props.messages}
               selectedUsername={this.props.selectedUsername}
             />
-            <ReplyArea onSendMessage={this.handleSendMessage} />
+            <ReplyArea onSendMessage={this.handleSendMessage}
+              onReplyKeyDown={this.handleReplyKeyDown}
+            />
           </div>
         );
       }
@@ -549,6 +573,10 @@
       }
     },
 
+    handleKeyDown: function(e) {
+      this.props.onReplyKeyDown();
+    },
+
     handleKeyUp: function(e) {
       if (e.keyCode == 13 && e.target.value) { // Enter
         this.props.onSendMessage(e.target.value);
@@ -566,6 +594,7 @@
             <textarea placeholder="Enter message"
               autoFocus={true}
               ref="textarea"
+              onKeyDown={this.handleKeyDown}
               onKeyUp={this.handleKeyUp}
             />
           </div>
