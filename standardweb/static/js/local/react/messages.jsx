@@ -28,6 +28,8 @@
       this.fetchContacts();
       this.fetchMessages(this.state.selectedUsername);
 
+      $(window).on('popstate', this.handlePopState);
+
       StandardWeb.realtime.subscribe('messages', function (error, socket) {
         if (error) {
           return;
@@ -68,6 +70,45 @@
       });
     },
 
+    createNewMessage: function() {
+      this.setState({
+        selectedUsername: null,
+        mode: 'new-message',
+        messages: []
+      });
+    },
+
+    selectContact: function(contact) {
+      var existingMessages = this.messagesMap[contact.username] || [];
+
+      this.fetchMessages(contact.username);
+
+      contact.new_message = false;
+
+      this.setState({
+        selectedUsername: contact.username,
+        mode: 'user',
+        contacts: this.state.contacts,
+        messages: existingMessages
+      });
+    },
+
+    handlePopState: function() {
+      var path = window.location.pathname;
+      var pathParts = path.split('/');
+
+      if (pathParts.length == 3) {
+        var username = path.split('/')[2];
+
+        if (username === 'new') {
+          this.createNewMessage();
+        } else {
+          var contact = this.getContact(username);
+          this.selectContact(contact);
+        }
+      }
+    },
+
     handleContacts: function(data) {
       this.setState({
         contacts: data.contacts
@@ -85,20 +126,9 @@
     },
 
     handleContactSelected: function(contact) {
-      var existingMessages = this.messagesMap[contact.username] || [];
-
-      this.fetchMessages(contact.username);
-
-      contact.new_message = false;
-
       window.history.pushState('', '', '/messages/' + contact.username);
 
-      this.setState({
-        selectedUsername: contact.username,
-        mode: 'user',
-        contacts: this.state.contacts,
-        messages: existingMessages
-      });
+      this.selectContact(contact);
     },
 
     handleReplyKeyDown: function() {
@@ -113,11 +143,8 @@
 
     handleCreateNewMessage: function() {
       window.history.pushState('', '', '/messages/new');
-      this.setState({
-        selectedUsername: null,
-        mode: 'new-message',
-        messages: []
-      });
+
+      this.createNewMessage();
     },
 
     handleNewMessageToUser: function(contact) {
