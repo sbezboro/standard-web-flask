@@ -538,7 +538,7 @@ def edit_post(post_id):
 
 
 @app.route('/forums/topic/<int:topic_id>/status')
-@login_required()
+@login_required(only_moderator=True)
 def forum_topic_status(topic_id):
     topic = ForumTopic.query.options(
         joinedload(ForumTopic.forum)
@@ -546,11 +546,6 @@ def forum_topic_status(topic_id):
 
     if not topic:
         abort(404)
-
-    user = g.user
-
-    if not user.admin and not user.moderator:
-        abort(403)
 
     status = request.args.get('status')
 
@@ -578,7 +573,7 @@ def forum_topic_status(topic_id):
 
 
 @app.route('/forums/post/<int:post_id>/delete')
-@login_required()
+@login_required(only_moderator=True)
 def forum_post_delete(post_id):
     post = ForumPost.query.options(
         joinedload(ForumPost.topic)
@@ -590,11 +585,6 @@ def forum_post_delete(post_id):
 
     if not post:
         abort(404)
-
-    user = g.user
-
-    if not user.admin and not user.moderator:
-        abort(403)
 
     first_post = ForumPost.query.join(ForumPost.topic) \
         .filter(ForumTopic.id == post.topic_id) \
