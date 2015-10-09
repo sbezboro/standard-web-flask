@@ -78,7 +78,7 @@
                         {% endif %}
                     </div>
 
-                    {% if current_user.admin or current_user in topic.forum.moderators and not post.user.admin %}
+                    {% if (current_user.admin or current_user.moderator) and not post.user.admin %}
                         <div class="post-author-admin">
                             {% if not post.user.forum_ban %}
                                 <a class="confirm" href="{{ url_for('forum_ban', user_id=post.user_id) }}">Ban from forums</a>
@@ -122,14 +122,14 @@
                     {% endif %}
                     {% if current_user %}
                         {% with delete_topic = loop.index0 == 0 and not page - 1 %}
-                            {% if current_user.admin or current_user in topic.forum.moderators %}
+                            {% if current_user.admin or current_user.moderator %}
                                 <a class="confirm" href="{{ url_for('forum_post_delete', post_id=post.id) }}">Delete {% if delete_topic %}topic{% endif %}</a>
                                 {% if not topic.closed %}
                                     |
                                 {% endif %}
                             {% endif %}
                             {% if not topic.closed %}
-                                {% if current_user == post.user or current_user.admin or current_user in topic.forum.moderators %}
+                                {% if current_user == post.user or current_user.admin or current_user.moderator %}
                                     <a href="{{ url_for('edit_post', post_id=post.id) }}">Edit</a> |
                                 {% endif %}
                                 <a class="reply" href="#">Reply</a>
@@ -178,7 +178,7 @@
                 </div>
             </div>
         {% endif %}
-        {% if current_user.admin or current_user in topic.forum.moderators %}
+        {% if current_user.admin or current_user.moderator %}
             <div class="moderation-area">
                 <b>Moderate:</b>
                 {% if topic.closed %}

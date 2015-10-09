@@ -907,11 +907,6 @@ class ForumCategory(db.Model, Base):
     forums = db.relationship('Forum')
 
 
-forum_moderators = db.Table('forum_moderators',
-    db.Column('forum_id', db.Integer, db.ForeignKey('forum.id')),
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')))
-
-
 class Forum(db.Model, Base):
     __tablename__ = 'forum'
 
@@ -929,8 +924,6 @@ class Forum(db.Model, Base):
     category = db.relationship('ForumCategory')
     topics = db.relationship('ForumTopic')
     last_post = db.relationship('ForumPost')
-    moderators = db.relationship('User', secondary=forum_moderators,
-                                 backref=db.backref('moderated_forums'))
 
     @property
     def url(self):

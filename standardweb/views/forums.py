@@ -194,9 +194,7 @@ def forum_search():
 @redirect_route('/forum/<int:forum_id>/')
 @app.route('/forum/<int:forum_id>')
 def forum(forum_id):
-    forum = Forum.query.options(
-        joinedload(Forum.moderators)
-    ).get(forum_id)
+    forum = Forum.query.get(forum_id)
 
     if not forum:
         abort(404)
@@ -265,7 +263,6 @@ def forum(forum_id):
 def forum_topic(topic_id):
     topic = ForumTopic.query.options(
         joinedload(ForumTopic.forum)
-        .joinedload(Forum.moderators)
     ).get(topic_id)
 
     if not topic or topic.deleted:
@@ -493,7 +490,6 @@ def edit_post(post_id):
     post = ForumPost.query.options(
         joinedload(ForumPost.topic)
         .joinedload(ForumTopic.forum)
-        .joinedload(Forum.moderators)
     ).options(
         joinedload(ForumPost.user)
         .joinedload(User.forum_profile)
@@ -507,7 +503,7 @@ def edit_post(post_id):
     if user.forum_ban:
         abort(403)
 
-    if user != post.user and not user.admin and user not in post.topic.forum.moderators:
+    if user != post.user and not user.admin and not user.moderator:
         abort(403)
 
     form = PostForm(obj=post)
@@ -546,7 +542,6 @@ def edit_post(post_id):
 def forum_topic_status(topic_id):
     topic = ForumTopic.query.options(
         joinedload(ForumTopic.forum)
-        .joinedload(Forum.moderators)
     ).get(topic_id)
 
     if not topic:
@@ -554,7 +549,7 @@ def forum_topic_status(topic_id):
 
     user = g.user
 
-    if not user.admin and user not in topic.forum.moderators:
+    if not user.admin and not user.moderator:
         abort(403)
 
     status = request.args.get('status')
@@ -588,7 +583,6 @@ def forum_post_delete(post_id):
     post = ForumPost.query.options(
         joinedload(ForumPost.topic)
         .joinedload(ForumTopic.forum)
-        .joinedload(Forum.moderators)
     ).options(
         joinedload(ForumPost.user)
         .joinedload(User.forum_profile)
@@ -599,7 +593,7 @@ def forum_post_delete(post_id):
 
     user = g.user
 
-    if not user.admin and user not in post.topic.forum.moderators:
+    if not user.admin and not user.moderator:
         abort(403)
 
     first_post = ForumPost.query.join(ForumPost.topic) \
