@@ -1,4 +1,5 @@
 import base64
+import calendar
 from datetime import datetime
 from functools import wraps
 import re
@@ -249,6 +250,7 @@ def rank_query():
         })
 
     time = h.elapsed_time_string(stats.time_spent)
+    last_seen = int(calendar.timegm(stats.last_seen.timetuple()))
 
     veteran_statuses = VeteranStatus.query.filter_by(player=player)
     for veteran_status in veteran_statuses:
@@ -258,7 +260,8 @@ def rank_query():
         server_name = {
             1: 'SS I',
             2: 'SS II',
-            4: 'SS III'
+            4: 'SS III',
+            5: 'SS IV'
         }[server_id]
 
         if rank <= 10:
@@ -281,6 +284,7 @@ def rank_query():
         'err': 0,
         'rank': stats.rank,
         'time': time,
+        'last_seen': last_seen,
         'minutes': stats.time_spent,
         'username': player.username,
         'uuid': player.uuid,
