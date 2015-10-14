@@ -263,6 +263,7 @@ def forum(forum_id):
 def forum_topic(topic_id):
     topic = ForumTopic.query.options(
         joinedload(ForumTopic.forum)
+        .joinedload(Forum.category)
     ).get(topic_id)
 
     if not topic or topic.deleted:
@@ -318,7 +319,8 @@ def forum_topic(topic_id):
         if subscribe:
             libforums.subscribe_to_topic(user, topic, commit=True)
 
-        api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=False)
+        if not topic.forum.category.collapsed:
+            api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=False)
 
         create_subscribed_post_notifications(post)
 
@@ -418,7 +420,9 @@ def forum_post(post_id):
 @app.route('/forum/<int:forum_id>/new_topic', methods=['GET', 'POST'])
 @login_required()
 def new_topic(forum_id):
-    forum = Forum.query.get(forum_id)
+    forum = Forum.query.options(
+        joinedload(Forum.category)
+    ).get(forum_id)
 
     if not forum:
         abort(404)
@@ -472,7 +476,8 @@ def new_topic(forum_id):
         if subscribe:
             libforums.subscribe_to_topic(user, topic, commit=True)
 
-        api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=True)
+        if not forum.category.collapsed:
+            api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=True)
 
         return redirect(topic.url)
 
