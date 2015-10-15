@@ -6,7 +6,17 @@ from sqlalchemy.sql import func, or_
 from standardweb import db
 from standardweb.lib import cache
 from standardweb.lib import helpers as h
-from standardweb.models import Player, DeathCount, KillCount, PlayerStats, Server, OreDiscoveryCount, MaterialType
+from standardweb.models import (
+    DeathCount,
+    KillCount,
+    MaterialType,
+    OreDiscoveryCount,
+    Player,
+    PlayerStats,
+    Server,
+    Title,
+    VeteranStatus
+)
 
 
 def extract_face(image, size):
@@ -184,3 +194,31 @@ def get_data_on_server(player, server):
         'combat_stats': get_combat_data(player, server),
         'server_stats': server_stats
     }
+
+
+def apply_veteran_titles(player, allow_commit=True):
+    update = False
+    veteran_statuses = VeteranStatus.query.options(
+        joinedload(VeteranStatus.server)
+    ).filter_by(player=player)
+
+    for veteran_status in veteran_statuses:
+        rank = veteran_status.rank
+        server = veteran_status.server
+
+        if rank <= 10:
+            veteran_group = 'Top 10 Veteran'
+        elif rank <= 40:
+            veteran_group = 'Top 40 Veteran'
+        else:
+            veteran_group = 'Veteran'
+
+        title_name = '%s %s' % (server.abbreviation, veteran_group)
+        title = Title.query.filter_by(name=title_name).first()
+
+        if title and title not in player.titles:
+            player.titles.append(title)
+            update = True
+
+    if update:
+        player.save(commit=allow_commit)

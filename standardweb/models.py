@@ -405,6 +405,7 @@ class Server(db.Model, Base):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
+    abbreviation = db.Column(db.String(10))
     address = db.Column(db.String(50))
     online = db.Column(db.Boolean())
     secret_key = db.Column(db.String(10))
@@ -675,6 +676,7 @@ class VeteranStatus(db.Model, Base):
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     rank = db.Column(db.Integer)
 
+    server = db.relationship('Server')
     player = db.relationship('Player')
 
 

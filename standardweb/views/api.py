@@ -28,8 +28,8 @@ from standardweb.lib.notifications import InvalidNotificationError
 from standardweb.lib.notifier import notify_new_message
 from standardweb.models import (
     Server, Player, DeathType, DeathEvent, KillCount, KillEvent, KillType, MaterialType,
-    OreDiscoveryEvent, OreDiscoveryCount, EmailToken, User, PlayerStats, VeteranStatus, Message,
-    Title, AuditLog, DeathCount, Notification
+    OreDiscoveryEvent, OreDiscoveryCount, EmailToken, User, PlayerStats, Message,
+    AuditLog, DeathCount, Notification
 )
 
 
@@ -252,32 +252,6 @@ def rank_query():
     time = h.elapsed_time_string(stats.time_spent)
     last_seen = int(calendar.timegm(stats.last_seen.timetuple()))
 
-    veteran_statuses = VeteranStatus.query.filter_by(player=player)
-    for veteran_status in veteran_statuses:
-        server_id = veteran_status.server_id
-        rank = veteran_status.rank
-
-        server_name = {
-            1: 'SS I',
-            2: 'SS II',
-            4: 'SS III',
-            5: 'SS IV'
-        }[server_id]
-
-        if rank <= 10:
-            veteran_group = 'Top 10 Veteran'
-        elif rank <= 40:
-            veteran_group = 'Top 40 Veteran'
-        else:
-            veteran_group = 'Veteran'
-
-        title_name = '%s %s' % (server_name, veteran_group)
-        title = Title.query.filter_by(name=title_name).first()
-
-        if title and title not in player.titles:
-            player.titles.append(title)
-            player.save(commit=True)
-
     titles = [{'name': x.name, 'broadcast': x.broadcast} for x in player.titles]
 
     retval = {
@@ -316,7 +290,9 @@ def join_server():
     notifications_url = url_for('notifications', _external=True)
     uuid = request.form.get('uuid')
 
-    player = Player.query.filter_by(uuid=uuid).first()
+    player = Player.query.options(
+        joinedload(Player.user)
+    ).filter_by(uuid=uuid).first()
 
     num_new_notifications = 0
     num_new_messages = 0
@@ -324,6 +300,8 @@ def join_server():
     no_user = True
 
     if player:
+        libplayer.apply_veteran_titles(player)
+
         no_user = not player.user
 
         messages = Message.query.options(
