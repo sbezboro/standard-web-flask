@@ -668,7 +668,7 @@ def forum_post_delete(post_id):
 
 
 @app.route('/forums/topic/<int:topic_id>/move', methods=['GET', 'POST'])
-@login_required()
+@login_required(only_moderator=True)
 def move_topic(topic_id):
     topic = ForumTopic.query.options(
         joinedload(ForumTopic.forum)
@@ -678,9 +678,6 @@ def move_topic(topic_id):
         abort(404)
 
     user = g.user
-
-    if not user.admin and not user.moderated_forums:
-        abort(403)
 
     all_categories = ForumCategory.query.options(
         joinedload(ForumCategory.forums)
@@ -747,12 +744,9 @@ def all_topics_read():
 
 
 @app.route('/forums/ban')
-@login_required()
+@login_required(only_moderator=True)
 def forum_ban():
     user = g.user
-
-    if not user.admin and not user.moderated_forums:
-        abort(403)
 
     user_id = request.args['user_id']
 
