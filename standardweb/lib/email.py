@@ -11,12 +11,16 @@ from sqlalchemy.orm import joinedload
 from standardweb import app
 from standardweb.lib import notifications
 from standardweb.models import EmailToken, User, ForumPost, Player
-from standardweb.tasks.email import send_email as send_email_task
+from standardweb.tasks.email import send_email_task
+from standardweb.tasks.messages import send_new_message_email_task
 
 
 DEFAULT_FROM_EMAIL = 'Standard Survival <server@standardsurvival.com>'
 MESSAGE_REPLY_FROM_EMAIL = 'Standard Survival <message-reply@mail.standardsurvival.com>'
 EMAIL_URL = 'https://api.mailgun.net/v2/mail.standardsurvival.com/messages'
+
+# time to collect notifications before sending a batch in one email
+EMAIL_BATCH_TIME_SEC = 300
 
 NOTIFICATION_EMAILS = {}
 
@@ -95,6 +99,12 @@ def send_reset_password(user):
     return send_email(to_email, '[Standard Survival] Reset password', text_body, html_body)
 
 
+def schedule_new_message_email(message):
+    send_new_message_email_task.apply_async((
+        message.id,
+    ), countdown=EMAIL_BATCH_TIME_SEC)
+
+
 @email_preference_enabled('new_message')
 def send_new_message_email(user, message):
     to_email = user.email
@@ -136,6 +146,41 @@ def send_new_message_email(user, message):
         text_body,
         html_body,
         from_email=MESSAGE_REPLY_FROM_EMAIL
+    )
+
+
+@email_preference_enabled('new_message')
+def send_new_messages_email(user, messages):
+    to_email = user.email
+
+    if not to_email:
+        return
+
+    from_user = messages[0].from_user
+    from_username = from_user.get_username()
+
+    conversation_url = url_for('messages', username=from_username, _external=True)
+
+    from_player_url = None
+    if from_user.player:
+        from_player_url = url_for('player', username=from_user.player.uuid, _external=True)
+
+    unsubscribe_link = notifications.generate_unsubscribe_link(user, 'new_message')
+
+    text_body, html_body = _render_email('messages/new_messages', to_email, {
+        'username': user.get_username(),
+        'from_username': from_username,
+        'num_messages': len(messages),
+        'conversation_url': conversation_url,
+        'from_player_url': from_player_url,
+        'unsubscribe_url': unsubscribe_link
+    })
+
+    send_email(
+        to_email,
+        '[Standard Survival] %s new unread messages from %s' % (len(messages), from_username),
+        text_body,
+        html_body
     )
 
 

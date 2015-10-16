@@ -689,6 +689,7 @@ class Message(db.Model, Base):
     to_player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     seen_at = db.Column(db.DateTime)
+    notified_at = db.Column(db.DateTime)
     body = db.Column(db.Text())
     body_html = db.Column(db.Text())
     user_ip = db.Column(db.String(15))

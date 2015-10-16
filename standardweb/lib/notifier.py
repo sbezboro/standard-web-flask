@@ -16,7 +16,7 @@ def notify_new_message(message):
     if to_user:
         realtime.new_message(message)
         realtime.unread_message_count(to_user)
-        email.send_new_message_email(to_user, message)
+        email.schedule_new_message_email(message)
 
     if to_player:
         api.new_message(to_player, from_user)

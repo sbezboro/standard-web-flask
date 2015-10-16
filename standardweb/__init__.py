@@ -142,6 +142,7 @@ import models
 
 import tasks.access_log
 import tasks.email
+import tasks.messages
 import tasks.notifications
 import tasks.realtime
 import tasks.server_api

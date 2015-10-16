@@ -1,12 +1,11 @@
 import requests
 import rollbar
 
-from standardweb import app
-from standardweb import celery
+from standardweb import app, celery
 
 
 @celery.task()
-def send_email(from_email, to_email, subject, text_body, html_body):
+def send_email_task(from_email, to_email, subject, text_body, html_body):
     from standardweb.lib.email import EMAIL_URL
 
     auth = ('api', app.config['MAILGUN_API_KEY'])
