@@ -3,7 +3,6 @@ import pytz
 
 from flask import (
     abort,
-    after_this_request,
     flash,
     g,
     jsonify,
@@ -32,14 +31,6 @@ MESSAGE_THROTTLE_PERIOD = 60  # minutes
 @app.route('/messages/<path:path>')
 @login_required()
 def messages(username=None, path=None):
-    user = g.user
-
-    if not user.email:
-        flash(Markup(
-            '<a href="%s">Set an email address</a> to receive email notifications for new messages!'
-            % url_for('profile_settings')
-        ), 'warning')
-
     return render_template('messages/index.html')
 
 
@@ -222,7 +213,6 @@ def send_message(username):
     ).all()
 
     if not app.config['DEBUG'] and len(recent_messages) > MESSAGE_THROTTLE_COUNT:
-        # TODO: handle auto alerting for ajax requests
         return jsonify({
             'err': 1,
             'message': 'Whoa there, you sent too many messages recently! Try sending a bit later.'

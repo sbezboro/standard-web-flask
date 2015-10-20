@@ -4,12 +4,6 @@
 
 {% block content %}
     <div class="container">
-        {% if current_user and not current_user.email %}
-            <div class="alert warning">
-                Please set an email address for your account <a href="{{ url_for('profile_settings') }}">here</a>.
-                <a class="close">&times;</a>
-            </div>
-        {% endif %}
         {% include 'includes/flash_messages.html' %}
         <h1>Standard Survival</h1>
         <div class="splash">
@@ -51,4 +45,16 @@
         </div>
     </div>
     <a class="github-banner" href="https://github.com/sbezboro/standard-web-flask"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" width="149" height="149"></a>
+{% endblock %}
+
+{% block js %}
+    {{ super() }}
+    {% if current_user and not current_user.email %}
+        <script>
+            StandardWeb.alertManager.addAlert(
+                'warning',
+                "Please set an email address for your account <a href=\"{{ url_for('profile_settings') }}\">here</a>."
+            );
+        </script>
+    {% endif %}
 {% endblock %}

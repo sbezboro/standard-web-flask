@@ -22,4 +22,13 @@
             document.getElementById('messages')
         );
     </script>
+
+    {% if current_user and not current_user.email %}
+        <script>
+            StandardWeb.alertManager.addAlert(
+                'warning',
+                "<a href=\"{{ url_for('profile_settings') }}\">Set an email address</a> to receive email notifications for new messages!"
+            );
+        </script>
+    {% endif %}
 {% endblock %}

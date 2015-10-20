@@ -103,10 +103,6 @@
       }
     });
 
-    $(document).on('click', '.alert > .close', function () {
-      $(this).closest('.alert').remove();
-    });
-
     $(document).on('click', 'a.confirm', function () {
       return confirm($(this).attr('data-confirm-message') || 'Are you sure?');
     });

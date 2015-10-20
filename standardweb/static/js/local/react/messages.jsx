@@ -201,7 +201,7 @@
         data: {body: value},
         success: function(data) {
           if (data.err) {
-            // TODO: show error
+            StandardWeb.alertManager.addAlert('error', data.message);
           } else {
             var i;
             var self;
@@ -222,7 +222,10 @@
             this.addMessage(data.message);
             this.updateContactFromMessage(this.state.selectedUsername, data.message, false);
           }
-        }.bind(this)
+        }.bind(this),
+        failure: function() {
+          StandardWeb.alertManager.addAlert('error', 'Something went wrong, try again later.');
+        }
       });
     },
 

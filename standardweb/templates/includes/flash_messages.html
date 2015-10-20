@@ -1,10 +1,16 @@
+<div id="alert-manager"></div>
+
+<script type="application/javascript">
+  StandardWeb.alertManager = React.render(
+    React.createElement(StandardWeb.reactComponents.AlertManager),
+    document.getElementById('alert-manager')
+  );
+</script>
+
 {% with flash_messages = get_flashed_messages(with_categories=true) %}
   {% if flash_messages %}
     {% for category, message in flash_messages %}
-      <div class="alert {{ category }}">
-        {{ message }}
-        <a class="close">&times;</a>
-      </div>
+      <script>StandardWeb.alertManager.addAlert('{{ category }}', '{{ message }}');</script>
     {% endfor %}
   {% endif %}
 {% endwith %}

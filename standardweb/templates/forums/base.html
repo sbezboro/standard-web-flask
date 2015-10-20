@@ -8,12 +8,6 @@
 
 {% block content %}
     <div class="container">
-        {% if current_user and not current_user.email %}
-            <div class="alert warning">
-                Please set an email address for your account <a href="{{ url_for('profile_settings') }}">here</a>.
-                <a class="close">&times;</a>
-            </div>
-        {% endif %}
         {% include 'includes/flash_messages.html' %}
         <h2>Standard Survival Forums</h2>
         <div class="forum-content">
@@ -75,4 +69,12 @@
             window.sceditor.sourceMode(true);
         }
     </script>
+    {% if current_user and not current_user.email %}
+        <script>
+            StandardWeb.alertManager.addAlert(
+                'warning',
+                "Please set an email address for your account <a href=\"{{ url_for('profile_settings') }}\">here</a>."
+            );
+        </script>
+    {% endif %}
 {% endblock %}

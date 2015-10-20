@@ -97,6 +97,10 @@
           }
         }
       });
+    },
+
+    alertManager: { // Default in case alert manager is not present on page
+      addAlert: function() {}
     }
   };
 
