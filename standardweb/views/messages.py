@@ -1,29 +1,23 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import pytz
 
 from flask import (
     abort,
-    flash,
     g,
     jsonify,
     render_template,
-    request,
-    url_for
+    request
 )
-from markupsafe import Markup
 import rollbar
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
 from standardweb import app, db, stats
+from standardweb.lib import messages as libmessages
 from standardweb.lib import realtime
 from standardweb.lib.notifier import notify_new_message, notify_message_read
 from standardweb.models import User, Player, Message
 from standardweb.views.decorators.auth import login_required
-
-
-MESSAGE_THROTTLE_COUNT = 60
-MESSAGE_THROTTLE_PERIOD = 60  # minutes
 
 
 @app.route('/messages')
@@ -205,36 +199,33 @@ def send_message(username):
                 'err': 1
             })
 
-    # prevent spam
-    recent_messages = Message.query.with_entities(Message.id).filter(
-        Message.from_user == user,
-        Message.sent_at > datetime.utcnow() - timedelta(minutes=MESSAGE_THROTTLE_PERIOD),
-        Message.deleted == False
-    ).all()
-
-    if not app.config['DEBUG'] and len(recent_messages) > MESSAGE_THROTTLE_COUNT:
+    if libmessages.is_sender_spamming(user, to_user, to_player):
+        rollbar.report_message('User blocked from spamming messages', request=request, extra_data={
+            'to_user_id': to_user.id if to_user else None,
+            'to_player_id': to_player.id if to_player else None
+        })
         return jsonify({
             'err': 1,
             'message': 'Whoa there, you sent too many messages recently! Try sending a bit later.'
         })
-    else:
-        message = Message(
-            from_user=user,
-            to_user=to_user,
-            to_player=to_player,
-            body=body,
-            user_ip=request.remote_addr
-        )
-        message.save()
 
-        notify_new_message(message)
+    message = Message(
+        from_user=user,
+        to_user=to_user,
+        to_player=to_player,
+        body=body,
+        user_ip=request.remote_addr
+    )
+    message.save()
 
-        stats.incr('messages.created')
+    notify_new_message(message)
 
-        return jsonify({
-            'err': 0,
-            'message': message.to_dict()
-        })
+    stats.incr('messages.created')
+
+    return jsonify({
+        'err': 0,
+        'message': message.to_dict()
+    })
 
 
 @app.route('/messages/mark_read', methods=['POST'])
