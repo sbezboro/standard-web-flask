@@ -43,7 +43,7 @@ def is_sender_spamming(user, to_user, to_player):
             Message.deleted == False
         ).all()
     else:
-        recent_messages_from_user = 0
+        recent_messages_from_user = []
 
     if len(recent_messages_to_player) - len(recent_messages_from_user) > MESSAGE_THROTTLE_DIFFERENCE:
         return True
