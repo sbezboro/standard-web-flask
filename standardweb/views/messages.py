@@ -177,7 +177,10 @@ def send_message(username):
     user = g.user
 
     if user.forum_ban:
-        abort(403)
+        return jsonify({
+            'err': 1,
+            'message': 'Oops, you are blocked from sending any messages. Awkward...'
+        })
 
     body = request.form.get('body')
 

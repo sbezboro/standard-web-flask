@@ -223,7 +223,7 @@
             this.updateContactFromMessage(this.state.selectedUsername, data.message, false);
           }
         }.bind(this),
-        failure: function() {
+        error: function() {
           StandardWeb.alertManager.addAlert('error', 'Something went wrong, try again later.');
         }
       });
