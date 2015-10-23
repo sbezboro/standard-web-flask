@@ -3,7 +3,7 @@ from datetime import timedelta
 import os
 import subprocess
 
-from flask import abort, g, jsonify, redirect, request, render_template, send_file, url_for
+from flask import abort, flash, g, jsonify, redirect, request, render_template, send_file, url_for
 from PIL import Image
 import requests
 import rollbar
@@ -13,7 +13,7 @@ from standardweb import app
 from standardweb.lib import leaderboards as libleaderboards
 from standardweb.lib import player as libplayer
 from standardweb.lib import server as libserver
-from standardweb.models import Server, ServerStatus
+from standardweb.models import Server, ServerStatus, MojangStatus
 from standardweb.views.decorators.cache import last_modified
 from standardweb.views.decorators.redirect import redirect_route
 
@@ -237,6 +237,13 @@ def chat(server_id=None):
         'servers': Server.query.all(),
         'player': player
     }
+
+    status = MojangStatus.query.order_by(MojangStatus.timestamp.desc()).limit(1).first()
+    if status and not status.session:
+        flash(
+            'Minecraft session servers are down, you many not be able to join the server!',
+            category='warning'
+        )
 
     return render_template('chat.html', **retval)
 
