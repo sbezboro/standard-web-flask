@@ -640,6 +640,11 @@
   });
 
   var ReplyArea = React.createClass({
+    componentDidUpdate: function() {
+      var textarea = React.findDOMNode(this.refs.textarea);
+      textarea.focus();
+    },
+
     handleClick: function(e) {
       var textarea = React.findDOMNode(this.refs.textarea);
 
