@@ -32,6 +32,7 @@ def is_sender_spamming(user, to_user, to_player):
         Message.from_user == user,
         Message.to_player == to_player,
         Message.sent_at > datetime.utcnow() - timedelta(hours=MESSAGE_THROTTLE_PERIOD),
+        Message.seen_at == None,
         Message.deleted == False
     ).all()
 
