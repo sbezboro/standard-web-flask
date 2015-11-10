@@ -987,6 +987,7 @@ class ForumTopic(db.Model, Base):
                 tracking.set_topics(topics)
                 tracking.save(commit=commit)
         else:
+            tracking.last_read = datetime.now()
             tracking.set_topics({self.id: self.last_post_id})
             tracking.save(commit=commit)
 
@@ -1043,7 +1044,10 @@ class ForumPostTracking(db.Model, Base):
     user = db.relationship('User', backref=db.backref('posttracking', uselist=False))
 
     def get_topics(self):
-        return json.loads(self.topics) if self.topics else None
+        try:
+            return json.loads(self.topics) if self.topics else None
+        except ValueError:
+            return None
 
     def set_topics(self, topics):
         self.topics = json.dumps(topics)
