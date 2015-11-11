@@ -75,6 +75,10 @@ class Base(object):
 
         return instance
 
+    @classmethod
+    def factory_and_created(cls, **kwargs):
+        return _get_or_create(cls, **kwargs)
+
 
 class User(db.Model, Base):
     __tablename__ = 'user'

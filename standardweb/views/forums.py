@@ -422,10 +422,13 @@ def forum_post_vote(post_id):
     if post.user_id == g.user.id:
         abort(403)
 
-    vote = ForumPostVote.factory(
+    vote, created = ForumPostVote.factory_and_created(
         user_id=g.user.id,
         post_id=post.id
     )
+
+    if not created:
+        vote.updated = datetime.utcnow()
 
     user_vote = request.form.get('vote')
 
