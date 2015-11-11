@@ -661,8 +661,10 @@
     },
 
     handleKeyUp: function(e) {
-      if (e.keyCode == 13 && e.target.value) { // Enter
-        this.props.onSendMessage(e.target.value);
+      var value = e.target.value.trim();
+
+      if (e.keyCode == 13 && value) { // Enter
+        this.props.onSendMessage(value);
         e.target.value = '';
 
         e.preventDefault();
