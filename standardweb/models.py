@@ -1001,10 +1001,10 @@ class ForumPost(db.Model, Base):
     created = db.Column(db.DateTime, default=datetime.utcnow)
     updated = db.Column(db.DateTime, default=None)
     updated_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    markup = db.Column(db.String(15), default='bbcode')
     body = db.Column(db.Text())
     body_html = db.Column(db.Text())
     user_ip = db.Column(db.String(15))
+    score = db.Column(db.Numeric(), default=0)
     deleted = db.Column(db.Boolean, default=False)
 
     topic = db.relationship('ForumTopic', foreign_keys='ForumPost.topic_id')
@@ -1031,6 +1031,17 @@ class ForumPost(db.Model, Base):
             self.body_html = pat.sub(path, self.body_html)
 
         return super(ForumPost, self).save(commit)
+
+
+class ForumPostVote(db.Model, Base):
+    __tablename__ = 'forum_post_vote'
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('forum_post.id'), primary_key=True)
+    vote = db.Column(db.Integer())
+
+    post = db.relationship('ForumPost', backref=db.backref('votes'))
+    user = db.relationship('User', backref=db.backref('votes'))
 
 
 class ForumPostTracking(db.Model, Base):

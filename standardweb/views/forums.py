@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import abort
 from flask import flash
 from flask import g
+from flask import jsonify
 from flask import redirect
 from flask import request
 from flask import render_template
@@ -21,7 +22,7 @@ from standardweb.lib import notifications
 from standardweb.lib.notifier import create_news_post_notifications, create_subscribed_post_notifications
 from standardweb.models import (
     ForumCategory, Forum, ForumPost, ForumTopic, User, ForumPostTracking, ForumAttachment,
-    PlayerStats, AuditLog, ForumBan, ForumTopicSubscription
+    PlayerStats, AuditLog, ForumBan, ForumTopicSubscription, ForumPostVote
 )
 from standardweb.views.decorators.auth import login_required
 from standardweb.views.decorators.redirect import redirect_route
@@ -352,10 +353,12 @@ def forum_topic(topic_id):
     ).options(
         joinedload(ForumPost.topic)
         .joinedload(ForumTopic.forum)
-    ).filter_by(topic_id=topic_id, deleted=False) \
-        .order_by(ForumPost.created) \
-        .limit(page_size) \
-        .offset((page - 1) * page_size)
+    ).filter(
+        ForumPost.topic_id == topic_id,
+        ForumPost.deleted == False
+    ).order_by(
+        ForumPost.created
+    ).limit(page_size).offset((page - 1) * page_size)
 
     player_ids = set([post.user.player_id for post in posts])
 
@@ -370,6 +373,7 @@ def forum_topic(topic_id):
     }
 
     subscription = None
+    votes = None
 
     if user:
         notifications.mark_notifications_read(
@@ -384,6 +388,15 @@ def forum_topic(topic_id):
             topic=topic
         ).first()
 
+        all_votes = ForumPostVote.query.filter(
+            ForumPostVote.user_id == user.id,
+            ForumPostVote.post_id.in_(post.id for post in posts)
+        )
+
+        votes = {
+            forum_post_vote.post_id: forum_post_vote.vote for forum_post_vote in all_votes
+        }
+
     retval = {
         'topic': topic,
         'posts': posts,
@@ -391,10 +404,41 @@ def forum_topic(topic_id):
         'page_size': page_size,
         'page': page,
         'form': form,
-        'subscription': subscription
+        'subscription': subscription,
+        'votes': votes
     }
 
     return render_template('forums/topic.html', **retval)
+
+
+@login_required()
+@app.route('/forums/post/<int:post_id>/vote', methods=['POST'])
+def forum_post_vote(post_id):
+    post = ForumPost.query.get(post_id)
+
+    if not post or post.deleted:
+        abort(404)
+
+    if post.user_id == g.user.id:
+        abort(403)
+
+    vote = ForumPostVote.factory(
+        user_id=g.user.id,
+        post_id=post.id
+    )
+
+    user_vote = request.form.get('vote')
+
+    if user_vote == '1':
+        vote.vote = 1
+    elif user_vote == '0':
+        vote.vote = 0
+    elif user_vote == '-1':
+        vote.vote = -1
+
+    vote.save(commit=True)
+
+    return jsonify({})
 
 
 @redirect_route('/forum/post/<int:post_id>/')
@@ -417,8 +461,8 @@ def forum_post(post_id):
     return redirect(url_for('forum_topic', topic_id=post.topic_id, _anchor=post.id))
 
 
-@app.route('/forum/<int:forum_id>/new_topic', methods=['GET', 'POST'])
 @login_required()
+@app.route('/forum/<int:forum_id>/new_topic', methods=['GET', 'POST'])
 def new_topic(forum_id):
     forum = Forum.query.options(
         joinedload(Forum.category)
@@ -676,8 +720,6 @@ def move_topic(topic_id):
 
     if not topic or topic.deleted:
         abort(404)
-
-    user = g.user
 
     all_categories = ForumCategory.query.options(
         joinedload(ForumCategory.forums)

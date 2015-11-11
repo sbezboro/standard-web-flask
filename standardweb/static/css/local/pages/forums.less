@@ -270,6 +270,26 @@
       text-align: right;
       font-size: 14px;
 
+      .vote {
+        float: left;
+        margin-right: 10px;
+
+        i {
+          color: #888;
+          cursor: pointer;
+
+          &.active {
+            &.up {
+              color: #6DB56D;
+            }
+
+            &.down {
+              color: #794343;
+            }
+          }
+        }
+      }
+
       .updated {
         float: left;
         color: #888;
