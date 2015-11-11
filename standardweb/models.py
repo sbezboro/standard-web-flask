@@ -1039,6 +1039,8 @@ class ForumPostVote(db.Model, Base):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('forum_post.id'), primary_key=True)
     vote = db.Column(db.Integer(), default=0)
+    created = db.Column(db.DateTime, default=datetime.utcnow)
+    updated = db.Column(db.DateTime, default=None)
 
     post = db.relationship('ForumPost', backref=db.backref('votes'))
     user = db.relationship('User', backref=db.backref('votes'))
