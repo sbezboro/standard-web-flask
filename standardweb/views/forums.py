@@ -464,8 +464,8 @@ def forum_post(post_id):
     return redirect(url_for('forum_topic', topic_id=post.topic_id, _anchor=post.id))
 
 
-@login_required()
 @app.route('/forum/<int:forum_id>/new_topic', methods=['GET', 'POST'])
+@login_required()
 def new_topic(forum_id):
     forum = Forum.query.options(
         joinedload(Forum.category)
