@@ -92,6 +92,7 @@ class User(db.Model, Base):
     password = db.Column(db.String(128))
     admin = db.Column(db.Boolean, default=False)
     moderator = db.Column(db.Boolean, default=False)
+    score = db.Column(db.Numeric(), default=0)
     last_login = db.Column(db.DateTime, default=None)
     date_joined = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -1043,6 +1044,7 @@ class ForumPostVote(db.Model, Base):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('forum_post.id'), primary_key=True)
     vote = db.Column(db.Integer(), default=0)
+    computed_weight = db.Column(db.Numeric())
     created = db.Column(db.DateTime, default=datetime.utcnow)
     updated = db.Column(db.DateTime, default=None)
 

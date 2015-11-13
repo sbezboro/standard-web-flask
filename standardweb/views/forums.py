@@ -24,6 +24,7 @@ from standardweb.models import (
     ForumCategory, Forum, ForumPost, ForumTopic, User, ForumPostTracking, ForumAttachment,
     PlayerStats, AuditLog, ForumBan, ForumTopicSubscription, ForumPostVote
 )
+from standardweb.tasks.vote_scores import compute_vote_score_task
 from standardweb.views.decorators.auth import login_required
 from standardweb.views.decorators.redirect import redirect_route
 from standardweb.views.decorators.referrers import reject_external_referrers
@@ -422,13 +423,21 @@ def forum_post_vote(post_id):
     if post.user_id == g.user.id:
         abort(403)
 
+    user = g.user
+
+    if user.forum_ban:
+        abort(403)
+
     vote, created = ForumPostVote.factory_and_created(
-        user_id=g.user.id,
+        user_id=user.id,
         post_id=post.id
     )
 
+    old_vote = None
+
     if not created:
         vote.updated = datetime.utcnow()
+        old_vote = vote.vote
 
     user_vote = request.form.get('vote')
 
@@ -439,7 +448,9 @@ def forum_post_vote(post_id):
     elif user_vote == '-1':
         vote.vote = -1
 
-    vote.save(commit=True)
+    if old_vote != vote.vote:
+        compute_vote_score_task.delay(vote.user_id, vote.post_id, old_vote)
+        vote.save(commit=True)
 
     return jsonify({})
 

@@ -115,6 +115,9 @@
                             <i class="fa fa-thumbs-o-down down {{'active' if votes[post.id] == -1 }}" data-type="-1"></i>
                         </span>
                     {% endif %}
+                    {% if current_user and current_user.admin %}
+                        <span class="vote score">{{ post.score }}</span>
+                    {% endif %}
                     {% if post.updated %}
                         <span class="updated">
                             Edited by
