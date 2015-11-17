@@ -40,6 +40,15 @@ def calculate_vote_weight(vote, post):
 
     weight = 1 - min(1.0, difference_minutes / MAX_VOTE_WEIGHT_TIME)
 
+    same_ip_votes = ForumPostVote.query.filter(
+        ForumPostVote.user_id != vote.user_id,
+        ForumPostVote.post_id == post.id,
+        ForumPostVote.user_ip == vote.user_ip
+    ).count()
+
+    if same_ip_votes:
+        weight *= (1 / (50.0 * same_ip_votes))
+
     return weight
 
 
