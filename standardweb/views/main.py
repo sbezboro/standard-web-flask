@@ -241,7 +241,7 @@ def chat(server_id=None):
     status = MojangStatus.query.order_by(MojangStatus.timestamp.desc()).limit(1).first()
     if status and not status.session:
         flash(
-            'Minecraft session servers are down, you many not be able to join the server!',
+            'Minecraft session servers are down, you may not be able to join the server!',
             category='warning'
         )
 
