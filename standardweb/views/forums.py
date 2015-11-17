@@ -435,7 +435,9 @@ def forum_post_vote(post_id):
 
     old_vote = None
 
-    if not created:
+    if created:
+        vote.user_ip = request.remote_addr
+    else:
         vote.updated = datetime.utcnow()
         old_vote = vote.vote
 
