@@ -90,6 +90,13 @@ def subscribe_to_topic(user, topic, commit=True):
     }, commit=commit)
 
 
+def should_notify_post(user, topic, post):
+    return (
+        not topic.forum.category.collapsed and
+        user.score > app.config['MINIMUM_USER_SCORE_FOR_POST_NOTIFY']
+    )
+
+
 _bbcode_parser.add_simple_formatter('img', '<img src="%(value)s"/>')
 _bbcode_parser.add_simple_formatter('youtube', '<iframe width="516" height="315" src="//www.youtube.com/embed/%(value)s" frameborder="0" allowfullscreen></iframe>')
 

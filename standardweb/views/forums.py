@@ -321,7 +321,7 @@ def forum_topic(topic_id):
         if subscribe:
             libforums.subscribe_to_topic(user, topic, commit=True)
 
-        if not topic.forum.category.collapsed:
+        if libforums.should_notify_post(user, topic, post):
             api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=False)
 
         create_subscribed_post_notifications(post)
@@ -534,7 +534,7 @@ def new_topic(forum_id):
         if subscribe:
             libforums.subscribe_to_topic(user, topic, commit=True)
 
-        if not forum.category.collapsed:
+        if libforums.should_notify_post(user, topic, post):
             api.forum_post(user, topic.forum.name, topic.name, post.url, is_new_topic=True)
 
         return redirect(topic.url)
