@@ -658,6 +658,10 @@
 
     handleKeyDown: function(e) {
       this.props.onReplyKeyDown();
+
+      if (e.keyCode == 13) {
+        e.preventDefault();
+      }
     },
 
     handleKeyUp: function(e) {
