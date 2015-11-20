@@ -37,3 +37,8 @@
   background-image: -ms-linear-gradient(left, @startColor, @endColor);
   background-image: -o-linear-gradient(left, @startColor, @endColor);
 }
+
+.blur (@amount) {
+  filter: blur(@amount);
+  -webkit-filter: blur(@amount);
+}

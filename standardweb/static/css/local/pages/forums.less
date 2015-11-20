@@ -1,4 +1,5 @@
 @import "../colors";
+@import "../mixins";
 
 .forum-content {
   h4 {
@@ -191,6 +192,7 @@
     background: #fff;
     margin-bottom: 20px;
     border: 1px solid #ddd;
+    position: relative;
 
     .post-author {
       background: #eaeaea;
@@ -254,6 +256,26 @@
         opacity: 0.2;
         filter: Alpha(opacity=20);
       }
+    }
+
+    &.bad {
+      .post-content {
+        .blur(4px);
+        img {
+          .blur(20px);
+        }
+      }
+    }
+
+    .bad-post-warning {
+      display: inline;
+      margin: 0 auto;
+      padding: 10px;
+      position: absolute;
+      left: 50%;
+      top: 65%;
+      transform: translate(-50%, 0);
+      z-index: 10;
     }
 
     .post-extras {

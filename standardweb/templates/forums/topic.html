@@ -24,7 +24,7 @@
     <div class="forum-topic">
         {% for post in posts %}
             <a class="anchor-nav" id="{{ post.id }}"></a>
-            <div class="forum-post {% if post.user.forum_ban %}banned{% endif %}">
+            <div class="forum-post {% if post.user.forum_ban %}banned{% endif %} {% if post.is_bad %}bad{% endif %}">
                 <h4>
                     <a href="{{ url_for('forum_post', post_id=post.id) }}">
                        {{ post.created|from_now }}
@@ -92,6 +92,11 @@
 
                     <div class="clearfix"></div>
                 </div>
+                {% if post.is_bad %}
+                    <div class="bad-post-warning alert warning">
+                        Warning! This post has been designated as a <b>shitpost</b> by the community. Click <a href="#" class="show-bad-post">here</a> to show it.
+                    </div>
+                {% endif %}
                 <div class="post-content" data-bbcode="{{ post.body }}">
                     {{ post.get_body_html(request.args.query)|safe }}
                 </div>
@@ -278,6 +283,17 @@
                 type: 'POST',
                 data: {vote: vote}
             });
+
+            return false;
+        });
+
+        $('.show-bad-post').on('click', function(e) {
+            var $this = $(this);
+            var $warning = $this.closest('.bad-post-warning');
+            var $forumPost = $this.closest('.forum-post');
+
+            $warning.remove();
+            $forumPost.removeClass('bad');
 
             return false;
         });

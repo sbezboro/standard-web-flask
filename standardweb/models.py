@@ -1020,6 +1020,10 @@ class ForumPost(db.Model, Base):
     def url(self):
         return url_for('forum_post', post_id=self.id)
 
+    @property
+    def is_bad(self):
+        return self.score < app.config['BAD_POST_THRESHOLD']
+
     def get_body_html(self, highlight=None):
         if highlight:
             return re.sub(r'(%s)' % re.escape(highlight),

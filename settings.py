@@ -32,6 +32,7 @@ CDN_DOMAIN = 'd2rpyddsvhacm5.cloudfront.net'
 BLACKLIST_EMAIL_DOMAINS = set([])
 
 MINIMUM_USER_SCORE_FOR_POST_NOTIFY = -10.0
+BAD_POST_THRESHOLD = -1.0
 
 try:
     from local_settings import *
