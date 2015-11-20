@@ -56,14 +56,14 @@ def to_int(value):
         return None
 
 
-def avoid_duplicate_username(username, uuid, allow_flush=True):
+def avoid_duplicate_username(username, allow_flush=True):
     """catch case if player on the server has renamed to an existing username in the db,
     look up existing player's current username since it must be different now
     """
     from standardweb.models import Player
     existing_username_player = Player.query.filter_by(username=username).first()
     if existing_username_player:
-        new_username = minecraft_uuid.lookup_latest_username_by_uuid(uuid)
+        new_username = minecraft_uuid.lookup_latest_username_by_uuid(existing_username_player.uuid)
         existing_username_player.set_username(new_username)
         existing_username_player.save(commit=False)
 

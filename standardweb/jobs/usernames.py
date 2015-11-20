@@ -50,7 +50,7 @@ def _handle_player(player):
         return False
 
     if actual_username != player.username:
-        h.avoid_duplicate_username(actual_username, player.uuid)
+        h.avoid_duplicate_username(actual_username)
 
         player.set_username(actual_username)
         player.save(commit=True)

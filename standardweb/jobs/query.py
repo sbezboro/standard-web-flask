@@ -153,12 +153,12 @@ def _query_server(server, mojang_status):
 
         if player:
             if player.username != username:
-                h.avoid_duplicate_username(username, uuid)
+                h.avoid_duplicate_username(username)
 
                 player.set_username(username)
                 player.save(commit=False)
         else:
-            h.avoid_duplicate_username(username, uuid)
+            h.avoid_duplicate_username(username)
 
             player = Player(username=username, uuid=uuid)
             player.save(commit=False)
