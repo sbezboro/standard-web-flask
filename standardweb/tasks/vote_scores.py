@@ -1,12 +1,28 @@
+from datetime import datetime, timedelta
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from standardweb import celery, db
-from standardweb.models import ForumPostVote, PlayerStats, Server
+from standardweb.models import ForumPost, ForumPostVote, PlayerStats, Server
 
 
 MAX_USER_ACTIVE_MULTIPLIER_TIME = 48000  # time in minutes before a player gets 1.0x multiplier
 MAX_VOTE_WEIGHT_TIME = 4320  # time in minutes before a vote no longer affects post score
+
+
+def _calculate_player_time_weight(player_id):
+    """Return a weight between 0.0 and 1.0 that is proportional to the user's
+    total time spent on the server."""
+    total_time = db.session.query(
+        func.sum(PlayerStats.time_spent)
+    ).join(Server).filter(
+        PlayerStats.player_id == player_id,
+        Server.type == 'survival'
+    ).scalar()
+
+    player_time_weight = min(1.0, float(total_time) / MAX_USER_ACTIVE_MULTIPLIER_TIME)
+
+    return player_time_weight
 
 
 def calculate_user_score_weight(user):
@@ -16,21 +32,41 @@ def calculate_user_score_weight(user):
     user_score = float(user.score)
 
     if user_score < 0:
+        # the lower the user's score, the less weight their votes have
         weight = 1 / (-user_score + 1)
 
     if user.player_id:
-        total_time = db.session.query(
-            func.sum(PlayerStats.time_spent)
-        ).join(Server).filter(
-            PlayerStats.player_id == user.player_id,
-            Server.type == 'survival'
-        ).scalar()
+        player_time_weight = _calculate_player_time_weight(user.player_id)
 
-        multiplier = min(1.0, float(total_time) / MAX_USER_ACTIVE_MULTIPLIER_TIME)
-
-        weight *= multiplier
+        weight *= player_time_weight
 
     return weight
+
+
+def _calculate_same_user_vote_weight(vote, post):
+    """Return a weight between 0.0 and 1.0 that is proportional to the ratio of votes on other
+    user's posts and the current vote's post's user."""
+    # votes the user has made for the post's user
+    same_user_vote_count = ForumPostVote.query.join(ForumPost).filter(
+        ForumPostVote.post_id != post.id,
+        ForumPostVote.user_id == vote.user_id,
+        ForumPostVote.created > datetime.utcnow() - timedelta(days=7),
+        ForumPost.user_id == post.user_id,
+    ).count()
+
+    # votes the user has made for posts not by this post's user
+    other_user_vote_count = ForumPostVote.query.join(ForumPost).filter(
+        ForumPostVote.post_id != post.id,
+        ForumPostVote.user_id == vote.user_id,
+        ForumPostVote.created > datetime.utcnow() - timedelta(days=7),
+        ForumPost.user_id != post.user_id
+    ).count()
+
+    # more votes on the current user compared to other users reduces the weight
+    same_user_vote_ratio = (other_user_vote_count + 5.0) / (same_user_vote_count + 5.0)
+    same_user_vote_weight = min(1.0, same_user_vote_ratio)
+
+    return same_user_vote_weight
 
 
 def calculate_vote_weight(vote, post):
@@ -48,6 +84,10 @@ def calculate_vote_weight(vote, post):
 
     if same_ip_votes:
         weight *= (1 / (50.0 * same_ip_votes))
+
+    same_user_vote_weight = _calculate_same_user_vote_weight(vote, post)
+
+    weight *= same_user_vote_weight
 
     return weight
 
