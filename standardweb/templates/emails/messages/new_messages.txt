@@ -3,8 +3,8 @@
 {% block content %}
 Hi {{ username }},
 
-You recently received {{ num_messages }} new messages from {{ from_username }}
+You recently received {{ num_messages }} new {{ 'message' if num_messages == 1 else 'messages' }} from {{ from_username }}
 
-See them at: {{ conversation_url }}
+See {{ 'it' if num_messages == 1 else 'them' }} at: {{ conversation_url }}
 
 {% endblock %}
