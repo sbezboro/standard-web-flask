@@ -235,6 +235,7 @@ def send_subscribed_topic_post_email(user, notification):
 
     notifications_url = url_for('notifications', _external=True)
     forum_post_url = url_for('forum_post', post_id=post_id, _external=True)
+    topic_url = url_for('forum_topic', topic_id=topic.id, _external=True)
     post_player_url = url_for('player', username=player.uuid, _external=True) if player else None
     unsubscribe_topic_url = url_for('forum_topic_unsubscribe', topic_id=topic.id, _external=True)
     unsubscribe_url = notifications.generate_unsubscribe_link(user, notifications.SUBSCRIBED_TOPIC_POST)
@@ -247,6 +248,8 @@ def send_subscribed_topic_post_email(user, notification):
         'post_username': post.user.get_username(),
         'post_player': player,
         'post_player_url': post_player_url,
+        'topic_url': topic_url,
+        'topic_name': topic.name,
         'unsubscribe_topic_url': unsubscribe_topic_url,
         'unsubscribe_url': unsubscribe_url,
         'notifications_url': notifications_url

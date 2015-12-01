@@ -2,10 +2,7 @@
 
 {% block content %}
 Hi {{ username }}!
-{% if post_player %}{{ post_player.displayname }}{% else %}{{ post_username }}{% endif %} just posted a new reply in a topic you are subscribed to:
-
-{{ post_body }}
-
+{% if post_player %}{{ post_player.displayname }}{% else %}{{ post_username }}{% endif %} just posted a new reply in a topic you are subscribed to: {{ topic_name }}.
 
 See more on the forums here: {{ post_url }}
 No longer interested in this topic? Click here to unsubscribe: {{ unsubscribe_topic_url }}
