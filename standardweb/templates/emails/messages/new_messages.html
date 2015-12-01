@@ -2,12 +2,12 @@
 
 {% block content %}
     <h3>Hi {{ username }},</h3>
-    <p>You recently received {{ num_messages }} new messages from
+    <p>You recently received {{ num_messages }} new {{ 'message' if num_messages == 1 else 'messages' }} from
         {% if from_player_url %}
             <a href="{{ from_player_url }}">{{ from_username }}</a>.
         {% else %}
             {{ from_username }}.
         {% endif %}
     </p>
-    <p>See them here: <a href="{{ conversation_url }}">{{ conversation_url }}</a>.</p>
+    <p>See {{ 'it' if num_messages == 1 else 'them' }} here: <a href="{{ conversation_url }}">{{ conversation_url }}</a>.</p>
 {% endblock %}

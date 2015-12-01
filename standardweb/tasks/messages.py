@@ -26,10 +26,7 @@ def send_new_message_email_task(message_id):
         ).all()
 
         if messages_to_notify:
-            if len(messages_to_notify) == 1:
-                email.send_new_message_email(message.to_user, messages_to_notify[0])
-            else:
-                email.send_new_messages_email(message.to_user, messages_to_notify)
+            email.send_new_messages_email(message.to_user, messages_to_notify)
 
             for message in messages_to_notify:
                 message.notified_at = datetime.utcnow()
