@@ -122,15 +122,12 @@ def compute_vote_score(vote, old_vote=None, commit=True):
 
 
 @celery.task()
-def compute_vote_score_task(user_id, post_id, old_vote):
+def compute_vote_score_task(post_id, old_vote):
     vote = ForumPostVote.query.options(
         joinedload(ForumPostVote.post)
     ).options(
         joinedload(ForumPostVote.user)
-    ).filter_by(
-        user_id=user_id,
-        post_id=post_id
-    ).first()
+    ).get(post_id)
 
     compute_vote_score(vote, old_vote=old_vote, commit=True)
 

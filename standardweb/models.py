@@ -1045,6 +1045,7 @@ class ForumPost(db.Model, Base):
 class ForumPostVote(db.Model, Base):
     __tablename__ = 'forum_post_vote'
 
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('forum_post.id'), primary_key=True)
     vote = db.Column(db.Integer(), default=0)

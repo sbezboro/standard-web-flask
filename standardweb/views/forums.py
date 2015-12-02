@@ -453,7 +453,7 @@ def forum_post_vote(post_id):
     if old_vote != vote.vote:
         vote.save(commit=True)
 
-        compute_vote_score_task.delay(vote.user_id, vote.post_id, old_vote)
+        compute_vote_score_task.delay(vote.id, old_vote)
 
     return jsonify({})
 
