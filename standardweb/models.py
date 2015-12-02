@@ -1046,8 +1046,8 @@ class ForumPostVote(db.Model, Base):
     __tablename__ = 'forum_post_vote'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    post_id = db.Column(db.Integer, db.ForeignKey('forum_post.id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('forum_post.id'))
     vote = db.Column(db.Integer(), default=0)
     user_ip = db.Column(db.String(15))
     computed_weight = db.Column(db.Numeric())
