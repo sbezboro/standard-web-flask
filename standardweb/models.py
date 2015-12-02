@@ -218,6 +218,22 @@ class User(db.Model, Base):
 
         return preference
 
+    @property
+    def has_great_score(self):
+        return self.score > app.config['GREAT_SCORE_THRESHOLD']
+
+    @property
+    def has_good_score(self):
+        return self.score > app.config['GOOD_SCORE_THRESHOLD'] and not self.has_great_score
+
+    @property
+    def has_bad_score(self):
+        return self.score < app.config['BAD_SCORE_THRESHOLD'] and not self.has_terrible_score
+
+    @property
+    def has_terrible_score(self):
+        return self.score < app.config['TERRIBLE_SCORE_THRESHOLD']
+
 
     @classmethod
     def _make_password(cls, password, salt=None, iterations=None):
