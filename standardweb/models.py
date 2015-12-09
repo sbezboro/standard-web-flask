@@ -219,8 +219,12 @@ class User(db.Model, Base):
         return preference
 
     @property
+    def has_excellent_score(self):
+        return self.score > app.config['EXCELLENT_SCORE_THRESHOLD']
+
+    @property
     def has_great_score(self):
-        return self.score > app.config['GREAT_SCORE_THRESHOLD']
+        return self.score > app.config['GREAT_SCORE_THRESHOLD'] and not self.has_excellent_score
 
     @property
     def has_good_score(self):
@@ -232,7 +236,11 @@ class User(db.Model, Base):
 
     @property
     def has_terrible_score(self):
-        return self.score < app.config['TERRIBLE_SCORE_THRESHOLD']
+        return self.score < app.config['TERRIBLE_SCORE_THRESHOLD'] and not self.has_abysmal_score
+
+    @property
+    def has_abysmal_score(self):
+        return self.score < app.config['ABYSMAL_SCORE_THRESHOLD']
 
 
     @classmethod

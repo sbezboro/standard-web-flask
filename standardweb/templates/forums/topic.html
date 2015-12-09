@@ -65,7 +65,9 @@
                                     {% if current_user and current_user.admin %}
                                         {{ post.user.score }}
                                     {% endif %}
-                                    {% if post.user.has_great_score %}
+                                    {% if post.user.has_excellent_score %}
+                                        <span class="score excellent">Excellent</span>
+                                    {% elif post.user.has_great_score %}
                                         <span class="score great">Great</span>
                                     {% elif post.user.has_good_score %}
                                         <span class="score good">Good</span>
@@ -73,6 +75,8 @@
                                         <span class="score bad">Bad</span>
                                     {% elif post.user.has_terrible_score %}
                                         <span class="score terrible">Shitty</span>
+                                    {% elif post.user.has_abysmal_score %}
+                                        <span class="score abysmal">Ultimate shitfest</span>
                                     {% else %}
                                         <span class="score neutral">Neutral</span>
                                     {% endif %}

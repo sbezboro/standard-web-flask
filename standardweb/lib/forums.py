@@ -93,7 +93,7 @@ def subscribe_to_topic(user, topic, commit=True):
 def should_notify_post(user, topic, post):
     return (
         not topic.forum.category.collapsed and
-        user.score > app.config['MINIMUM_USER_SCORE_FOR_POST_NOTIFY']
+        user.score > app.config['BAD_SCORE_THRESHOLD']
     )
 
 
