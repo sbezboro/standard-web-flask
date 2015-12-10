@@ -1,0 +1,17 @@
+{% macro render_user_score(user) %}
+    {% if user.has_excellent_score %}
+        <span class="score excellent">Excellent</span>
+    {% elif user.has_great_score %}
+        <span class="score great">Great</span>
+    {% elif user.has_good_score %}
+        <span class="score good">Good</span>
+    {% elif user.has_abysmal_score %}
+        <span class="score abysmal">Ultimate shitfest</span>
+    {% elif user.has_terrible_score %}
+        <span class="score terrible">Shitty</span>
+    {% elif user.has_bad_score %}
+        <span class="score bad">Bad</span>
+    {% else %}
+        <span class="score neutral">Neutral</span>
+    {% endif %}
+{%- endmacro %}

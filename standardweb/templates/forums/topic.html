@@ -3,6 +3,7 @@
 {% block title %}{{ topic.name }} - {{ topic.forum.name }} - Standard Survival Forum{% endblock %}
 
 {% from 'includes/forms.html' import render_field %}
+{% from 'includes/score.html' import render_user_score %}
 
 {% block forum_content %}
     <div class="breadcrumbs">
@@ -61,25 +62,11 @@
                                         {{ stats.last_seen|from_now }}
                                     {% endif %}
                                     <br/>
-                                    <b>Score:</b>
+                                    <b>Rating:</b>
                                     {% if current_user and current_user.admin %}
                                         {{ post.user.score }}
                                     {% endif %}
-                                    {% if post.user.has_excellent_score %}
-                                        <span class="score excellent">Excellent</span>
-                                    {% elif post.user.has_great_score %}
-                                        <span class="score great">Great</span>
-                                    {% elif post.user.has_good_score %}
-                                        <span class="score good">Good</span>
-                                    {% elif post.user.has_abysmal_score %}
-                                        <span class="score abysmal">Ultimate shitfest</span>
-                                    {% elif post.user.has_terrible_score %}
-                                        <span class="score terrible">Shitty</span>
-                                    {% elif post.user.has_bad_score %}
-                                        <span class="score bad">Bad</span>
-                                    {% else %}
-                                        <span class="score neutral">Neutral</span>
-                                    {% endif %}
+                                    {{ render_user_score(post.user) }}
                                 {% endif %}
                             </div>
                         {% endwith %}

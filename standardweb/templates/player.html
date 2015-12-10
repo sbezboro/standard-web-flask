@@ -16,6 +16,8 @@
 
 {% block select_player %}{% if current_user.username == username %}selected{% endif %}{% endblock %}
 
+{% from 'includes/score.html' import render_user_score %}
+
 {% block content %}
     <div class="container">
         {% include 'includes/flash_messages.html' %}
@@ -84,6 +86,15 @@
                                     <a href="{{ last_post.url }}">
                                         {{ last_post.created|from_now }}
                                     </a>
+                                </div>
+                            </div>
+                            <div class="section-stat">
+                                <div class="stat-name">Rating</div>
+                                <div class="stat-value">
+                                    {% if current_user and current_user.admin %}
+                                        {{ player.user.score }}
+                                    {% endif %}
+                                    {{ render_user_score(player.user) }}
                                 </div>
                             </div>
                         {% endif %}
