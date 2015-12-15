@@ -153,10 +153,15 @@ def messages_json(username):
 
     for message in messages:
         if message.to_user == user and not message.seen_at:
-            message.seen_at = datetime.utcnow()
-            message.save(commit=False)
-
             notify_message_read(message)
+
+    Message.query.filter(
+        recipient_filter,
+        Message.to_user == user,
+        Message.seen_at.is_(None)
+    ).update({
+        'seen_at': datetime.utcnow()
+    })
 
     db.session.commit()
 
