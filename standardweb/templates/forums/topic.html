@@ -61,13 +61,13 @@
                                     {% else %}
                                         {{ stats.last_seen|from_now }}
                                     {% endif %}
-                                    <br/>
-                                    <b>Rating:</b>
-                                    {% if current_user and current_user.admin %}
-                                        {{ post.user.score }}
-                                    {% endif %}
-                                    {{ render_user_score(post.user) }}
                                 {% endif %}
+                                <br/>
+                                <b>Rating:</b>
+                                {% if current_user and current_user.admin %}
+                                    {{ post.user.score }}
+                                {% endif %}
+                                {{ render_user_score(post.user) }}
                             </div>
                         {% endwith %}
                     {% else %}
