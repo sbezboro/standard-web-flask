@@ -363,7 +363,11 @@ def forum_topic(topic_id):
 
     player_ids = set([post.user.player_id for post in posts])
 
-    player_stats = PlayerStats.query.filter(
+    player_stats = PlayerStats.query.options(
+        joinedload(PlayerStats.player)
+    ).options(
+        joinedload(PlayerStats.group)
+    ).filter(
         PlayerStats.server_id == app.config['MAIN_SERVER_ID'],
         PlayerStats.player_id.in_(player_ids)
     )
