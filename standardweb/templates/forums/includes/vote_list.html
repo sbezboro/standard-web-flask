@@ -1,0 +1,29 @@
+{% macro render_vote_list(grouped_votes) -%}
+    {% if grouped_votes.up_list %}
+        Likes:
+        <br>
+        {% for vote in grouped_votes.up_list %}
+            {% if vote.user.player %}
+                {{ vote.user.player.displayname }}
+            {% else %}
+                {{ vote.user.username}}
+            {% endif %}
+            <br>
+        {% endfor %}
+    {% endif %}
+    {% if grouped_votes.up_list and grouped_votes.down_list %}
+        <br>
+    {% endif %}
+    {% if grouped_votes.down_list %}
+        Dislikes:
+        <br>
+        {% for vote in grouped_votes.down_list %}
+            {% if vote.user.player %}
+                {{ vote.user.player.displayname }}
+            {% else %}
+                {{ vote.user.username}}
+            {% endif %}
+            <br>
+        {% endfor %}
+    {% endif %}
+{%- endmacro %}

@@ -4,6 +4,7 @@
 
 {% from 'includes/forms.html' import render_field %}
 {% from 'includes/score.html' import render_user_score %}
+{% from 'forums/includes/vote_list.html' import render_vote_list %}
 
 {% block forum_content %}
     <div class="breadcrumbs">
@@ -121,6 +122,11 @@
                     {% endif %}
                 </div>
                 <div class="post-details">
+                    {% with total_votes = post.grouped_votes.up_list|length + post.grouped_votes.down_list|length %}
+                        <span class="vote counts tooltip" title="{{ render_vote_list(post.grouped_votes) }}" data-tooltip-gravity="e" data-tooltip-offset="5" data-tooltip-html="true">
+                            {{ total_votes }} {{ 'vote' if total_votes == 1 else 'votes' }}
+                        </span>
+                    {% endwith %}
                     {% if current_user and current_user.id != post.user_id%}
                         <span class="vote tooltip" title="Rate this post" data-tooltip-gravity="w" data-tooltip-offset="5" data-post-id="{{ post.id }}">
                             <i class="fa fa-thumbs-o-up up {{'active' if votes[post.id] == 1 }}" data-type="1"></i> |

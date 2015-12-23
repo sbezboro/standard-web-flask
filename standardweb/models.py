@@ -1048,6 +1048,11 @@ class ForumPost(db.Model, Base):
     def is_bad(self):
         return self.score < app.config['BAD_POST_THRESHOLD']
 
+    @property
+    def grouped_votes(self):
+        from standardweb.lib import forums
+        return forums.grouped_votes(self.votes)
+
     def get_body_html(self, highlight=None):
         if highlight:
             return re.sub(r'(%s)' % re.escape(highlight),

@@ -97,6 +97,22 @@ def should_notify_post(user, topic, post):
     )
 
 
+def grouped_votes(votes):
+    up_list = []
+    down_list = []
+
+    for vote in votes:
+        if vote.vote == 1:
+            up_list.append(vote)
+        elif vote.vote == -1:
+            down_list.append(vote)
+
+    return {
+        'up_list': up_list,
+        'down_list': down_list
+    }
+
+
 _bbcode_parser.add_simple_formatter('img', '<img src="%(value)s"/>')
 _bbcode_parser.add_simple_formatter('youtube', '<iframe width="516" height="315" src="//www.youtube.com/embed/%(value)s" frameborder="0" allowfullscreen></iframe>')
 

@@ -216,7 +216,7 @@
       var opts = {};
 
       var i;
-      var props = ['gravity', 'offset'];
+      var props = ['gravity', 'offset', 'html'];
       for (i = 0; i < props.length; ++i) {
         var propValue = $elem.data('tooltip-' + props[i]);
         if (propValue) {

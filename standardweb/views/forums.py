@@ -354,6 +354,10 @@ def forum_topic(topic_id):
     ).options(
         joinedload(ForumPost.topic)
         .joinedload(ForumTopic.forum)
+    ).options(
+        joinedload(ForumPost.votes)
+        .joinedload(ForumPostVote.user)
+        .joinedload(User.player)
     ).filter(
         ForumPost.topic_id == topic_id,
         ForumPost.deleted == False
