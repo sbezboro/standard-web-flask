@@ -122,9 +122,10 @@
                     {% endif %}
                 </div>
                 <div class="post-details">
-                    {% with total_votes = post.grouped_votes.up_list|length + post.grouped_votes.down_list|length %}
+                    {% with up_count = post.grouped_votes.up_list|length, down_count = post.grouped_votes.down_list|length %}
                         <span class="vote counts tooltip" title="{{ render_vote_list(post.grouped_votes) }}" data-tooltip-gravity="e" data-tooltip-offset="5" data-tooltip-html="true">
-                            {{ total_votes }} {{ 'vote' if total_votes == 1 else 'votes' }}
+                            {{ up_count }} {{ 'like' if total_votes == 1 else 'likes' }}
+                            {{ down_count }} {{ 'dislike' if total_votes == 1 else 'dislikes' }}
                         </span>
                     {% endwith %}
                     {% if current_user and current_user.id != post.user_id%}
