@@ -7,7 +7,7 @@ from standardweb import app
 from standardweb.models import AuditLog, ForumTopicSubscription
 
 
-_bbcode_parser = bbcode.Parser(replace_links=False)
+_bbcode_parser = bbcode.Parser()
 
 _emoticon_map = {
     ':\)': 'emoticons/smile.png',
@@ -113,8 +113,18 @@ def grouped_votes(votes):
     }
 
 
-_bbcode_parser.add_simple_formatter('img', '<img src="%(value)s"/>')
-_bbcode_parser.add_simple_formatter('youtube', '<iframe width="516" height="315" src="//www.youtube.com/embed/%(value)s" frameborder="0" allowfullscreen></iframe>')
+_bbcode_parser.add_simple_formatter(
+    'img',
+    '<img src="%(value)s"/>',
+    replace_links=False,
+    replace_cosmetic=False
+)
+_bbcode_parser.add_simple_formatter(
+    'youtube',
+    '<iframe width="516" height="315" src="//www.youtube.com/embed/%(value)s" frameborder="0" allowfullscreen></iframe>',
+    replace_links=False,
+    replace_cosmetic=False
+)
 
 _bbcode_parser.add_formatter('size', _render_size)
 _bbcode_parser.add_formatter('quote', _render_quote)
