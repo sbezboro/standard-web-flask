@@ -143,6 +143,7 @@
 
       var username = player.username;
       var nickname = player.nickname;
+      var address = player.address;
 
       var displayName = (nickname ? nickname : username);
 
@@ -151,6 +152,7 @@
           <a href={'/' + StandardWeb.chat.serverId + '/player/' + username} target="_blank">
             <span><img className="face-thumb" src={'/face/16/' + username + '.png'}/>{displayName}</span>
           </a>
+          <span className="address">{address ? address : ''}</span>
         </td>
       );
     },
