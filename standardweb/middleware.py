@@ -186,8 +186,9 @@ def rts_auth_data():
         username = g.user.player.username if g.user.player else g.user.username
         uuid = g.user.player.uuid if g.user.player else ''
         admin = g.user.admin
+        moderator = g.user.moderator
 
-        content = '-'.join([str(user_id), username, uuid, str(int(admin))])
+        content = '-'.join([str(user_id), username, uuid, str(int(admin)), str(int(moderator))])
 
         token = hmac.new(
             app.config['RTS_SECRET'],
@@ -200,6 +201,7 @@ def rts_auth_data():
             'username': username,
             'uuid': uuid,
             'is_superuser': int(admin),
+            'is_moderator': int(moderator),
             'token': token
         }
 
