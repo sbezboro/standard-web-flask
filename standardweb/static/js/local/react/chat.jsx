@@ -91,9 +91,9 @@
     render: function() {
       var muteTooltip;
       if (this.props.muted) {
-        muteTooltip = "Unmute notification sounds";
+        muteTooltip = "Unmute mention sounds";
       } else {
-        muteTooltip = "Mute notification sounds";
+        muteTooltip = "Mute mention sounds";
       }
 
       return (
