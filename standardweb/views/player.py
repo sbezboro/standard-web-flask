@@ -1,10 +1,10 @@
-from flask import abort, jsonify, redirect, render_template, request, url_for
+from flask import abort, g, jsonify, redirect, render_template, request, url_for
 from sqlalchemy.orm import joinedload
 
 from standardweb import app
 from standardweb.lib import helpers as h
 from standardweb.lib import player as libplayer
-from standardweb.models import Server, Player, User
+from standardweb.models import Server, Player, User, IPTracking
 from standardweb.views.decorators.auth import login_required
 from standardweb.views.decorators.redirect import redirect_route
 
@@ -27,6 +27,8 @@ def player(username, server_id=None):
     if server.type != 'survival':
         return redirect(url_for('player', username=username,
                                 server_id=app.config['MAIN_SERVER_ID']))
+
+    user = g.user
 
     template = 'player.html'
     retval = {
@@ -70,6 +72,29 @@ def player(username, server_id=None):
     })
 
     retval.update(data)
+
+    if user and (user.admin or user.moderator):
+        ip_tracking_list = IPTracking.query.filter_by(
+            player=player
+        ).distinct(
+            IPTracking.ip
+        ).order_by(IPTracking.timestamp.desc()).limit(10).all()
+
+        ip_addresses = [ip_tracking.ip for ip_tracking in ip_tracking_list]
+
+        same_ip_player_list = Player.query.join(
+            IPTracking
+        ).filter(
+            IPTracking.ip.in_(ip_addresses),
+            IPTracking.player != player
+        ).distinct(
+            IPTracking.player_id
+        ).order_by(IPTracking.timestamp.desc()).all()
+
+        retval.update({
+            'ip_tracking_list': ip_tracking_list,
+            'same_ip_player_list': same_ip_player_list
+        })
 
     return render_template(template, **retval)
 

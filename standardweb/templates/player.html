@@ -113,18 +113,31 @@
                     {% endif %}
                 {% endwith %}
 
-                {% if current_user and (current_user.admin or current_user.moderator) %}
-                    {% if ip_tracking_list %}
-                        <br>
-                        <div class="section-stat">
-                            <div class="stat-name">Recent IPs</div>
-                            <div class="stat-value">
-                                {% for ip_tracking in ip_tracking_list %}
-                                    {{ ip_tracking.ip }} - first seen {{ ip_tracking.timestamp|from_now }}<br>
-                                {% endfor %}
-                            </div>
+                {% if ip_tracking_list %}
+                    <br>
+                    <div class="section-stat">
+                        <div class="stat-name">Recent IPs</div>
+                        <div class="stat-value">
+                            {% for ip_tracking in ip_tracking_list %}
+                                {{ ip_tracking.ip }} - first seen {{ ip_tracking.timestamp|from_now }}<br>
+                            {% endfor %}
                         </div>
-                    {% endif %}
+                    </div>
+                {% endif %}
+
+                {% if same_ip_player_list %}
+                    <br>
+                    <div class="section-stat">
+                        <div class="stat-name">Duplicate IPs</div>
+                        <div class="stat-value">
+                            {% for same_ip_player in same_ip_player_list %}
+                                <a href="{{ url_for('player', server_id=server.id, username=same_ip_player.username) }}">
+                                    {{ same_ip_player.username }}
+                                </a>
+                                <br>
+                            {% endfor %}
+                        </div>
+                    </div>
                 {% endif %}
 
                 {% if player.titles %}
