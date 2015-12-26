@@ -577,7 +577,7 @@ def edit_post(post_id):
     if user.forum_ban:
         abort(403)
 
-    if user != post.user and not user.admin and not user.moderator:
+    if user != post.user and not user.admin_or_moderator:
         abort(403)
 
     form = PostForm(obj=post)

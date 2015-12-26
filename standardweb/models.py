@@ -98,6 +98,10 @@ class User(db.Model, Base):
 
     player = db.relationship('Player', backref=db.backref('user', uselist=False))
 
+    @property
+    def admin_or_moderator(self):
+        return self.admin or self.moderator
+
     @classmethod
     def create(cls, player, plaintext_password, email):
         user = cls(player=player, uuid=player.uuid)

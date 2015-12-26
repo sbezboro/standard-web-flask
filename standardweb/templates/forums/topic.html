@@ -86,7 +86,7 @@
                         {% endif %}
                     </div>
 
-                    {% if (current_user.admin or current_user.moderator) and not post.user.admin %}
+                    {% if current_user.admin_or_moderator and not post.user.admin %}
                         <div class="post-author-admin">
                             {% if not post.user.forum_ban %}
                                 <a class="confirm" href="{{ url_for('forum_ban', user_id=post.user_id) }}">Ban from forums</a>
@@ -130,7 +130,7 @@
                     {% endif %}
                     {% with up_count = post.grouped_votes.up_list|length, down_count = post.grouped_votes.down_list|length %}
                         <span class="vote counts tooltip"
-                              title="{% if current_user.admin or current_user.moderator %}{{ render_vote_list(post.grouped_votes) }}{% endif %}"
+                              title="{% if current_user.admin_or_moderator %}{{ render_vote_list(post.grouped_votes) }}{% endif %}"
                               data-tooltip-gravity="w" data-tooltip-offset="5" data-tooltip-html="true">
                             {{ up_count }} {{ 'like' if up_count == 1 else 'likes' }}
                             {{ down_count }} {{ 'dislike' if down_count == 1 else 'dislikes' }}
@@ -152,14 +152,14 @@
                     {% endif %}
                     {% if current_user %}
                         {% with delete_topic = loop.index0 == 0 and not page - 1 %}
-                            {% if current_user.admin or current_user.moderator %}
+                            {% if current_user.admin_or_moderator %}
                                 <a class="confirm" href="{{ url_for('forum_post_delete', post_id=post.id) }}">Delete {% if delete_topic %}topic{% endif %}</a>
                                 {% if not topic.closed %}
                                     |
                                 {% endif %}
                             {% endif %}
                             {% if not topic.closed %}
-                                {% if current_user == post.user or current_user.admin or current_user.moderator %}
+                                {% if current_user == post.user or current_user.admin_or_moderator %}
                                     <a href="{{ url_for('edit_post', post_id=post.id) }}">Edit</a> |
                                 {% endif %}
                                 <a class="reply" href="#">Reply</a>
@@ -209,7 +209,7 @@
                 </div>
             </div>
         {% endif %}
-        {% if current_user.admin or current_user.moderator %}
+        {% if current_user.admin_or_moderator %}
             <div class="moderation-area">
                 <b>Moderate:</b>
                 {% if topic.closed %}

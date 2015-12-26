@@ -73,7 +73,7 @@ def player(username, server_id=None):
 
     retval.update(data)
 
-    if user and (user.admin or user.moderator):
+    if user and user.admin_or_moderator:
         ip_tracking_list = IPTracking.query.filter_by(
             player=player
         ).distinct(

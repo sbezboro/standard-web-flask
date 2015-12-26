@@ -25,7 +25,7 @@ def login_required(show_message=True, only_moderator=False, only_admin=False):
             if only_admin and not g.user.admin:
                 abort(403)
 
-            if only_moderator and not g.user.admin and not g.user.moderator:
+            if only_moderator and not g.user.admin_or_moderator:
                 abort(403)
 
             return func(*args, **kwargs)
