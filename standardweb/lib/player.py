@@ -15,8 +15,8 @@ from standardweb.models import (
     PlayerStats,
     Server,
     Title,
-    VeteranStatus
-)
+    VeteranStatus,
+    IPTracking)
 
 
 def extract_face(image, size):
@@ -172,6 +172,12 @@ def get_data_on_server(player, server):
         player=player
     ).first()
 
+    ip_tracking_list = IPTracking.query.filter_by(
+        player=player
+    ).distinct(
+        IPTracking.ip
+    ).order_by(IPTracking.timestamp.desc()).limit(10).all()
+
     server_stats = None
     if stats:
         server_stats = {
@@ -189,6 +195,7 @@ def get_data_on_server(player, server):
     return {
         'first_ever_seen': first_ever_seen,
         'last_seen': last_seen,
+        'ip_tracking_list': ip_tracking_list,
         'online_now': online_now,
         'total_time': h.elapsed_time_string(total_time),
         'combat_stats': get_combat_data(player, server),

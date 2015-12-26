@@ -113,6 +113,20 @@
                     {% endif %}
                 {% endwith %}
 
+                {% if current_user and (current_user.admin or current_user.moderator) %}
+                    {% if ip_tracking_list %}
+                        <br>
+                        <div class="section-stat">
+                            <div class="stat-name">Recent IPs</div>
+                            <div class="stat-value">
+                                {% for ip_tracking in ip_tracking_list %}
+                                    {{ ip_tracking.ip }} - first seen {{ ip_tracking.timestamp|from_now }}<br>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
                 {% if player.titles %}
                     <br>
                     <div class="section-stat">
