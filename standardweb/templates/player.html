@@ -119,8 +119,15 @@
                         <div class="stat-name">Recent IPs</div>
                         <div class="stat-value">
                             {% for ip_tracking in ip_tracking_list %}
-                                {{ ip_tracking.ip }} - first seen {{ ip_tracking.timestamp|from_now }}<br>
+                                <div class="{% if loop.index >= 5 %}hidden{% endif %}">
+                                    {{ ip_tracking.ip }} - first seen {{ ip_tracking.timestamp|from_now }}<br>
+                                </div>
                             {% endfor %}
+                            {% if ip_tracking_list|length > 5 %}
+                                <div class="load-all">
+                                    <a href="#">show all...</a>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 {% endif %}
@@ -131,11 +138,18 @@
                         <div class="stat-name">Duplicate IPs</div>
                         <div class="stat-value">
                             {% for same_ip_player in same_ip_player_list %}
-                                <a href="{{ url_for('player', server_id=server.id, username=same_ip_player.username) }}">
-                                    {{ same_ip_player.username }}
-                                </a>
-                                <br>
+                                <div class="{% if loop.index >= 5 %}hidden{% endif %}">
+                                    <a href="{{ url_for('player', server_id=server.id, username=same_ip_player.username) }}">
+                                        {{ same_ip_player.username }}
+                                    </a>
+                                    <br>
+                                </div>
                             {% endfor %}
+                            {% if same_ip_player_list|length > 5 %}
+                                <div class="load-all">
+                                    <a href="#">show all...</a>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 {% endif %}
@@ -280,7 +294,7 @@
         <script type="application/javascript">
             $(document).ready(function() {
                 $('.load-all').on('click', function() {
-                    $(this).siblings('.other.hidden').removeClass('hidden');
+                    $(this).siblings('.hidden').removeClass('hidden');
                     $(this).addClass('hidden');
                     return false;
                 });
