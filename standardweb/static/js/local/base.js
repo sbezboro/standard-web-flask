@@ -35,6 +35,9 @@
     reactComponents: {},
     reactMixins: {},
     sounds: {},
+    originalTitle: document.title,
+    numNewMessages: 0,
+    numNewNotifications: 0,
 
     refreshFromnow: function($rootElement) {
       $rootElement = $rootElement || document;
@@ -101,6 +104,46 @@
 
     alertManager: { // Default in case alert manager is not present on page
       addAlert: function() {}
+    },
+
+    refreshTitleNotificationCount: function() {
+      var count = this.numNewMessages + this.numNewNotifications;
+
+      if (count) {
+        document.title = '(' + count + ') ' + this.originalTitle;
+      } else {
+        document.title = this.originalTitle;
+      }
+    },
+
+    setNewItemCount: function(count, type) {
+      var $account = $('.header-account');
+      var $items = $account.find('.' + type);
+      var $itemsCount = $account.find('.' + type + ' .count');
+
+      if (count && !$items.hasClass('new')) {
+        $items.addClass('new');
+      } else if (!count && $items.hasClass('new')) {
+        $items.removeClass('new');
+      }
+
+      $itemsCount.html(count);
+    },
+
+    setNumNewMessages: function(count) {
+      this.numNewMessages = count;
+
+      this.setNewItemCount(count, 'messages');
+
+      this.refreshTitleNotificationCount();
+    },
+
+    setNumNewNotifications: function(count) {
+      this.numNewNotifications = count;
+
+      this.setNewItemCount(count, 'notifications');
+
+      this.refreshTitleNotificationCount();
     }
   };
 

@@ -149,5 +149,10 @@
         </div>
     </body>
 
-    {% block js %}{% endblock %}
+    {% block js %}
+        <script type="application/javascript">
+            StandardWeb.numNewNotifications = {{ new_notifications }};
+            StandardWeb.numNewMessages = {{ new_messages }};
+        </script>
+    {% endblock %}
 </html>

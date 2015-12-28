@@ -168,19 +168,7 @@
       }
 
       socket.on('unread-count', function(data) {
-        var count = data.count;
-
-        var $account = $('.header-account');
-        var $messages = $account.find('.messages');
-        var $messagesCount = $account.find('.messages .count');
-
-        if (count && !$messages.hasClass('new')) {
-          $messages.addClass('new');
-        } else if (!count && $messages.hasClass('new')) {
-          $messages.removeClass('new');
-        }
-
-        $messagesCount.html(count);
+        StandardWeb.setNumNewMessages(data.count);
       }.bind(this));
     });
 
@@ -190,23 +178,11 @@
       }
 
       socket.on('unread-count', function(data) {
-        var count = data.count;
-
-        var $account = $('.header-account');
-        var $notifications = $account.find('.notifications');
-        var $notificationsCount = $account.find('.notifications .count');
-
-        if (count && !$notifications.hasClass('new')) {
-          $notifications.addClass('new');
-        } else if (!count && $notifications.hasClass('new')) {
-          $notifications.removeClass('new');
-        }
-
-        $notificationsCount.html(count);
+        StandardWeb.setNumNewNotifications(data.count);
       }.bind(this));
     });
 
-
+    StandardWeb.refreshTitleNotificationCount();
     StandardWeb.refreshFromnow();
 
     $('.placeholder').placeholder();
