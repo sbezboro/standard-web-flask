@@ -176,9 +176,15 @@ def send_new_messages_email(user, messages):
         'unsubscribe_url': unsubscribe_link
     })
 
+    subject = '[Standard Survival] %s new unread %s from %s' % (
+        len(messages),
+        'message' if len(messages) == 1 else 'messages',
+        from_username
+    )
+
     send_email(
         to_email,
-        '[Standard Survival] %s new unread messages from %s' % (len(messages), from_username),
+        subject,
         text_body,
         html_body
     )
