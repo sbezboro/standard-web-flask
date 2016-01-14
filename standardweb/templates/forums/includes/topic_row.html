@@ -24,7 +24,7 @@
                 {% if topic.post_count > topic_page_size %}
                     -
                     <span class="pages">
-                    {% with page_edge_count = 3, num_pages = (topic.replies // topic_page_size) + 2 %}
+                    {% with page_edge_count = 3, num_pages = (topic.replies // topic_page_size) + 1 %}
                         {% for page in range(1, num_pages + 1) %}
                             {% if page <= page_edge_count or page > num_pages - page_edge_count %}
                                 {% if page > 1 %}
