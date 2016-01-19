@@ -3,7 +3,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from standardweb import celery, db
-from standardweb.models import ForumPost, ForumPostVote, PlayerStats, Server
+from standardweb.models import ForumPost, ForumPostVote, PlayerStats, Server, User
 
 
 MAX_USER_ACTIVE_MULTIPLIER_TIME = 48000  # time in minutes before a player gets 1.0x multiplier
@@ -115,10 +115,17 @@ def compute_vote_score(vote, old_vote=None, commit=True):
         weighted_score = computed_weight * float(vote.vote)
 
     post.score = float(post.score) + weighted_score
-    post_user.score = float(post_user.score) + weighted_score
-
-    post_user.save(commit=False)
     post.save(commit=commit)
+
+    new_user_score = db.session.query(
+        func.avg(ForumPost.score)
+    ).filter(
+        ForumPost.score != 0,
+        ForumPost.user_id == post_user.id
+    ).scalar()
+
+    post_user.score = new_user_score
+    post_user.save(commit=commit)
 
 
 @celery.task()
