@@ -3,7 +3,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from standardweb import celery, db
-from standardweb.models import ForumPost, ForumPostVote, PlayerStats, Server, User
+from standardweb.models import ForumPost, ForumPostVote, PlayerStats, Server
 
 
 MAX_USER_ACTIVE_MULTIPLIER_TIME = 48000  # time in minutes before a player gets 1.0x multiplier
