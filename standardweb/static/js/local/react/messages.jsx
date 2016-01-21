@@ -30,13 +30,13 @@
 
       $(window).on('popstate', this.handlePopState);
 
-      StandardWeb.realtime.subscribe('messages', function (error, socket) {
+      StandardWeb.realtime.subscribe('user', function (error, socket) {
         if (error) {
           return;
         }
 
-        socket.on('read', this.handleMessageRead.bind(this));
-        socket.on('new', this.handleNewMessage.bind(this));
+        socket.on('read-message', this.handleMessageRead.bind(this));
+        socket.on('new-message', this.handleNewMessage.bind(this));
       }.bind(this));
     },
 

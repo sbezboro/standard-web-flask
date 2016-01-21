@@ -6,7 +6,7 @@ def new_message(message):
         'message': message.to_dict()
     }
 
-    send_rts_data(message.to_user_id, 'messages', 'new', payload)
+    send_user_rts_data(message.to_user_id, 'new-message', payload)
 
 
 def message_read(message):
@@ -14,7 +14,7 @@ def message_read(message):
         'message': message.to_dict()
     }
 
-    send_rts_data(message.from_user_id, 'messages', 'read', payload)
+    send_user_rts_data(message.from_user_id, 'read-message', payload)
 
 
 def unread_message_count(user):
@@ -22,7 +22,7 @@ def unread_message_count(user):
         'count': user.get_unread_message_count()
     }
 
-    send_rts_data(user.id, 'messages', 'unread-count', payload)
+    send_user_rts_data(user.id, 'unread-message-count', payload)
 
 
 def unread_notification_count(user):
@@ -30,7 +30,11 @@ def unread_notification_count(user):
         'count': user.get_unread_notification_count()
     }
 
-    send_rts_data(user.id, 'notifications', 'unread-count', payload)
+    send_user_rts_data(user.id, 'unread-notification-count', payload)
+
+
+def send_user_rts_data(user_id, action, payload):
+    send_rts_data(user_id, 'event/user', action, payload)
 
 
 def send_rts_data(user_id, channel, action, payload):

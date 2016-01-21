@@ -151,10 +151,6 @@ def messages_json(username):
         Message.sent_at.desc()
     ).limit(40).all()
 
-    for message in messages:
-        if message.to_user == user and not message.seen_at:
-            notify_message_read(message)
-
     Message.query.filter(
         recipient_filter,
         Message.to_user == user,
@@ -164,6 +160,10 @@ def messages_json(username):
     })
 
     db.session.commit()
+
+    for message in messages:
+        if message.to_user == user and not message.seen_at:
+            notify_message_read(message)
 
     realtime.unread_message_count(user)
 

@@ -162,22 +162,16 @@
       });
     });
 
-    StandardWeb.realtime.subscribe('messages', function(error, socket) {
+    StandardWeb.realtime.subscribe('user', function(error, socket) {
       if (error) {
         return;
       }
 
-      socket.on('unread-count', function(data) {
+      socket.on('unread-message-count', function(data) {
         StandardWeb.setNumNewMessages(data.count);
       }.bind(this));
-    });
 
-    StandardWeb.realtime.subscribe('notifications', function(error, socket) {
-      if (error) {
-        return;
-      }
-
-      socket.on('unread-count', function(data) {
+      socket.on('unread-notification-count', function(data) {
         StandardWeb.setNumNewNotifications(data.count);
       }.bind(this));
     });
