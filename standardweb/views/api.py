@@ -17,6 +17,7 @@ from sqlalchemy.orm import joinedload
 from standardweb import app, db, stats
 from standardweb.lib import helpers as h
 from standardweb.lib import player as libplayer
+from standardweb.lib import realtime
 from standardweb.lib.csrf import exempt_funcs
 from standardweb.lib.email import (
     send_creation_email,
@@ -50,6 +51,27 @@ def base_api_func(function):
     name = function.__name__
     app.add_url_rule('/api/v<int:version>/%s' % name, name, decorator, methods=['GET', 'POST'])
     
+    return decorator
+
+
+# Internal API function decorator that checks secret token hedaer.
+def internal_api_func(function):
+
+    @wraps(function)
+    def decorator(*args, **kwargs):
+        secret = request.headers.get('x-standard-secret')
+        user_id = request.headers.get('x-standard-user-id')
+
+        if not secret or secret != app.config['RTS_SECRET']:
+            abort(403)
+
+        if user_id:
+            setattr(g, 'user', User.query.get(user_id))
+
+        return function(*args, **kwargs)
+
+    base_api_func(decorator)
+
     return decorator
 
 
@@ -452,6 +474,17 @@ def servers():
         'err': 0,
         'servers': servers
     })
+
+
+@internal_api_func
+def rts_user_connection():
+    user = g.user
+
+    if user:
+        realtime.unread_message_count(user)
+        realtime.unread_notification_count(user)
+
+    return jsonify({})
 
 
 @base_api_func
