@@ -120,7 +120,7 @@
                         <div class="stat-value">
                             {% for ip_tracking in ip_tracking_list %}
                                 <div class="{% if loop.index >= 5 %}hidden{% endif %}">
-                                    {{ ip_tracking.ip }} - first seen {{ ip_tracking.timestamp|from_now }}<br>
+                                    <a href="http://whatismyipaddress.com/ip/{{ ip_tracking.ip }}">{{ ip_tracking.ip }}</a> - first seen {{ ip_tracking.timestamp|from_now }}<br>
                                 </div>
                             {% endfor %}
                             {% if ip_tracking_list|length > 5 %}
