@@ -161,7 +161,7 @@
       var rows = [];
 
       var i;
-      for (i = 0; i < this.props.maxPlayers / this.columns; ++i) {
+      for (i = 0; i < this.props.players.length / this.columns; ++i) {
         rows.push(this.renderRow(i));
       }
 
