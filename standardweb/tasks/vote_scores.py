@@ -33,7 +33,7 @@ def calculate_user_score_weight(user):
 
     if user_score < 0:
         # the lower the user's score, the less weight their votes have
-        weight = 1 / (-user_score + 1)
+        weight = 1 / (-user_score + 2)
 
     if user.player_id:
         player_time_weight = _calculate_player_time_weight(user.player_id)
