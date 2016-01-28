@@ -64,7 +64,6 @@
     },
 
     render: function () {
-      console.log(this.state.serverDetails)
       return (
         <div>
           <h2>Live Server Chat</h2>
