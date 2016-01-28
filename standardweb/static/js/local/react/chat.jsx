@@ -12,7 +12,8 @@
         muted: false,
         serverDetails: {
           maxPlayers: 100,
-          players: []
+          players: [],
+          users: []
         }
       };
     },
@@ -63,6 +64,7 @@
     },
 
     render: function () {
+      console.log(this.state.serverDetails)
       return (
         <div>
           <h2>Live Server Chat</h2>
@@ -77,8 +79,11 @@
               onInputEntered={this.handleInputEntered}
             />
           </div>
-          <PlayerTable players={this.state.serverDetails.players}
-            maxPlayers={this.state.serverDetails.maxPlayers}
+          <UserTable users={this.state.serverDetails.users}
+            title='Web chat users'
+          />
+          <UserTable users={this.state.serverDetails.players}
+            title='Players online'
           />
         </div>
       );
@@ -115,7 +120,7 @@
     }
   });
 
-  var PlayerTable = React.createClass({
+  var UserTable = React.createClass({
 
     columns: 4,
 
@@ -125,7 +130,7 @@
       var i;
       for (i = 0; i < this.columns; ++i) {
         cells.push(
-          this.renderCell(i, this.props.players[(rowNum * this.columns) + i])
+          this.renderCell(i, this.props.users[(rowNum * this.columns) + i])
         );
       }
 
@@ -136,14 +141,14 @@
       );
     },
 
-    renderCell: function(cellNum, player) {
-      if (!player) {
+    renderCell: function(cellNum, user) {
+      if (!user) {
         return (<td key={'td-' + cellNum}> </td>);
       }
 
-      var username = player.username;
-      var nickname = player.nickname;
-      var address = player.address;
+      var username = user.username;
+      var nickname = user.nickname;
+      var address = user.address;
 
       var displayName = (nickname ? nickname : username);
 
@@ -161,14 +166,21 @@
       var rows = [];
 
       var i;
-      for (i = 0; i < this.props.players.length / this.columns; ++i) {
+      for (i = 0; i < this.props.users.length / this.columns; ++i) {
         rows.push(this.renderRow(i));
       }
 
+      if (rows.length == 0) {
+        return <div></div>;
+      }
+
       return (
-        <table className="players-table">
-          {rows}
-        </table>
+        <div>
+          <h3>{this.props.title}</h3>
+          <table className="players-table">
+            {rows}
+          </table>
+        </div>
       );
     }
   });

@@ -47,12 +47,19 @@
         return 0;
       });
 
+      var users = data.users.sort(function (a, b) {
+        if (a.username.toLowerCase() < b.username.toLowerCase()) return -1;
+        if (a.username.toLowerCase() > b.username.toLowerCase()) return 1;
+        return 0;
+      });
+
       this.setState({
         serverDetails: {
           numPlayers: data.numPlayers,
           maxPlayers: data.maxPlayers,
           load: data.load,
           tps: data.tps,
+          users: users,
           players: players
         }
       });
