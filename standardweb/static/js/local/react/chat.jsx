@@ -121,28 +121,9 @@
 
   var UserTable = React.createClass({
 
-    columns: 4,
-
-    renderRow: function(rowNum) {
-      var cells = [];
-
-      var i;
-      for (i = 0; i < this.columns; ++i) {
-        cells.push(
-          this.renderCell(i, this.props.users[(rowNum * this.columns) + i])
-        );
-      }
-
-      return (
-        <tr key={'row-' + rowNum}>
-          {cells}
-        </tr>
-      );
-    },
-
     renderCell: function(cellNum, user) {
       if (!user) {
-        return (<td key={'td-' + cellNum}> </td>);
+        return (<div key={'cell-' + cellNum}> </div>);
       }
 
       var username = user.username;
@@ -152,33 +133,35 @@
       var displayName = (nickname ? nickname : username);
 
       return (
-        <td key={'td-' + cellNum}>
+        <div key={'cell-' + cellNum} className="col-1-4 player-cell">
           <a href={'/' + StandardWeb.chat.serverId + '/player/' + username} target="_blank">
             <span><img className="face-thumb" src={'/face/16/' + username + '.png'}/>{displayName}</span>
           </a>
           <span className="address">{address ? address : ''}</span>
-        </td>
+        </div>
       );
     },
 
     render: function() {
-      var rows = [];
+      var cells = [];
 
       var i;
-      for (i = 0; i < this.props.users.length / this.columns; ++i) {
-        rows.push(this.renderRow(i));
+      for (i = 0; i < this.props.users.length; ++i) {
+        cells.push(
+          this.renderCell(i, this.props.users[i])
+        );
       }
 
-      if (rows.length == 0) {
+      if (cells.length == 0) {
         return <div></div>;
       }
 
       return (
         <div>
           <h3>{this.props.title}</h3>
-          <table className="players-table">
-            {rows}
-          </table>
+          <div className="players-table grid flush">
+            {cells}
+          </div>
         </div>
       );
     }
