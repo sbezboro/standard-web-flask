@@ -1,7 +1,7 @@
 (function(window, document, $) {
   StandardWeb.reactMixins.StreamMixin = {
 
-    mentionPat: '(&gt;(?!&lt;).*|Server] .*|Web Chat].*: .*|To group.*|command:.*)(MENTION_PART)',
+    mentionPat: '(&gt;(?!.+&lt;).*|Server] .*|Web Chat].*: .*|To group.*|command:.*)(MENTION_PART)',
     numLines: 0,
     mentions: [],
     nextMentionSoundTime: 0,
