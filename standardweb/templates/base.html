@@ -59,7 +59,7 @@
             {% if current_user.player %}
                 <script type="application/javascript">
                     StandardWeb.playerId = {{ current_user.player_id }};
-                    StandardWeb.nickname = '{{ current_user.player.nickname }}';
+                    StandardWeb.nickname = '{{ current_user.player.nickname or '' }}';
                 </script>
             {% endif %}
         {% endif %}
