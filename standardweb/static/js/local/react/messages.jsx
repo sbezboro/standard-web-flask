@@ -13,6 +13,7 @@
           mode = 'new-message';
         } else {
           selectedUsername = urlPart[1];
+          mode = 'loading';
         }
       }
 
@@ -88,7 +89,7 @@
 
       this.setState({
         selectedUsername: contact.username,
-        mode: 'user',
+        mode: 'loading',
         contacts: this.state.contacts,
         messages: existingMessages
       });
@@ -428,6 +429,7 @@
           <div className="messages-content">
             <MessageList messages={this.props.messages}
               selectedUsername={this.props.selectedUsername}
+              mode={this.props.mode}
             />
             <ReplyArea onSendMessage={this.handleSendMessage}
               onReplyKeyDown={this.handleReplyKeyDown}
@@ -555,11 +557,19 @@
           </div>
         );
       } else {
-        return (
-          <div className="help">
-            {this.props.selectedUsername ? 'No messages yet, say hello!' : 'Select a contact from the left or hit "New message"'}
-          </div>
-        );
+        if (this.props.mode === 'loading') {
+          return (
+            <div className="help">
+              <i className="fa fa-spinner fa-spin"></i>
+            </div>
+          );
+        } else {
+          return (
+            <div className="help">
+              {this.props.selectedUsername ? 'No messages yet, say hello!' : 'Select a contact from the left or hit "New message"'}
+            </div>
+          );
+        }
       }
     }
   });
