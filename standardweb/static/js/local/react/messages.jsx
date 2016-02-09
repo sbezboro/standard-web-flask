@@ -533,7 +533,19 @@
 
   var MessageList = React.createClass({
 
+    componentDidMount: function() {
+      $(document).bind('.message-body img', 'load', this.scrollToBottom);
+    },
+
+    componentDidUnmount: function() {
+      $(document).unbind('.message-body img', 'load', this.scrollToBottom);
+    },
+
     componentDidUpdate: function() {
+      this.scrollToBottom();
+    },
+
+    scrollToBottom: function() {
       var $list = $(React.findDOMNode(this.refs.messagesList));
       $list.scrollTop($list.prop("scrollHeight"));
     },
