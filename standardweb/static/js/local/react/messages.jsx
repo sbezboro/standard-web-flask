@@ -533,14 +533,6 @@
 
   var MessageList = React.createClass({
 
-    componentDidMount: function() {
-      $(document).bind('.message-body img', 'load', this.scrollToBottom);
-    },
-
-    componentDidUnmount: function() {
-      $(document).unbind('.message-body img', 'load', this.scrollToBottom);
-    },
-
     componentDidUpdate: function() {
       this.scrollToBottom();
     },
@@ -552,7 +544,8 @@
 
     renderMessage: function(message) {
       return (
-        <Message message={message}/>
+        <Message message={message}
+          onImageLoaded={this.scrollToBottom}/>
       );
     },
 
@@ -616,6 +609,11 @@
   var Message = React.createClass({
     componentDidMount: function() {
       StandardWeb.refreshFromnow($(React.findDOMNode(this)));
+
+      var self = this;
+      $(React.findDOMNode(this)).find('img').each(function() {
+        $(this).load(self.props.onImageLoaded);
+      });
     },
 
     componentDidUpdate: function() {
