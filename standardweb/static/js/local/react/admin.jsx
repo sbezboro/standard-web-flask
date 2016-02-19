@@ -81,6 +81,25 @@
       this.state.socket.on('server-status', this.handleServerStatus);
     },
 
+    postProcessLineExtra: function(line) {
+      line = line.replace(
+        /(.+: )(.+)( issued server command)/,
+        '$1<span style="color: #00b1ff">$2</span><span style="color: #9fe7ff">$3</span>'
+      );
+
+      line = line.replace(
+        /(WARN)\]/,
+        '<span style="color: #ffde81">$1</span>]'
+      );
+
+      line = line.replace(
+        /(ERROR)\]/,
+        '<span style="color: #bb0500">$1</span>]'
+      );
+
+      return line;
+    },
+
     render: function () {
       return (
         <div className="admin-panel">
