@@ -78,7 +78,7 @@ def player(username, server_id=None):
             player=player
         ).distinct(
             IPTracking.ip
-        ).order_by(IPTracking.timestamp.desc()).limit(10).all()
+        ).order_by(IPTracking.timestamp.desc()).all()
 
         ip_addresses = [ip_tracking.ip for ip_tracking in ip_tracking_list]
 
