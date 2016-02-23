@@ -154,6 +154,7 @@ import views.api
 import views.auth
 import views.forums
 import views.groups
+import views.ip
 import views.main
 import views.messages
 import views.notifications

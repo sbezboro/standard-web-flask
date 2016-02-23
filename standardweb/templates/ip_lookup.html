@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}IP Lookup - Standard Survival Minecraft Server{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>IP Lookup - <a href="http://whatismyipaddress.com/ip/{{ address }}">{{ address }}</a></h2>
+
+        <ul class="search-list lite-anchor">
+        {% for ip_tracking in ip_tracking_list %}
+            <li>
+                <a href="{{ url_for('player', username=ip_tracking.player.username) }}">
+                    {{ ip_tracking.player.username|face_thumb }}
+                    {{ ip_tracking.player.displayname_html|safe }}
+                    {% if ip_tracking.player.nickname %}
+                        ({{ ip_tracking.player.username }})
+                    {% endif %}
+                </a>
+                -
+                seen {{ ip_tracking.timestamp|from_now }}
+            </li>
+        {% else %}
+            No results found
+        {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
