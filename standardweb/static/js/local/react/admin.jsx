@@ -295,7 +295,7 @@
               <div>
                 <b>IP Address</b>
                 <span className="stat-value">
-                  <a href={'http://whatismyipaddress.com/ip/' + player.address}>{player.address}</a>
+                  <a href={'http://whatismyipaddress.com/ip/' + player.address} target="_blank">{player.address}</a>
                 </span>
               </div>
             </div>
