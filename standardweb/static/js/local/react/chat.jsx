@@ -132,8 +132,13 @@
 
       var displayName = (nickname ? nickname : username);
 
+      var activeClass = '';
+      if (user.hasOwnProperty('active')) {
+        activeClass = user.active ? 'active': 'inactive'
+      }
+
       return (
-        <div key={'cell-' + cellNum} className="col-1-4 player-cell">
+        <div key={'cell-' + cellNum} className={'col-1-4 player-cell ' + activeClass}>
           <a href={'/' + StandardWeb.chat.serverId + '/player/' + username} target="_blank">
             <span><img className="face-thumb" src={'/face/16/' + username + '.png'}/>{displayName}</span>
           </a>
