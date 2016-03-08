@@ -4,9 +4,10 @@ PLAYER_ACTIVITY_TYPES = {
 }
 
 API_CALL_RESULTS = {
-  'ok': 0,
-  'exception': 1,
-  'not_handled': 2,
-  'banned': 3,
-  'muted': 4
+    'ok': 0,
+    'exception': 1,
+    'not_handled': 2,
+    'banned': 3,
+    'muted': 4,
+    'never_joined': 5
 }
