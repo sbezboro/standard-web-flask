@@ -364,9 +364,9 @@ def join_server():
 
 @server_api_func
 def leave_server():
-    username = request.form.get('username')
+    uuid = request.form.get('uuid')
 
-    player = Player.query.filter_by(username=username).first()
+    player = Player.query.filter_by(uuid=uuid).first()
 
     if player:
         player_stats = PlayerStats.query.filter_by(server=g.server, player=player).first()
