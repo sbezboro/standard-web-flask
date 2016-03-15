@@ -5,6 +5,7 @@
 
 @admin-right-size: 300px;
 @detail-size: 300px;
+@user-list-size: 200px;
 
 .admin-panel {
   position: relative;
@@ -148,7 +149,7 @@
     }
 
     .players {
-      bottom: 0;
+      bottom: @user-list-size;
       left: 0;
       overflow-y: auto;
       position: absolute;
@@ -187,8 +188,39 @@
 
     .users {
       border-top: 2px solid #aaa;
-      overflow-y: scroll;
-      padding: 5px;
+      bottom: 0;
+      height: @user-list-size;
+      left: 0;
+      overflow-y: auto;
+      position: absolute;
+      right: 0;
+
+      a {
+        color: #555;
+
+        .user.inactive {
+          color: #aeaeae;
+        }
+      }
+
+      .user {
+        background: #e5e5e5;
+        border: 1px solid #ccc;
+        border-top-color: #fff;
+        border-bottom-color: #aaa;
+        height: 20px;
+        padding: 5px;
+
+        &:hover {
+          background: #fff;
+        }
+
+        .address {
+          color: #777;
+          float: right;
+          font-size: 14px;
+        }
+      }
     }
   }
 }

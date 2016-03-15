@@ -15,7 +15,8 @@
           maxPlayers: '-',
           tps: '-',
           load: '-',
-          players: []
+          players: [],
+          users: []
         }
       };
     },
@@ -132,6 +133,7 @@
             />
           ): ''}
           <PlayerArea players={this.state.serverDetails.players}
+            users={this.state.serverDetails.users}
             status={this.state.status}
             selectedPlayer={this.state.selectedPlayer}
             onPlayerSelected={this.handlePlayerSelected} />
@@ -184,11 +186,43 @@
        );
     },
 
+    renderUser: function(user) {
+      return (
+        <UserRow key={user.uuid}
+          user={user} />
+      );
+    },
+
     render: function() {
       return (
         <div className="admin-right">
           <div className="players">{this.props.players.map(this.renderPlayer)}</div>
+          <div className="users">{this.props.users.map(this.renderUser)}</div>
         </div>
+      );
+    }
+  });
+
+  var UserRow = React.createClass({
+    render: function() {
+      var user = this.props.user;
+      var nickname = user.nickname;
+      var displayName = nickname ? nickname : user.username;
+      var address = user.address;
+
+      var activeClass = '';
+      if (user.hasOwnProperty('active')) {
+        activeClass = user.active ? 'active': 'inactive'
+      }
+
+      return (
+        <a href={'/player/' + user.uuid} target="_blank">
+          <div className={'user ' + activeClass}>
+            <img className="face-thumb" src={'/face/16/' + user.username + '.png'} />
+            {displayName}
+            <span className="address">{address ? address : ''}</span>
+          </div>
+        </a>
       );
     }
   });
