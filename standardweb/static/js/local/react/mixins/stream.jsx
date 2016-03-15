@@ -48,8 +48,11 @@
       });
 
       var users = data.users.sort(function (a, b) {
-        if (a.username.toLowerCase() < b.username.toLowerCase()) return -1;
-        if (a.username.toLowerCase() > b.username.toLowerCase()) return 1;
+        a = (a.nickname ? a.nickname : a.username);
+        b = (b.nickname ? b.nickname : b.username);
+
+        if (a.toLowerCase() < b.toLowerCase()) return -1;
+        if (a.toLowerCase() > b.toLowerCase()) return 1;
         return 0;
       });
 
