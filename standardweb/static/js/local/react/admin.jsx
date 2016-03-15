@@ -66,12 +66,6 @@
       this.setState({selectedPlayer: null});
     },
 
-    handleSetDonator: function() {
-      this.state.socket.emit('set-donator', {
-        uuid: this.state.selectedPlayer.uuid
-      });
-    },
-
     socketInitialized: function() {
       this.addChatMention('server', 'background:#A0A');
       // A player messaging console
@@ -314,7 +308,6 @@
               </div>
             </div>
             <div className="options">
-              <a className="btn donator" href="#" onClick={this.handleSetDonator}>Set Donator</a>
               <br/>
             </div>
           </div>
