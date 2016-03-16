@@ -22,6 +22,8 @@
       this.$outputArea = $('.chat', $(React.findDOMNode(this)));
       $(document).keypress(this.handleRefocus);
 
+      this.initializeFocusHandling();
+
       this.serverId = StandardWeb.chat.serverId;
 
       this.connect();

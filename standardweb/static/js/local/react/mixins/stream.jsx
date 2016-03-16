@@ -8,6 +8,25 @@
     focused: true,
     commandIndex: -1,
     commandHistory: [],
+    inactivityTimeout: null,
+
+    initializeFocusHandling: function() {
+      $(window).focus(function() {
+        if (!this.focused) {
+          this.sendActivity(true);
+        }
+
+        this.focused = true;
+      }.bind(this));
+
+      $(window).blur(function() {
+        if (this.focused) {
+          this.sendActivity(false);
+        }
+
+        this.focused = false;
+      }.bind(this));
+    },
 
     addOutputLine: function(line) {
       return this.addOutputLines([line]);
@@ -214,22 +233,6 @@
         socket.on('mc-connection-lost', function() {
           this.setState({status: 'mc-connection-lost'});
           this.addOutputLine("Connection to Minecraft server lost, retrying...");
-        }.bind(this));
-
-        $(window).focus(function() {
-          if (!this.focused) {
-            this.sendActivity(true);
-          }
-
-          this.focused = true;
-        }.bind(this));
-
-        $(window).blur(function() {
-          if (this.focused) {
-            this.sendActivity(false);
-          }
-
-          this.focused = false;
         }.bind(this));
       }.bind(this));
     }
