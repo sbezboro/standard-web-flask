@@ -10,22 +10,35 @@
     commandHistory: [],
     inactivityTimeout: null,
 
-    initializeFocusHandling: function() {
-      $(window).focus(function() {
-        if (!this.focused) {
-          this.sendActivity(true);
-        }
+    setActive: function() {
+      if (this.inactivityTimeout) {
+        clearTimeout(this.inactivityTimeout);
+      }
 
+      this.inactivityTimeout = setTimeout(this.setInactive, 60000);
+
+      if (!this.focused) {
+        this.sendActivity(true);
         this.focused = true;
-      }.bind(this));
+      }
+    },
 
-      $(window).blur(function() {
-        if (this.focused) {
-          this.sendActivity(false);
-        }
+    setInactive: function() {
+      if (this.inactivityTimeout) {
+        clearTimeout(this.inactivityTimeout);
+      }
 
+      if (this.focused) {
+        this.sendActivity(false);
         this.focused = false;
-      }.bind(this));
+      }
+    },
+
+    initializeActivityHandling: function() {
+      $(window).bind('mousewheel DOMMouseScroll', this.setActive.bind(this));
+      $(window).mousemove(this.setActive.bind(this));
+      $(window).focus(this.setActive.bind(this));
+      $(window).blur(this.setInactive.bind(this));
     },
 
     addOutputLine: function(line) {
@@ -115,6 +128,7 @@
     },
 
     handleInputChange: function(inputValue) {
+      this.setActive();
       this.setState({inputValue: inputValue});
     },
 
@@ -234,6 +248,8 @@
           this.setState({status: 'mc-connection-lost'});
           this.addOutputLine("Connection to Minecraft server lost, retrying...");
         }.bind(this));
+
+        this.setActive();
       }.bind(this));
     }
   };
