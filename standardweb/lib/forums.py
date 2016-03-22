@@ -121,7 +121,7 @@ def can_user_post(user):
     if not user.player:
         return True
 
-    total_time = libplayer.get_total_player_time(user.player)
+    total_time = libplayer.get_total_player_time(user.player.id)
 
     return total_time > app.config['MINIMUM_FORUM_POST_PLAYER_TIME']
 

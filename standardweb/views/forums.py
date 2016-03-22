@@ -421,7 +421,7 @@ def forum_topic(topic_id):
         'form': form,
         'subscription': subscription,
         'votes': votes,
-        'user_can_post': can_user_post
+        'can_user_post': can_user_post
     }
 
     return render_template('forums/topic.html', **retval)
