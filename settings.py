@@ -40,6 +40,8 @@ BAD_SCORE_THRESHOLD = -1.0
 TERRIBLE_SCORE_THRESHOLD = -2.0
 ABYSMAL_SCORE_THRESHOLD = -3.0
 
+MINIMUM_FORUM_POST_PLAYER_TIME = 86400
+
 try:
     from local_settings import *
 except ImportError:

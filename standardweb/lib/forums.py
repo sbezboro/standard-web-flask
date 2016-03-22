@@ -4,6 +4,7 @@ import cgi
 import re
 
 from standardweb import app
+from standardweb.lib import player as libplayer
 from standardweb.models import AuditLog, ForumTopicSubscription
 
 
@@ -111,6 +112,18 @@ def grouped_votes(votes):
         'up_list': up_list,
         'down_list': down_list
     }
+
+
+def can_user_post(user):
+    if not user:
+        return False
+
+    if not user.player:
+        return True
+
+    total_time = libplayer.get_total_player_time(user.player)
+
+    return total_time > app.config['MINIMUM_FORUM_POST_PLAYER_TIME']
 
 
 _bbcode_parser.add_simple_formatter(

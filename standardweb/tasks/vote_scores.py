@@ -3,6 +3,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from standardweb import celery, db
+from standardweb.lib import player as libplayer
 from standardweb.models import ForumPost, ForumPostVote, PlayerStats, Server
 
 
@@ -13,12 +14,7 @@ MAX_VOTE_WEIGHT_TIME = 4320  # time in minutes before a vote no longer affects p
 def _calculate_player_time_weight(player_id):
     """Return a weight between 0.0 and 1.0 that is proportional to the user's
     total time spent on the server."""
-    total_time = db.session.query(
-        func.sum(PlayerStats.time_spent)
-    ).join(Server).filter(
-        PlayerStats.player_id == player_id,
-        Server.type == 'survival'
-    ).scalar()
+    total_time = libplayer.get_total_player_time(player_id)
 
     player_time_weight = min(1.0, float(total_time) / MAX_USER_ACTIVE_MULTIPLIER_TIME)
 

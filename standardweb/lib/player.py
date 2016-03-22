@@ -146,12 +146,7 @@ def get_data_on_server(player, server):
         Server.type == 'survival'
     ).scalar()
 
-    total_time = db.session.query(
-        func.sum(PlayerStats.time_spent)
-    ).join(Server).filter(
-        PlayerStats.player_id == player.id,
-        Server.type == 'survival'
-    ).scalar()
+    total_time = get_total_player_time(player.id)
 
     ore_discoveries = OreDiscoveryCount.query.options(
         joinedload(OreDiscoveryCount.material_type)
@@ -194,6 +189,16 @@ def get_data_on_server(player, server):
         'combat_stats': get_combat_data(player, server),
         'server_stats': server_stats
     }
+
+
+@cache.CachedResult('total_player_time', time=300)
+def get_total_player_time(player_id):
+    return db.session.query(
+        func.sum(PlayerStats.time_spent)
+    ).join(Server).filter(
+        PlayerStats.player_id == player_id,
+        Server.type == 'survival'
+    ).scalar()
 
 
 def apply_veteran_titles(player, allow_commit=True):

@@ -177,6 +177,8 @@
     {% if current_user %}
         {% if topic.closed and not current_user.admin %}
             This topic is closed
+        {% elif not can_user_post %}
+            You need to spend more time on the server before being able to post!
         {% else %}
             <div class="forum-form-section">
                 <h4>

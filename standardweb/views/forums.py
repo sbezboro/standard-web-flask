@@ -235,8 +235,9 @@ def forum(forum_id):
 
     active_topic_ids = set()
 
-    if g.user:
-        user = g.user
+    user = g.user
+
+    if user:
         read_topics = user.posttracking.get_topics()
         last_read = user.posttracking.last_read
 
@@ -275,6 +276,8 @@ def forum_topic(topic_id):
 
     form = PostForm()
 
+    can_user_post = libforums.can_user_post(user)
+
     if form.validate_on_submit():
         if not user:
             flash('You must log in first', 'warning')
@@ -289,6 +292,9 @@ def forum_topic(topic_id):
             return redirect(url_for('forum', forum_id=topic.forum_id))
 
         if user.forum_ban:
+            abort(403)
+
+        if not can_user_post:
             abort(403)
 
         body = form.body.data
@@ -414,7 +420,8 @@ def forum_topic(topic_id):
         'page': page,
         'form': form,
         'subscription': subscription,
-        'votes': votes
+        'votes': votes,
+        'user_can_post': can_user_post
     }
 
     return render_template('forums/topic.html', **retval)
@@ -503,6 +510,12 @@ def new_topic(forum_id):
 
     if forum.locked and not user.admin:
         abort(403)
+
+    can_post = libforums.can_user_post(user)
+
+    if not can_post:
+        flash('You need to spend more time on the server before being able to post!', 'warning')
+        return redirect(url_for('forum', forum_id=forum_id))
 
     form = NewTopicForm()
 
