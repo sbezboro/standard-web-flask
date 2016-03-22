@@ -224,6 +224,10 @@ def register():
     else:
         send_creation_email(email, uuid, username)
 
+    total_time = libplayer.get_total_player_time(player.id)
+    if total_time < 5:
+        rollbar.report_message('Player creating user account super quickly', level='error', request=request)
+
     return jsonify({
         'err': 0,
         'message': 'Email sent! Check your inbox for further instructions'
