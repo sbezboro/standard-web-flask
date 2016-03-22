@@ -699,6 +699,7 @@ def forum_post_delete(post_id):
             .order_by(ForumPost.created.desc()).first()
 
         post.topic.last_post = new_last_post
+        post.topic.updated = new_last_post.created
         post.topic.save(commit=False)
 
     # if this is the last post for the forum, or the topic is being deleted and the topic
