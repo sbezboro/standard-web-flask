@@ -26,6 +26,7 @@
     setInactive: function() {
       if (this.inactivityTimeout) {
         clearTimeout(this.inactivityTimeout);
+        this.inactivityTimeout = null;
       }
 
       if (this.focused) {
@@ -249,7 +250,10 @@
           this.addOutputLine("Connection to Minecraft server lost, retrying...");
         }.bind(this));
 
-        this.setActive();
+        socket.on('authorized', function() {
+          this.setActive();
+        }.bind(this));
+
       }.bind(this));
     }
   };
