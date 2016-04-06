@@ -491,6 +491,26 @@ def rts_user_connection():
     return jsonify({})
 
 
+@internal_api_func
+def get_player_data():
+    user = g.user
+
+    player = user.player
+
+    if not player:
+        return jsonify({
+            'username': user.username
+        })
+
+    return jsonify({
+        'uuid': player.uuid,
+        'username': player.username,
+        'nickname': player.nickname,
+        'nickname_ansi': player.nickname_ansi,
+        'nickname_hmtl': player.nickname_html
+    })
+
+
 @base_api_func
 def contact_query():
     query = request.args.get('query')
