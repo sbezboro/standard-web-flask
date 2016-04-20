@@ -3,9 +3,9 @@ import bbcode
 import cgi
 import re
 
-from standardweb import app
+from standardweb import app, db
 from standardweb.lib import player as libplayer
-from standardweb.models import AuditLog, ForumTopicSubscription
+from standardweb.models import AuditLog, ForumTopicSubscription, ForumTopic, ForumPost, Forum
 
 
 _bbcode_parser = bbcode.Parser()
@@ -124,6 +124,74 @@ def can_user_post(user):
     total_time = libplayer.get_total_player_time(user.player.id)
 
     return total_time > app.config['MINIMUM_FORUM_POST_PLAYER_TIME']
+
+
+def delete_post(post):
+    first_post = ForumPost.query.join(ForumPost.topic) \
+        .filter(ForumTopic.id == post.topic_id) \
+        .order_by(ForumPost.created).first()
+
+    post.deleted = True
+    post.save(commit=True)
+
+    # if its the first post being deleted, this means the topic will be deleted
+    # as well, so reduce the post count for every user in the topic
+    if post == first_post:
+        posts = ForumPost.query.join(ForumPost.topic) \
+            .filter(ForumPost.deleted == False, ForumTopic.id == post.topic_id)
+
+        for other_post in posts:
+            other_post.deleted = True
+            other_post.save(commit=False)
+
+            other_post.user.forum_profile.post_count -= 1
+            other_post.user.forum_profile.save(commit=False)
+
+            other_post.topic.forum.post_count -= 1
+
+        post.topic.forum.topic_count -= 1
+        post.topic.forum.save(commit=False)
+
+        post.topic.post_count = 0
+        post.topic.deleted = True
+
+        # commit so the queries below will work properly
+        post.topic.save(commit=True)
+
+    # otherwise if this is the last post in the topic, update the topic's last
+    # post pointer to be the next latest post in the topic
+    elif post.id == post.topic.last_post_id:
+        new_last_post = ForumPost.query.join(ForumPost.topic) \
+            .filter(ForumPost.deleted == False, ForumTopic.id == post.topic_id) \
+            .order_by(ForumPost.created.desc()).first()
+
+        post.topic.last_post = new_last_post
+        post.topic.updated = new_last_post.created
+        post.topic.save(commit=False)
+
+    # if this is the last post for the forum, or the topic is being deleted and the topic
+    # is the last topic of the forum, update the forum's last post pointer to be
+    # the next latest post in the forum
+    if (post == first_post and post.topic.last_post_id == post.topic.forum.last_post_id) or \
+                    post.id == post.topic.forum.last_post_id:
+        new_last_post = ForumPost.query.join(ForumPost.topic).join(ForumTopic.forum) \
+            .filter(ForumPost.deleted == False, Forum.id == post.topic.forum_id) \
+            .order_by(ForumPost.created.desc()).first()
+
+        post.topic.forum.last_post = new_last_post
+        post.topic.forum.save(commit=False)
+
+    post.user.forum_profile.post_count -= 1
+    post.user.forum_profile.save(commit=False)
+
+    post.topic.forum.post_count -= 1
+    post.topic.forum.save(commit=False)
+
+    if post.topic.post_count > 0:
+        post.topic.post_count -= 1
+        post.topic.save(commit=False)
+
+    db.session.commit()
 
 
 _bbcode_parser.add_simple_formatter(

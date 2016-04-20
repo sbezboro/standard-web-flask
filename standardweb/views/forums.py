@@ -668,86 +668,57 @@ def forum_post_delete(post_id):
     ).options(
         joinedload(ForumPost.user)
         .joinedload(User.forum_profile)
-    ).get(post_id)
+    ).filter_by(deleted=False).get(post_id)
 
     if not post:
         abort(404)
 
-    first_post = ForumPost.query.join(ForumPost.topic) \
-        .filter(ForumTopic.id == post.topic_id) \
-        .order_by(ForumPost.created).first()
+    first_post = ForumPost.query.join(ForumPost.topic).filter(
+        ForumTopic.id == post.topic_id
+    ).order_by(ForumPost.created).first()
 
-    post.deleted = True
-    post.save(commit=True)
+    libforums.delete_post(post)
 
-    # if its the first post being deleted, this means the topic will be deleted
-    # as well, so reduce the post count for every user in the topic
     if post == first_post:
-        posts = ForumPost.query.join(ForumPost.topic) \
-            .filter(ForumPost.deleted == False, ForumTopic.id == post.topic_id)
-
-        for other_post in posts:
-            other_post.deleted = True
-            other_post.save(commit=False)
-
-            other_post.user.forum_profile.post_count -= 1
-            other_post.user.forum_profile.save(commit=False)
-
-            other_post.topic.forum.post_count -= 1
-
-        post.topic.forum.topic_count -= 1
-        post.topic.forum.save(commit=False)
-
-        post.topic.post_count = 0
-        post.topic.deleted = True
-
-        # commit so the queries below will work properly
-        post.topic.save(commit=True)
-
-    # otherwise if this is the last post in the topic, update the topic's last
-    # post pointer to be the next latest post in the topic
-    elif post.id == post.topic.last_post_id:
-        new_last_post = ForumPost.query.join(ForumPost.topic) \
-            .filter(ForumPost.deleted == False, ForumTopic.id == post.topic_id) \
-            .order_by(ForumPost.created.desc()).first()
-
-        post.topic.last_post = new_last_post
-        post.topic.updated = new_last_post.created
-        post.topic.save(commit=False)
-
-    # if this is the last post for the forum, or the topic is being deleted and the topic
-    # is the last topic of the forum, update the forum's last post pointer to be
-    # the next latest post in the forum
-    if (post == first_post and post.topic.last_post_id == post.topic.forum.last_post_id) or \
-                    post.id == post.topic.forum.last_post_id:
-        new_last_post = ForumPost.query.join(ForumPost.topic).join(ForumTopic.forum) \
-            .filter(ForumPost.deleted == False, Forum.id == post.topic.forum_id) \
-            .order_by(ForumPost.created.desc()).first()
-
-        post.topic.forum.last_post = new_last_post
-        post.topic.forum.save(commit=False)
-
-    post.user.forum_profile.post_count -= 1
-    post.user.forum_profile.save(commit=False)
-
-    post.topic.forum.post_count -= 1
-    post.topic.forum.save(commit=False)
-
-    if post.topic.post_count > 0:
-        post.topic.post_count -= 1
-        post.topic.save(commit=False)
-
-        redirect_url = post.topic.url
-        message = 'Post deleted'
-    else:
         redirect_url = post.topic.forum.url
         message = 'Topic deleted'
-
-    db.session.commit()
+    else:
+        redirect_url = post.topic.url
+        message = 'Post deleted'
 
     flash(message, 'success')
 
     return redirect(redirect_url)
+
+
+@app.route('/forums/posts/delete')
+@login_required(only_moderator=True)
+def delete_user_forum_posts():
+    user_id = request.args.get('user_id')
+    if not user_id:
+        flash('Must specify user id', 'error')
+        return redirect(request.referrer)
+
+    posts = ForumPost.query.options(
+        joinedload(ForumPost.topic)
+        .joinedload(ForumTopic.forum)
+    ).options(
+        joinedload(ForumPost.user)
+        .joinedload(User.forum_profile)
+    ).filter_by(
+        user_id=user_id,
+        deleted=False
+    ).order_by(ForumPost.created.desc())
+
+    count = 0
+
+    for post in posts:
+        libforums.delete_post(post)
+        count += 1
+
+    flash('%s posts deleted' % count, 'success')
+
+    return redirect(request.referrer)
 
 
 @app.route('/forums/topic/<int:topic_id>/move', methods=['GET', 'POST'])

@@ -24,8 +24,20 @@
         {% if player %}
         <div class="border-section player-section">
             <div class="section-header">
-                <div class="pull-right">
+                <div class="pull-right align-right">
                     {% if current_user and player.user != current_user %}
+                        {% if current_user.admin_or_moderator %}
+                            {% if player.user.forum_ban %}
+                                Forum banned
+                            {% else %}
+                                <a class="btn btn-lite btn-danger confirm" href="{{ url_for('forum_ban', user_id=player.user.id) }}">Forum Ban</a>
+                            {% endif %}
+                            {% with profile = player.user.forum_profile %}
+                                {% if profile and profile.post_count %}
+                                    <a class="btn btn-lite btn-danger confirm" data-confirm-message="Are you absolutely sure? There is no way to undo this!" href="{{ url_for('delete_user_forum_posts', user_id=player.user.id) }}">Delete All Forum Posts</a>
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
                         <a class="btn btn-lite" href="{{ url_for('messages', username=player.username) }}">Send Message</a>
                     {% endif %}
                 </div>
