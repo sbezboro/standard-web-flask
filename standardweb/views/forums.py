@@ -668,9 +668,9 @@ def forum_post_delete(post_id):
     ).options(
         joinedload(ForumPost.user)
         .joinedload(User.forum_profile)
-    ).filter_by(deleted=False).get(post_id)
+    ).get(post_id)
 
-    if not post:
+    if not post or post.deleted:
         abort(404)
 
     first_post = ForumPost.query.join(ForumPost.topic).filter(
