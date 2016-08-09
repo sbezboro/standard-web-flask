@@ -2,6 +2,7 @@ from flask import abort, g, jsonify, redirect, render_template, request, url_for
 from sqlalchemy.orm import joinedload
 
 from standardweb import app
+from standardweb.lib import api
 from standardweb.lib import helpers as h
 from standardweb.lib import player as libplayer
 from standardweb.models import Server, Player, User, IPTracking
@@ -116,6 +117,22 @@ def adjust_player_time(server_id, uuid):
         abort(400)
 
     player.adjust_time_spent(server, adjustment, reason='manual', commit=True)
+
+    return jsonify({
+        'err': 0
+    })
+
+
+@login_required(only_moderator=True)
+@app.route('/player/<uuid>/ban', methods=['POST'])
+def ban_player(uuid):
+    player = Player.query.filter_by(uuid=uuid).first()
+    if not player:
+        abort(404)
+
+    reason = request.form.get('reason') or None
+
+    api.ban_player(player, reason=reason)
 
     return jsonify({
         'err': 0

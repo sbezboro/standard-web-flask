@@ -26,17 +26,20 @@
             <div class="section-header">
                 <div class="pull-right align-right">
                     {% if current_user and player.user != current_user %}
-                        {% if current_user.admin_or_moderator and player.user %}
-                            {% if player.user.forum_ban %}
-                                Forum banned
-                            {% else %}
-                                <a class="btn btn-lite btn-danger confirm" href="{{ url_for('forum_ban', user_id=player.user.id) }}">Forum Ban</a>
-                            {% endif %}
-                            {% with profile = player.user.forum_profile %}
-                                {% if profile and profile.post_count %}
-                                    <a class="btn btn-lite btn-danger confirm" data-confirm-message="Are you absolutely sure? There is no way to undo this!" href="{{ url_for('delete_user_forum_posts', user_id=player.user.id) }}">Delete All Forum Posts</a>
+                        {% if current_user.admin_or_moderator %}
+                            <a class="btn btn-lite btn-danger ban" href="#">Server Ban</a>
+                            {% if player.user %}
+                                {% if player.user.forum_ban %}
+                                    Forum banned
+                                {% else %}
+                                    <a class="btn btn-lite btn-danger confirm" href="{{ url_for('forum_ban', user_id=player.user.id) }}">Forum Ban</a>
                                 {% endif %}
-                            {% endwith %}
+                                {% with profile = player.user.forum_profile %}
+                                    {% if profile and profile.post_count %}
+                                        <a class="btn btn-lite btn-danger confirm" data-confirm-message="Are you absolutely sure? There is no way to undo this!" href="{{ url_for('delete_user_forum_posts', user_id=player.user.id) }}">Delete All Forum Posts</a>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
                         {% endif %}
                         <a class="btn btn-lite" href="{{ url_for('messages', username=player.username) }}">Send Message</a>
                     {% endif %}
@@ -314,6 +317,27 @@
         </script>
         {% if current_user and current_user.admin %}
             <script type="application/javascript">
+                $('.ban').on('click', function() {
+                    var dialog = new StandardWeb.InputDialog('Server Ban', 'Reason:', '');
+                    dialog.positiveCallback = function(inputValue) {
+                        $.ajax({
+                            url: "{{ url_for('ban_player', uuid=player.uuid) }}",
+                            type: 'POST',
+                            data: {reason: inputValue},
+                            success: function() {
+                                dialog.close();
+                                StandardWeb.alertManager.addAlert('success', 'Player banned from all servers!');
+                            },
+                            error: function() {
+                                dialog.close();
+                                StandardWeb.alertManager.addAlert('error', 'There was a problem banning the user, please try again.');
+                            }
+                        });
+                    };
+
+                    dialog.show();
+                    return false;
+                });
                 $('.adjust-time').on('click', function() {
                     var dialog = new StandardWeb.InputDialog('Adjust player time', 'Adjustment:', 'minutes');
                     dialog.positiveCallback = function(inputValue) {
