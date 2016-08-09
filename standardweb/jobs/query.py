@@ -141,6 +141,13 @@ def _query_server(server, mojang_status):
     server_status = api.get_server_status(server) or {}
     
     player_stats = []
+
+    Player.query.filter(
+        Player.uuid.in_(server_status.get('banned_uuids', [])),
+        Player.banned == False
+    ).update({
+        'banned': True,
+    }, synchronize_session=False)
     
     online_player_ids = []
     for player_info in server_status.get('players', []):
