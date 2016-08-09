@@ -6,7 +6,7 @@ from standardweb.models import Player, PlayerStats, Server, User
 
 
 @celery.task()
-def api_forum_post(username, uuid, forum_name, topic_name, path, is_new_topic):
+def api_forum_post_task(username, uuid, forum_name, topic_name, path, is_new_topic):
     from standardweb.lib.api import api_call
 
     base_url = url_for('index', _external=True).rstrip('/')
@@ -27,7 +27,21 @@ def api_forum_post(username, uuid, forum_name, topic_name, path, is_new_topic):
 
 
 @celery.task()
-def api_new_message(to_player_id, from_user_id):
+def api_player_action_task(uuid, action, reason):
+    from standardweb.lib.api import api_call
+
+    for server in Server.query.filter_by(online=True):
+        data = {
+            'uuid': uuid,
+            'action': action,
+            'reason': reason
+        }
+
+        api_call(server, 'player_action', data=data)
+
+
+@celery.task()
+def api_new_message_task(to_player_id, from_user_id):
     from standardweb.lib.api import api_call
 
     to_player = Player.query.get(to_player_id)

@@ -3,8 +3,9 @@ import rollbar
 from standardweb import app
 from standardweb.lib.constants import *
 from standardweb.models import Server
-from standardweb.tasks.server_api import api_forum_post as api_forum_post_task
-from standardweb.tasks.server_api import api_new_message as api_new_message_task
+from standardweb.tasks.server_api import api_forum_post_task
+from standardweb.tasks.server_api import api_player_action_task
+from standardweb.tasks.server_api import api_new_message_task
 from standardweb.vendor.minecraft_api import MinecraftJsonApi
 
 
@@ -84,6 +85,14 @@ def send_player_stats(server, stats):
 
 def send_stats(server, data):
     api_call(server, 'stats', data=data)
+
+
+def ban_player(player, reason=None):
+    api_player_action_task.apply_async((
+        player.uuid,
+        'ban',
+        reason
+    ))
 
 
 def forum_post(user, forum_name, topic_name, path, is_new_topic=False):
