@@ -7,7 +7,7 @@ from sqlalchemy import or_
 from standardweb import app, stats
 from standardweb.forms import LoginForm, VerifyEmailForm, ForgotPasswordForm, ResetPasswordForm
 from standardweb.lib.email import send_reset_password
-from standardweb.models import Player, User, EmailToken
+from standardweb.models import EmailToken, ForumBan, Player, User
 from standardweb.views.decorators.ssl import ssl_required
 
 
@@ -98,8 +98,18 @@ def create_account(token):
         return result
 
     if g.user:
-        rollbar.report_message('User already logged in when verifying creation email',
-                               level='warning', request=request)
+        if g.user.forum_ban:
+            session['forum_ban'] = True
+            session.permanent = True
+
+        rollbar.report_message(
+            'User already logged in when verifying creation email',
+            level='warning',
+            request=request,
+            extra_data={
+                'existing_forum_ban': bool(g.user.forum_ban)
+            }
+        )
 
         session.pop('user_id', None)
         g.user = None
@@ -120,6 +130,15 @@ def create_account(token):
 
             user = User.create(player, password, email)
 
+            if session['forum_ban']:
+                rollbar.report_message(
+                    'Banning user associated with another forum banned user',
+                    level='error',
+                    request=request
+                )
+                ban = ForumBan(user_id=user.id)
+                ban.save(commit=True)
+
             session['user_id'] = user.id
             session['first_login'] = True
             session.permanent = True
@@ -128,12 +147,16 @@ def create_account(token):
 
             stats.incr('account.created')
 
-            rollbar.report_message('Account created', level='info', request=request,
-                                   extra_data={
-                                       'user_id': user.id,
-                                       'player_id': player.id,
-                                       'username': player.username
-                                   })
+            rollbar.report_message(
+                'Account created',
+                level='info',
+                request=request,
+                extra_data={
+                    'user_id': user.id,
+                    'player_id': player.id,
+                    'username': player.username
+                }
+            )
 
             return redirect(url_for('index'))
 
