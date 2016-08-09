@@ -27,7 +27,11 @@
                 <div class="pull-right align-right">
                     {% if current_user and player.user != current_user %}
                         {% if current_user.admin_or_moderator %}
-                            <a class="btn btn-lite btn-danger ban" href="#">Server Ban</a>
+                            {% if player.banned %}
+                                Server banned
+                            {% else %}
+                                <a class="btn btn-lite btn-danger ban" href="#">Server Ban</a>
+                            {% endif %}
                             {% if player.user %}
                                 {% if player.user.forum_ban %}
                                     Forum banned
@@ -326,7 +330,7 @@
                             data: {reason: inputValue},
                             success: function() {
                                 dialog.close();
-                                StandardWeb.alertManager.addAlert('success', 'Player banned from all servers!');
+                                location.reload();
                             },
                             error: function() {
                                 dialog.close();
