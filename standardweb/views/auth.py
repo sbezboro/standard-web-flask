@@ -130,7 +130,7 @@ def create_account(token):
 
             user = User.create(player, password, email)
 
-            if session['forum_ban']:
+            if session.get('forum_ban'):
                 rollbar.report_message(
                     'Banning user associated with another forum banned user',
                     level='error',
