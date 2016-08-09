@@ -5,7 +5,7 @@ from standardweb import app
 from standardweb.lib import api
 from standardweb.lib import helpers as h
 from standardweb.lib import player as libplayer
-from standardweb.models import Server, Player, User, IPTracking
+from standardweb.models import AuditLog, IPTracking, Player, Server, User
 from standardweb.views.decorators.auth import login_required
 from standardweb.views.decorators.redirect import redirect_route
 
@@ -133,6 +133,15 @@ def ban_player(uuid):
     reason = request.form.get('reason') or None
 
     api.ban_player(player, reason=reason)
+
+    AuditLog.create(
+        AuditLog.PLAYER_BAN,
+        player_id=player.id,
+        by_user_id=g.user.id,
+        reason=reason,
+        commit=False
+    )
+
     player.banned = True
     player.save(commit=True)
 

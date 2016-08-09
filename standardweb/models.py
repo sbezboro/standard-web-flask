@@ -869,6 +869,7 @@ class AuditLog(db.Model, Base):
 
     PLAYER_TIME_ADJUSTMENT = 'player_time_adjustment'
     PLAYER_RENAME = 'player_rename'
+    PLAYER_BAN = 'player_ban'
 
     @classmethod
     def create(cls, type, data=None, server_id=None, user_id=None, player_id=None, commit=True, **kw):
