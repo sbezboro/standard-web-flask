@@ -133,6 +133,8 @@ def ban_player(uuid):
     reason = request.form.get('reason') or None
 
     api.ban_player(player, reason=reason)
+    player.banned = True
+    player.save(commit=True)
 
     return jsonify({
         'err': 0

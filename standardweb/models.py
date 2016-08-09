@@ -323,6 +323,7 @@ class Player(db.Model, Base):
     username = db.Column(db.String(30))
     nickname = db.Column(db.String(30))
     nickname_ansi = db.Column(db.String(256))
+    banned = db.Column(db.Boolean, default=False)
 
     def __str__(self):
         return self.displayname
