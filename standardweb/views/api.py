@@ -507,7 +507,8 @@ def get_player_data():
         'username': player.username,
         'nickname': player.nickname,
         'nickname_ansi': player.nickname_ansi,
-        'nickname_hmtl': player.nickname_html
+        'nickname_hmtl': player.nickname_html,
+        'banned': player.banned
     })
 
 
