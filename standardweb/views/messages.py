@@ -180,8 +180,10 @@ def messages_json(username):
 @login_required()
 def send_message(username):
     user = g.user
+    player = user.player
 
-    if user.forum_ban:
+    if user.forum_ban or (player and player.banned):
+        rollbar.report_message('User blocked from sending a message', level='warning', request=request)
         return jsonify({
             'err': 1,
             'message': 'Oops, you are blocked from sending any messages. Awkward...'
