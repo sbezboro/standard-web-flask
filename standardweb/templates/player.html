@@ -319,47 +319,53 @@
                 });
             });
         </script>
-        {% if current_user and current_user.admin %}
-            <script type="application/javascript">
-                $('.ban').on('click', function() {
-                    var dialog = new StandardWeb.InputDialog('Server Ban', 'Reason:', '');
-                    dialog.positiveCallback = function(inputValue) {
-                        $.ajax({
-                            url: "{{ url_for('ban_player', uuid=player.uuid) }}",
-                            type: 'POST',
-                            data: {reason: inputValue},
-                            success: function() {
-                                dialog.close();
-                                location.reload();
-                            },
-                            error: function() {
-                                dialog.close();
-                                StandardWeb.alertManager.addAlert('error', 'There was a problem banning the user, please try again.');
-                            }
-                        });
-                    };
+        {% if current_user %}
+            {% if current_user.admin_or_moderator %}
+                <script type="application/javascript">
+                    $('.ban').on('click', function() {
+                        var dialog = new StandardWeb.InputDialog('Server Ban', 'Reason:', '');
+                        dialog.positiveCallback = function(inputValue) {
+                            $.ajax({
+                                url: "{{ url_for('ban_player', uuid=player.uuid) }}",
+                                type: 'POST',
+                                data: {reason: inputValue},
+                                success: function() {
+                                    dialog.close();
+                                    location.reload();
+                                },
+                                error: function() {
+                                    dialog.close();
+                                    StandardWeb.alertManager.addAlert('error', 'There was a problem banning the user, please try again.');
+                                }
+                            });
+                        };
 
-                    dialog.show();
-                    return false;
-                });
-                $('.adjust-time').on('click', function() {
-                    var dialog = new StandardWeb.InputDialog('Adjust player time', 'Adjustment:', 'minutes');
-                    dialog.positiveCallback = function(inputValue) {
-                        $.ajax({
-                            url: "{{ url_for('adjust_player_time', server_id=server.id, uuid=player.uuid) }}",
-                            type: 'POST',
-                            data: {adjustment: inputValue},
-                            success: function() {
-                                dialog.close();
-                                location.reload();
-                            }
-                        });
-                    };
+                        dialog.show();
+                        return false;
+                    });
+                </script>
+            {% endif %}
+            {% if current_user.admin %}
+                <script type="application/javascript">
+                    $('.adjust-time').on('click', function() {
+                        var dialog = new StandardWeb.InputDialog('Adjust player time', 'Adjustment:', 'minutes');
+                        dialog.positiveCallback = function(inputValue) {
+                            $.ajax({
+                                url: "{{ url_for('adjust_player_time', server_id=server.id, uuid=player.uuid) }}",
+                                type: 'POST',
+                                data: {adjustment: inputValue},
+                                success: function() {
+                                    dialog.close();
+                                    location.reload();
+                                }
+                            });
+                        };
 
-                    dialog.show();
-                    return false;
-                });
-            </script>
+                        dialog.show();
+                        return false;
+                    });
+                </script>
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endblock %}
