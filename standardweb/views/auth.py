@@ -101,13 +101,17 @@ def create_account(token):
         if g.user.forum_ban:
             session['forum_ban'] = True
             session.permanent = True
+        if g.user.player.banned:
+            session['player_ban'] = True
+            session.permanent = True
 
         rollbar.report_message(
             'User already logged in when verifying creation email',
             level='warning',
             request=request,
             extra_data={
-                'existing_forum_ban': bool(g.user.forum_ban)
+                'existing_forum_ban': bool(g.user.forum_ban),
+                'existing_player_ban': bool(g.user.player.banned)
             }
         )
 
@@ -138,6 +142,14 @@ def create_account(token):
                 )
                 ban = ForumBan(user_id=user.id)
                 ban.save(commit=True)
+            if session.get('player_ban'):
+                rollbar.report_message(
+                    'Banning player associated with another banned player',
+                    level='error',
+                    request=request
+                )
+                player.banned = True
+                player.save(commit=True)
 
             session['user_id'] = user.id
             session['first_login'] = True

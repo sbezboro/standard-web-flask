@@ -27,14 +27,16 @@ def api_forum_post_task(username, uuid, forum_name, topic_name, path, is_new_top
 
 
 @celery.task()
-def api_player_action_task(uuid, action, reason):
+def api_player_action_task(uuid, action, reason, ip, with_ip):
     from standardweb.lib.api import api_call
 
     for server in Server.query.filter_by(online=True):
         data = {
             'uuid': uuid,
             'action': action,
-            'reason': reason
+            'reason': reason,
+            'ip': ip,
+            'with_ip': with_ip
         }
 
         api_call(server, 'player_action', data=data)

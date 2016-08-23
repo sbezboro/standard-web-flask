@@ -10,6 +10,7 @@ import rollbar
 import StringIO
 
 from standardweb import app
+from standardweb.lib import api
 from standardweb.lib import leaderboards as libleaderboards
 from standardweb.lib import player as libplayer
 from standardweb.lib import server as libserver
@@ -237,6 +238,9 @@ def chat(server_id=None):
         'servers': Server.query.all(),
         'player': player
     }
+
+    if player and player.banned:
+        api.ban_player(player)
 
     status = MojangStatus.query.order_by(MojangStatus.timestamp.desc()).limit(1).first()
     if status and not status.session:
