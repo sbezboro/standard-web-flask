@@ -87,7 +87,7 @@ def send_stats(server, data):
     api_call(server, 'stats', data=data)
 
 
-def ban_player(player, reason=None, with_ip=False):
+def ban_player(player, reason, with_ip):
     api_player_action_task.apply_async((
         player.uuid,
         'ban',

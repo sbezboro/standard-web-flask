@@ -29,6 +29,19 @@
                         {% if current_user.admin_or_moderator %}
                             {% if player.banned %}
                                 Server banned
+                                {% if ban_time %}{{ ban_time|from_now }} {% else %} - date unknown{% endif %}
+                                {% if ban_reason %} for: <b>{{ ban_reason }}</b>{% endif %}
+                                {% if ban_by_user %} | Ban given by: <b>
+                                    {% if ban_by_user.player %}
+                                        <a href="{{ url_for('player', server_id=server.id, username=ban_by_user.player.username) }}">
+                                            {{ ban_by_user.player.username|face_thumb(scaled_size=12) }}
+                                            {{ ban_by_user.player.displayname_html|safe }}
+                                        </a>
+                                    {% else %}
+                                        {{ ban_by_user.username }}
+                                    {% endif %}</b>
+                                {% endif %}
+                                {% if ban_source %}| Ban source: <b>{{ ban_source }}</b>{% endif %}
                             {% else %}
                                 <a class="btn btn-lite btn-danger ban" href="#">Server Ban</a>
                             {% endif %}

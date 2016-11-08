@@ -8,9 +8,10 @@ from flask import abort, g, redirect, request, session, url_for
 import rollbar
 
 from standardweb import app, stats
-from standardweb.lib import csrf
+from standardweb.lib import api, csrf, geoip
 from standardweb.lib import helpers as h
-from standardweb.models import User
+from standardweb.lib import player as libplayer
+from standardweb.models import User, ForumBan
 from standardweb.tasks.access_log import log as log_task
 from sqlalchemy.orm import joinedload
 
@@ -77,6 +78,20 @@ def first_login():
 @app.before_request
 def track_request_time():
     g._start_time = time.time()
+
+
+@app.before_request
+def ensure_valid_user():
+    if request.method == "POST" and g.user and geoip.is_nok(request.remote_addr):
+        user = g.user
+        player = user.player
+
+        if not user.forum_ban:
+            ban = ForumBan(user_id=g.user.id)
+            ban.save(commit=True)
+
+        if player and not player.banned:
+            libplayer.ban_player(player, source='invalid_user', commit=True)
 
 
 @app.after_request

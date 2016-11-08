@@ -15,6 +15,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
 from standardweb import app, db, stats
+from standardweb.lib import forums as libforums
 from standardweb.lib import helpers as h
 from standardweb.lib import player as libplayer
 from standardweb.lib import realtime
@@ -225,8 +226,14 @@ def register():
         send_creation_email(email, uuid, username)
 
     total_time = libplayer.get_total_player_time(player.id)
-    if total_time < 5:
+    if total_time < app.config['MINIMUM_REGISTER_PLAYER_TIME']:
         rollbar.report_message('Player creating user account super quickly', level='error', request=request)
+        AuditLog.create(
+            AuditLog.QUICK_USER_CREATE,
+            player_id=player.id,
+            username=player.username,
+            commit=True
+        )
 
     return jsonify({
         'err': 0,
@@ -508,7 +515,8 @@ def get_player_data():
         'nickname': player.nickname,
         'nickname_ansi': player.nickname_ansi,
         'nickname_hmtl': player.nickname_html,
-        'banned': player.banned
+        'banned': player.banned,
+        'can_post': libforums.can_user_post(user)
     })
 
 

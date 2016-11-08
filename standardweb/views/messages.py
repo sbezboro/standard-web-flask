@@ -2,7 +2,6 @@ from datetime import datetime
 import pytz
 
 from flask import (
-    abort,
     g,
     jsonify,
     render_template,
@@ -226,6 +225,7 @@ def send_message(username):
         body=body,
         user_ip=request.remote_addr
     )
+
     message.save()
 
     notify_new_message(message)

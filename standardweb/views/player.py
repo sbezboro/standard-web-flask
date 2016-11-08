@@ -2,10 +2,9 @@ from flask import abort, g, jsonify, redirect, render_template, request, url_for
 from sqlalchemy.orm import joinedload
 
 from standardweb import app
-from standardweb.lib import api
 from standardweb.lib import helpers as h
 from standardweb.lib import player as libplayer
-from standardweb.models import AuditLog, IPTracking, Player, Server, User
+from standardweb.models import IPTracking, Player, Server, User, AuditLog
 from standardweb.views.decorators.auth import login_required
 from standardweb.views.decorators.redirect import redirect_route
 
@@ -97,6 +96,28 @@ def player(username, server_id=None):
             'same_ip_player_list': same_ip_player_list
         })
 
+        if player.banned:
+            latest_audit = player.audit_logs.filter(
+                AuditLog.player == player,
+                AuditLog.type.in_(['player_ban', 'spam_ban', 'spam_shadow_mute_ban'])
+            ).order_by(
+                AuditLog.timestamp.desc()
+            ).first()
+
+            if latest_audit and latest_audit.data:
+                retval['ban_time'] = latest_audit.timestamp
+
+                if latest_audit.data.get('reason'):
+                    retval['ban_reason'] = latest_audit.data['reason']
+
+                if latest_audit.data.get('by_user_id'):
+                    retval['ban_by_user'] = User.query.get(latest_audit.data['by_user_id'])
+
+                if latest_audit.data.get('source'):
+                    retval['ban_source'] = latest_audit.data['source']
+                elif 'spam' in latest_audit.type:
+                    retval['ban_source'] = 'spam'
+
     return render_template(template, **retval)
 
 
@@ -132,18 +153,14 @@ def ban_player(uuid):
 
     reason = request.form.get('reason') or None
 
-    api.ban_player(player, reason=reason)
-
-    AuditLog.create(
-        AuditLog.PLAYER_BAN,
-        player_id=player.id,
-        by_user_id=g.user.id,
+    libplayer.ban_player(
+        player,
         reason=reason,
-        commit=False
+        with_ip=True,
+        by_user_id=g.user.id,
+        source='user_ban_player',
+        commit=True
     )
-
-    player.banned = True
-    player.save(commit=True)
 
     return jsonify({
         'err': 0

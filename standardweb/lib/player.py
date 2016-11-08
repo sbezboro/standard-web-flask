@@ -4,9 +4,10 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import func, or_
 
 from standardweb import db
-from standardweb.lib import cache
+from standardweb.lib import api, cache
 from standardweb.lib import helpers as h
 from standardweb.models import (
+    AuditLog,
     DeathCount,
     KillCount,
     MaterialType,
@@ -15,8 +16,8 @@ from standardweb.models import (
     PlayerStats,
     Server,
     Title,
-    VeteranStatus,
-    IPTracking)
+    VeteranStatus
+)
 
 
 def extract_face(image, size):
@@ -227,3 +228,23 @@ def apply_veteran_titles(player, allow_commit=True):
 
     if update:
         player.save(commit=allow_commit)
+
+
+def ban_player(player, reason=None, with_ip=False, by_user_id=None, source=None, commit=True, **kwargs):
+    reason = reason or 'The Ban Hammer has spoken!'
+
+    api.ban_player(player, reason, with_ip)
+
+    AuditLog.create(
+        AuditLog.PLAYER_BAN,
+        player_id=player.id,
+        username=player.username,
+        by_user_id=by_user_id,
+        reason=reason,
+        source=source,
+        commit=False,
+        **kwargs
+    )
+
+    player.banned = True
+    player.save(commit=commit)
