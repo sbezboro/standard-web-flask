@@ -869,6 +869,7 @@ class AuditLog(db.Model, Base):
     PLAYER_TIME_ADJUSTMENT = 'player_time_adjustment'
     PLAYER_RENAME = 'player_rename'
     PLAYER_BAN = 'player_ban'
+    PLAYER_UNBAN = 'player_unban'
     QUICK_USER_CREATE = 'quick_user_create'
 
     @classmethod

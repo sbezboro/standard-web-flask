@@ -203,9 +203,18 @@ def _query_server(server, mojang_status):
             enter = PlayerActivity(server=server, player=player,
                                    activity_type=PLAYER_ACTIVITY_TYPES['enter'])
             enter.save(commit=False)
-        
-        # respect nicknames from the main server
+
         if server.id == app.config['MAIN_SERVER_ID']:
+            if player.banned:
+                player.banned = False
+                AuditLog.create(
+                    AuditLog.PLAYER_UNBAN,
+                    player_id=player.id,
+                    username=player.username,
+                    source='server_sync',
+                    commit=False
+                )
+
             nickname_ansi = player_info.get('nickname_ansi')
             nickname = player_info.get('nickname')
 

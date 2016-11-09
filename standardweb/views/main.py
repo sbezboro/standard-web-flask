@@ -10,7 +10,6 @@ import rollbar
 import StringIO
 
 from standardweb import app
-from standardweb.lib import forums as libforums
 from standardweb.lib import leaderboards as libleaderboards
 from standardweb.lib import player as libplayer
 from standardweb.lib import server as libserver
