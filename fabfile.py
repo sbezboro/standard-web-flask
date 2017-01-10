@@ -17,8 +17,8 @@ SCHEDULE_SERVICE = 'standard-web-celery-beat'
 
 env.user = 'deploy'
 env.roledefs = {
-    'web': ['107.191.38.163'],
-    'graphite': ['107.191.38.163']
+    'web': ['107.191.37.51'],
+    'graphite': ['107.191.37.51']
 }
 
 
