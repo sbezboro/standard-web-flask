@@ -128,15 +128,15 @@
                             <i class="fa fa-thumbs-o-down down {{'active' if votes[post.id] == -1 }}" data-type="-1"></i>
                         </span>
                     {% endif %}
-                    {% with up_count = post.grouped_votes.up_list|length, down_count = post.grouped_votes.down_list|length %}
-                        <span class="vote counts tooltip"
-                              title="{% if current_user.admin_or_moderator %}{{ render_vote_list(post.grouped_votes) }}{% endif %}"
-                              data-tooltip-gravity="w" data-tooltip-offset="5" data-tooltip-html="true">
-                            {{ up_count }} {{ 'like' if up_count == 1 else 'likes' }}
-                            {{ down_count }} {{ 'dislike' if down_count == 1 else 'dislikes' }}
-                        </span>
-                    {% endwith %}
-                    {% if current_user and current_user.admin %}
+                    {% if current_user.admin %}
+                        {% with up_count = post.grouped_votes.up_list|length, down_count = post.grouped_votes.down_list|length %}
+                            <span class="vote counts tooltip"
+                                  title="{{ render_vote_list(post.grouped_votes) }}"
+                                  data-tooltip-gravity="w" data-tooltip-offset="5" data-tooltip-html="true">
+                                {{ up_count }} {{ 'like' if up_count == 1 else 'likes' }}
+                                {{ down_count }} {{ 'dislike' if down_count == 1 else 'dislikes' }}
+                            </span>
+                        {% endwith %}
                         <span class="vote score">{{ post.score }}</span>
                     {% endif %}
                     {% if post.updated %}
