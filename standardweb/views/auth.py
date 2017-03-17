@@ -1,13 +1,18 @@
 from datetime import datetime, timedelta
+import urlparse
+import StringIO
 
-from flask import flash, g, redirect, request, render_template, session, url_for
+from flask import abort, flash, g, redirect, request, render_template, session, url_for, Response
+import pyotp
+import qrcode
 import rollbar
 from sqlalchemy import or_
 
 from standardweb import app, stats
-from standardweb.forms import LoginForm, VerifyEmailForm, ForgotPasswordForm, ResetPasswordForm
+from standardweb.forms import LoginForm, VerifyMFAForm, VerifyEmailForm, ForgotPasswordForm, ResetPasswordForm
 from standardweb.lib.email import send_reset_password
 from standardweb.models import EmailToken, ForumBan, Player, User
+from standardweb.views.decorators.auth import login_required
 from standardweb.views.decorators.ssl import ssl_required
 
 
@@ -35,6 +40,10 @@ def login():
             session['user_id'] = user.id
             session.permanent = True
 
+            if user.mfa_login:
+                session['mfa_stage'] = 'password-verified'
+                return redirect(url_for('verify_mfa', next=next_path))
+
             if not user.last_login:
                 session['first_login'] = True
 
@@ -56,9 +65,61 @@ def login():
     return render_template('login.html', form=form)
 
 
+@app.route('/verify-mfa', methods=['GET', 'POST'])
+def verify_mfa():
+    if not session.get('user_id'):
+        abort(403)
+
+    if session.get('mfa_stage') != 'password-verified':
+        abort(403)
+
+    user = User.query.get(session['user_id'])
+
+    if not user:
+        abort(403)
+
+    form = VerifyMFAForm()
+
+    if form.validate_on_submit():
+        token = request.form['token']
+        next_path = request.form.get('next')
+
+        totp = pyotp.TOTP(user.mfa_secret)
+
+        if totp.verify(token):
+            session['mfa_stage'] = 'mfa-verified'
+            flash('Successfully logged in', 'success')
+            return redirect(next_path or url_for('index'))
+        else:
+            flash('Invalid code', 'error')
+
+    return render_template('verify_mfa.html', form=form)
+
+
+@app.route('/static/mfa-qr-code.png')
+@login_required()
+def mfa_qr_code():
+    user = g.user
+
+    if not user.mfa_secret:
+        user.mfa_secret = pyotp.random_base32()
+        user.save(commit=True)
+
+    totp = pyotp.TOTP(user.mfa_secret)
+    uri = totp.provisioning_uri(user.get_username(), 'Standard Survival')
+    image = qrcode.make(uri)
+
+    stream = StringIO.StringIO()
+    image.save(stream)
+    image = stream.getvalue()
+
+    return Response(image, mimetype='image/png')
+
+
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
+    session.pop('mfa_stage', None)
 
     flash('Successfully logged out', 'success')
 

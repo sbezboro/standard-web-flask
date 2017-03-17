@@ -92,6 +92,8 @@ class User(db.Model, Base):
     password = db.Column(db.String(128))
     admin = db.Column(db.Boolean, default=False)
     moderator = db.Column(db.Boolean, default=False)
+    mfa_login = db.Column(db.Boolean, default=False)
+    mfa_secret = db.Column(db.String(20))
     score = db.Column(db.Numeric(), default=0)
     last_login = db.Column(db.DateTime, default=None)
     date_joined = db.Column(db.DateTime, default=datetime.utcnow)

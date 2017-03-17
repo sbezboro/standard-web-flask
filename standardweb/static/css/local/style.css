@@ -62,6 +62,11 @@
     margin: 0;
 }
 
+.settings-section .settings-content .mfa-img {
+    width: 200px;
+    height: 200px;
+}
+
 .settings-section .settings-content .control-group {
     margin: 0 0 20px;
 }

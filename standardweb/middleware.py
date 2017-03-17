@@ -20,12 +20,15 @@ from sqlalchemy.orm import joinedload
 def user_session():
     if request.endpoint and 'static' not in request.endpoint \
             and request.endpoint != 'face' and session.get('user_id'):
-        
-        g.user = User.query.options(
-            joinedload(User.player)
-        ).options(
-            joinedload(User.posttracking)
-        ).get(session['user_id'])
+
+        if session.get('mfa_stage') and session['mfa_stage'] != 'mfa-verified':
+            g.user = None
+        else:
+            g.user = User.query.options(
+                joinedload(User.player)
+            ).options(
+                joinedload(User.posttracking)
+            ).get(session['user_id'])
     else:
         g.user = None
 

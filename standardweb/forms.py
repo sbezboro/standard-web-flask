@@ -147,6 +147,21 @@ class LoginForm(RedirectForm):
     password = PasswordField('Password', validators=[DataRequired()])
 
 
+class AddMFAForm(BaseForm):
+    token = TextField('Verification code', validators=[DataRequired(), Length(
+        min=6, max=6, message='Value must be 6 numbers long'
+    )])
+
+
+class VerifyMFAForm(RedirectForm):
+    token = TextField('Verification code', validators=[DataRequired(), Length(
+        min=6, max=6, message='Value must be 6 numbers long'
+    )])
+
+
+class RemoveMFAForm(BaseForm):
+    pass
+
 class VerifyEmailForm(BaseForm):
     password = PasswordField('Choose a password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm password', validators=[DataRequired()])

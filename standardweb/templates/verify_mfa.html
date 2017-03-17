@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Two-factor Code - Standard Survival Minecraft Server{% endblock %}
+
+{% from 'includes/forms.html' import render_field %}
+
+{% block content %}
+  <div class="container">
+    <div class="center-form-section">
+      <form action="{{ url_for('verify_mfa') }}" method="post">
+        {{ form.hidden_tag() }}
+        <h2>Enter your Google Authenticator code</h2>
+        <fieldset>
+          {% include 'includes/flash_messages.html' %}
+
+          {{ render_field(form.token) }}
+
+          <div class="control-group">
+            <div class="control">
+              <input class="btn" type="submit" value="Submit">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control">
+              <a href="mailto:server@standardsurvival.com?subject=I lost my phone">Lose your phone?</a>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+{% endblock %}

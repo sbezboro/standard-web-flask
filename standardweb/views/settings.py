@@ -1,14 +1,17 @@
 import urllib
 
-from flask import abort, flash, g, redirect, render_template, request, url_for
+from flask import abort, flash, g, redirect, render_template, request, url_for, session
 from markupsafe import Markup
+import pyotp
 import rollbar
 
 from standardweb import app, db
 from standardweb.forms import (
     generate_notification_settings_form,
+    AddMFAForm,
     ProfileSettingsForm,
-    ChangePasswordForm
+    ChangePasswordForm,
+    RemoveMFAForm
 )
 from standardweb.lib.email import send_verify_email
 from standardweb.lib.notifications import verify_unsubscribe_request
@@ -204,3 +207,45 @@ def unsubscribe(encoded_email, type, signature):
     )
 
     return redirect(url_for('index'))
+
+
+@app.route('/settings/mfa', methods=['GET', 'POST'])
+@login_required()
+def mfa_settings():
+    user = g.user
+
+    if user.mfa_login:
+        form = RemoveMFAForm()
+
+        if form.validate_on_submit():
+            session['mfa_stage'] = None
+            user.mfa_login = False
+            user.save(commit=True)
+
+            flash('Disabled two-factor authentication', 'success')
+
+            return redirect(url_for('mfa_settings'))
+    else:
+        form = AddMFAForm()
+
+        if form.validate_on_submit():
+            token = request.form['token']
+            totp = pyotp.TOTP(user.mfa_secret)
+
+            if totp.verify(token):
+                session['mfa_stage'] = 'mfa-verified'
+                user.mfa_login = True
+                user.save(commit=True)
+
+                flash('Successfully enabled two-factor authentication', 'success')
+
+                return redirect(url_for('mfa_settings'))
+            else:
+                form.token.errors = ['Invalid code']
+
+    template_vars = {
+        'form': form,
+        'active_option': 'mfa'
+    }
+
+    return render_template('settings/mfa.html', **template_vars)
