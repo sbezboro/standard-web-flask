@@ -96,7 +96,7 @@ def verify_mfa():
     return render_template('verify_mfa.html', form=form)
 
 
-@app.route('/static/mfa-qr-code.png')
+@app.route('/mfa-qr-code.png')
 @login_required()
 def mfa_qr_code():
     user = g.user
