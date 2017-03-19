@@ -14,3 +14,4 @@ gen/
 standardweb/attachments
 node_modules/
 .webassets-cache/
+*.dat

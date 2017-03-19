@@ -40,10 +40,6 @@ def login():
             session['user_id'] = user.id
             session.permanent = True
 
-            if user.mfa_login:
-                session['mfa_stage'] = 'password-verified'
-                return redirect(url_for('verify_mfa', next=next_path))
-
             if not user.last_login:
                 session['first_login'] = True
 
@@ -51,6 +47,10 @@ def login():
             user.save(commit=True)
 
             stats.incr('login.success')
+
+            if user.mfa_login:
+                session['mfa_stage'] = 'password-verified'
+                return redirect(url_for('verify_mfa', next=next_path))
 
             flash('Successfully logged in', 'success')
 
