@@ -4,7 +4,7 @@ import os
 import time
 import uuid
 
-from flask import abort, g, redirect, request, session, url_for
+from flask import abort, flash, g, redirect, request, session, url_for
 import rollbar
 
 from standardweb import app, stats
@@ -18,9 +18,7 @@ from sqlalchemy.orm import joinedload
 
 @app.before_request
 def user_session():
-    if request.endpoint and 'static' not in request.endpoint \
-            and request.endpoint != 'face' and session.get('user_id'):
-
+    if _is_not_static_request() and session.get('user_id'):
         if session.get('mfa_stage') and session['mfa_stage'] != 'mfa-verified':
             g.user = None
         else:
@@ -35,6 +33,23 @@ def user_session():
     if not session.get('client_uuid'):
         session['client_uuid'] = uuid.uuid4()
         session.permanent = True
+
+
+def _is_not_static_request():
+    return request.endpoint and 'static' not in request.endpoint and request.endpoint != 'face'
+
+
+@app.before_request
+def force_moderator_mfa():
+    if (
+        _is_not_static_request() and
+        request.endpoint not in ('mfa_settings', 'mfa_qr_code', 'logout') and
+        g.user and
+        g.user.moderator and
+        not g.user.mfa_login
+    ):
+        flash('Moderators must use 2-factor authentication, sorry! Please enable it below', 'error')
+        return redirect(url_for('mfa_settings'))
 
 
 @app.before_request
