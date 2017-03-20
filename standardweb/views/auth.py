@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-import urlparse
 import StringIO
 
 from flask import abort, flash, g, redirect, request, render_template, session, url_for, Response
@@ -11,7 +10,7 @@ from sqlalchemy import or_
 from standardweb import app, stats
 from standardweb.forms import LoginForm, VerifyMFAForm, VerifyEmailForm, ForgotPasswordForm, ResetPasswordForm
 from standardweb.lib.email import send_reset_password
-from standardweb.models import EmailToken, ForumBan, Player, User
+from standardweb.models import AuditLog, EmailToken, ForumBan, Player, User
 from standardweb.views.decorators.auth import login_required
 from standardweb.views.decorators.ssl import ssl_required
 
@@ -60,6 +59,14 @@ def login():
 
             stats.incr('login.invalid')
 
+            AuditLog.create(
+                AuditLog.INVALID_LOGIN,
+                username=username,
+                matched_user_id=user.id if user else None,
+                ip=request.remote_addr,
+                commit=True
+            )
+
             return render_template('login.html', form=form), 401
 
     return render_template('login.html', form=form)
@@ -89,6 +96,7 @@ def verify_mfa():
         if totp.verify(token):
             session['mfa_stage'] = 'mfa-verified'
             flash('Successfully logged in', 'success')
+
             return redirect(next_path or url_for('index'))
         else:
             flash('Invalid code', 'error')
