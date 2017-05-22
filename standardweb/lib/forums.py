@@ -136,7 +136,7 @@ def delete_post(post):
 
     # if its the first post being deleted, this means the topic will be deleted
     # as well, so reduce the post count for every user in the topic
-    if post == first_post:
+    if post.id == first_post.id:
         posts = ForumPost.query.join(ForumPost.topic) \
             .filter(ForumPost.deleted == False, ForumTopic.id == post.topic_id)
 
