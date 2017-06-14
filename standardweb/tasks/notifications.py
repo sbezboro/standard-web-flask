@@ -5,7 +5,7 @@ from sqlalchemy.orm import joinedload
 
 from standardweb import celery, db, app
 from standardweb.lib import api, email, notifications, realtime
-from standardweb.models import ForumPost, ForumTopicSubscription, Notification, Player, PlayerStats, User
+from standardweb.models import ForumBan, ForumPost, ForumTopicSubscription, Notification, Player, PlayerStats, User
 
 
 @celery.task()
@@ -32,6 +32,8 @@ def create_news_post_notifications_task(forum_post_id, email_all):
         Player.id, User.id
     ).outerjoin(
         User
+    ).outerjoin(
+        ForumBan, ForumBan.user_id == User.id
     ).join(
         PlayerStats
     ).filter(
@@ -42,6 +44,9 @@ def create_news_post_notifications_task(forum_post_id, email_all):
             ),
             User.email != None
         )
+    ).filter(
+        ForumBan.id == None,
+        Player.banned == False
     ).distinct(
         Player.id, User.id
     ).all()
