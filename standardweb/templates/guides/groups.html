@@ -24,14 +24,13 @@
         <p>
             You can lock a chest by looking at it and typing <code>/g lock</code> as long as it is not already locked. You will now own this lock and be the only one with access to it. Giving access to another group member is as simple as typing <code>/g lock add &lt;player name&gt;</code> while looking at the chest.
         </p>
-        <h3>Differences from Factions</h3>
-        <p>
-            Groups have no relations with one another (ie. allies or enemies). Anyone can attack each other at any time as long as they aren't in the same group. The amount of claims per group is only dependant on time, not member count or deaths, so this results in no possibility for over-claiming.
-        </p>
         <h3>Commands</h3>
         <p>
             Here are the available commands (<b>[L]</b> symbolizes commands only available to leaders, <b>[L, M]</b> for leaders and moderators):
             <ul class="soft-list">
+                <li><b>/g adjustmaxpower &lt;value&gt;</b> - Controls your group's max power and power damage</li>
+                <li><b>/g autolock [add/remove/public/info/unlock]</b> - Lock several blocks by punching them</li>
+                <li><b>/g autolock off</b> - Disable autolock</li>
                 <li><b>/g chat</b> - Switch chat modes between public chat and group chat</li>
                 <li><b>/g claim</b> - Claim the chunk you are in for your group <b>[L, M]</b></li>
                 <li><b>/g create &lt;group name&gt;</b> - Create a new group</li>
@@ -39,6 +38,8 @@
                 <li><b>/g info [group name]</b> - Show info about your group or another group</li>
                 <li><b>/g invite &lt;player name&gt;</b> - Invite another player to your group <b>[L, M]</b></li>
                 <li><b>/g friend &lt;group name&gt;</b> - Friend another group <b>[L]</b></li>
+                <li><b>/g gm &lt;message&gt;</b> - Set a message for your group members to see upon login<b>[L][M]</b></li>
+                <li><b>/g gm off</b> - Disable message shown to group members upon login<b>[L][M]</b></li>
                 <li><b>/g join &lt;group name&gt;</b> - Attempt to join a group</li>
                 <li><b>/g kick &lt;player name&gt;</b> - Kick a player from your group <b>[L, M]</b></li>
                 <li><b>/g leader &lt;player name&gt;</b> - Give another player leadership of your group <b>[L]</b></li>
@@ -51,6 +52,7 @@
                 <li><b>/g lock info</b> - Show info about a look that is being looked at</li>
                 <li><b>/g map</b> - Toggle the in-game map showing your orientation and nearby groups</li>
                 <li><b>/g mod &lt;player name&gt;</b> - Set a player as a group moderator <b>[L]</b></li>
+                <li><b>/g power &lt;group name&gt;</b> - Show a group's current power</li>
                 <li><b>/g rename &lt;new name&gt;</b> - Rename your group to a new name <b>[L, M]</b></li>
                 <li><b>/g show claims</b> - Show a list of your claims in the world <b>[L, M]</b></li>
                 <li><b>/g unclaim</b> - Unclaim the chunk you are in <b>[L, M]</b></li>
