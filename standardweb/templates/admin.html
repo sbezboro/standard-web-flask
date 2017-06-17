@@ -10,7 +10,7 @@
         <ul>
           {% for s in servers %}
             <li class="{% if server == s %}selected{% endif %}">
-              <a class="tooltip {% if not s.online %}disabled{% endif %}" href="{% if s.online %}/{{s.id}}/admin{% else %}#{% endif %}" title="{% if s.online %}Address: {% endif %}{{ s.address }}">{{ s.name }}</a>
+              <a class="tooltip {% if not s.online %}disabled{% endif %}" href="{% if s.online %}/{{s.id}}/admin{% else %}#{% endif %}" title="{% if s.online %}Address: {% endif %}{{ s.address }}">{{ s.abbreviation }}</a>
             </li>
           {% endfor %}
         </ul>

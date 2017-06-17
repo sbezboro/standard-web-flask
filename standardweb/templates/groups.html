@@ -9,7 +9,7 @@
             <ul>
                 {% for s in servers %}
                     <li class="{% if server == s %}selected{% endif %}">
-                        <a class="tooltip" href="{{ url_for('groups', server_id=s.id) }}" title="Address: {{ s.address }}">{{ s.name }}</a>
+                        <a class="tooltip" href="{{ url_for('groups', server_id=s.id) }}" title="Address: {{ s.address }}">{{ s.abbreviation }}</a>
                     </li>
                 {% endfor %}
             </ul>
