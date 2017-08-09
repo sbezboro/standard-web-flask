@@ -31,12 +31,16 @@ def login():
         if player:
             user = player.user
         else:
+            # TODO: check renames
             user = User.query.filter(
                 or_(User.username == username, User.email == username)
             ).first()
 
         if user and user.check_password(password):
-            session['user_id'] = user.id
+            if not user.session_key:
+                user.generate_session_key(commit=False)
+
+            session['user_session_key'] = user.session_key
             session.permanent = True
 
             if not user.last_login:
@@ -74,13 +78,15 @@ def login():
 
 @app.route('/verify-mfa', methods=['GET', 'POST'])
 def verify_mfa():
-    if not session.get('user_id'):
+    if not session.get('user_session_key'):
         abort(403)
 
     if session.get('mfa_stage') != 'password-verified':
         abort(403)
 
-    user = User.query.get(session['user_id'])
+    user = User.query.filter_by(
+        session_key=session['user_session_key']
+    ).first()
 
     if not user:
         abort(403)
@@ -126,7 +132,7 @@ def mfa_qr_code():
 
 @app.route('/logout')
 def logout():
-    session.pop('user_id', None)
+    session.pop('user_session_key', None)
     session.pop('mfa_stage', None)
 
     flash('Successfully logged out', 'success')
@@ -184,7 +190,7 @@ def create_account(token):
             }
         )
 
-        session.pop('user_id', None)
+        session.pop('user_session_key', None)
         g.user = None
 
     form = VerifyEmailForm()
@@ -220,7 +226,7 @@ def create_account(token):
                 player.banned = True
                 player.save(commit=True)
 
-            session['user_id'] = user.id
+            session['user_session_key'] = user.session_key
             session['first_login'] = True
             session.permanent = True
 
@@ -277,7 +283,7 @@ def reset_password(token):
         rollbar.report_message('User already logged in when resetting password',
                                level='warning', request=request)
 
-        session.pop('user_id', None)
+        session.pop('user_session_key', None)
         g.user = None
 
     form = ResetPasswordForm()
@@ -295,10 +301,10 @@ def reset_password(token):
 
             user.set_password(password, commit=False)
             user.last_login = datetime.utcnow()
+            user.generate_session_key(commit=False)
             user.save(commit=True)
 
-            session['user_id'] = user.id
-            session.permanent = True
+            session['user_session_key'] = user.session_key
 
             flash('Password reset', 'success')
 

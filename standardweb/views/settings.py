@@ -136,6 +136,11 @@ def change_password_settings():
             form.confirm_new_password.errors = ['Passwords do not match']
         else:
             user.set_password(new_password, commit=False)
+            user.generate_session_key(commit=False)
+
+            session['user_session_key'] = user.session_key
+            session.permanent = True
+
             user.save(commit=True)
 
             flash('Password changed', 'success')

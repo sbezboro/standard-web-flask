@@ -8,7 +8,7 @@ from flask import abort, flash, g, redirect, request, session, url_for
 import rollbar
 
 from standardweb import app, stats
-from standardweb.lib import api, csrf, geoip
+from standardweb.lib import csrf, geoip
 from standardweb.lib import helpers as h
 from standardweb.lib import player as libplayer
 from standardweb.models import User, ForumBan
@@ -18,7 +18,7 @@ from sqlalchemy.orm import joinedload
 
 @app.before_request
 def user_session():
-    if _is_not_static_request() and session.get('user_id'):
+    if _is_not_static_request() and session.get('user_session_key'):
         if session.get('mfa_stage') and session['mfa_stage'] != 'mfa-verified':
             g.user = None
         else:
@@ -26,7 +26,9 @@ def user_session():
                 joinedload(User.player)
             ).options(
                 joinedload(User.posttracking)
-            ).get(session['user_id'])
+            ).filter_by(
+                session_key=session['user_session_key']
+            ).first()
     else:
         g.user = None
 
@@ -86,7 +88,7 @@ def first_login():
     first_login = False
 
     if request.endpoint and 'static' not in request.endpoint \
-            and request.endpoint != 'face' and session.get('user_id'):
+            and request.endpoint != 'face' and session.get('user_session_key'):
         if 'first_login' in session:
             first_login = session.pop('first_login')
 

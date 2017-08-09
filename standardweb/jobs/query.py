@@ -166,8 +166,10 @@ def _query_server(server, mojang_status):
                 commit=False
             )
 
+    players = server_status.get('players', [])
     online_player_ids = []
-    for player_info in server_status.get('players', []):
+    players_to_nok_ban = []
+    for player_info in players:
         username = player_info['username']
         uuid = player_info['uuid']
 
@@ -229,7 +231,7 @@ def _query_server(server, mojang_status):
                 existing_player_ip.save(commit=False)
 
             if geoip.is_nok(ip):
-                libplayer.ban_player(player, with_ip=True, source='query', ip=ip, commit=False)
+                players_to_nok_ban.append((player, ip))
 
         stats = PlayerStats.query.filter_by(server=server, player=player).first()
         if not stats:
@@ -249,6 +251,10 @@ def _query_server(server, mojang_status):
             'rank': stats.rank,
             'titles': titles
         })
+
+    if len(players) and (float(len(players_to_nok_ban)) / float(len(players))) < 0.5:
+        for player, ip in players_to_nok_ban:
+            libplayer.ban_player(player, with_ip=True, source='query', ip=ip, commit=False)
 
     five_minutes_ago = datetime.utcnow() - timedelta(minutes=10)
     result = PlayerStats.query.filter(PlayerStats.server == server,

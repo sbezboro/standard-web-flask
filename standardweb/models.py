@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 import hashlib
 from operator import attrgetter
 import os
+import random
+import string
 from pbkdf2 import pbkdf2_bin
 import pytz
 import re
@@ -97,6 +99,7 @@ class User(db.Model, Base):
     score = db.Column(db.Numeric(), default=0)
     last_login = db.Column(db.DateTime, default=None)
     date_joined = db.Column(db.DateTime, default=datetime.utcnow)
+    session_key = db.Column(db.String(32))
 
     player = db.relationship('Player', backref=db.backref('user', uselist=False))
 
@@ -110,6 +113,8 @@ class User(db.Model, Base):
         user.set_password(plaintext_password)
         user.last_login = datetime.utcnow()
         user.email = email
+
+        user.generate_session_key(commit=False)
 
         user.save(commit=False)
 
@@ -223,6 +228,10 @@ class User(db.Model, Base):
             preference.save(commit=can_commit)
 
         return preference
+
+    def generate_session_key(self, commit=True):
+        self.session_key = ''.join(random.choice(string.ascii_lowercase + string.digits) for i in range(32))
+        self.save(commit=commit)
 
     @property
     def has_excellent_score(self):
@@ -444,7 +453,7 @@ class Server(db.Model, Base):
     abbreviation = db.Column(db.String(10))
     address = db.Column(db.String(50))
     online = db.Column(db.Boolean())
-    secret_key = db.Column(db.String(10))
+    secret_key = db.Column(db.String(64))
     type = db.Column(db.String(20))
 
     @classmethod
