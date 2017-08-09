@@ -139,7 +139,6 @@ def change_password_settings():
             user.generate_session_key(commit=False)
 
             session['user_session_key'] = user.session_key
-            session.permanent = True
 
             user.save(commit=True)
 
