@@ -16,7 +16,7 @@ MESSAGE_THROTTLE_PERIOD = 2  # hours
 
 
 def is_sender_spamming(user, to_user, to_player):
-    if app.config['DEBUG'] and False:
+    if app.config['DEBUG'] or user.admin_or_moderator:
         return False
 
     recent_unique_recipients = db.session.query(func.count(Message.to_player_id)).filter(

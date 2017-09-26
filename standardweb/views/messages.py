@@ -12,10 +12,12 @@ from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
 from standardweb import app, db, stats
+from standardweb.lib import forums as libforums
 from standardweb.lib import messages as libmessages
+from standardweb.lib import player as libplayer
 from standardweb.lib import realtime
 from standardweb.lib.notifier import notify_new_message, notify_message_read
-from standardweb.models import User, Player, Message
+from standardweb.models import ForumBan, Message, Player, User
 from standardweb.views.decorators.auth import login_required
 
 
@@ -209,10 +211,21 @@ def send_message(username):
             })
 
     if libmessages.is_sender_spamming(user, to_user, to_player):
+        can_post = libforums.can_user_post(user)
+
         rollbar.report_message('User blocked from spamming messages', request=request, extra_data={
             'to_user_id': to_user.id if to_user else None,
-            'to_player_id': to_player.id if to_player else None
+            'to_player_id': to_player.id if to_player else None,
+            'can-Post': can_post
         })
+
+        if not can_post and not user.forum_ban:
+            player = user.player
+            libplayer.ban_player(player, source='message_spamming', commit=False)
+
+            ban = ForumBan(user_id=user.id)
+            ban.save(commit=True)
+
         return jsonify({
             'err': 1,
             'message': 'Whoa there, you sent too many messages recently! Try sending a bit later.'
