@@ -24,7 +24,7 @@ ASSETS_AUTO_BUILD = False
 UGLIFYJS_EXTRA_ARGS = ['-c', '-m']
 
 FLASK_ASSETS_USE_CDN = True
-CDN_DOMAIN = 'd2rpyddsvhacm5.cloudfront.net'
+CDN_DOMAIN = 'standardsurvival.com'
 
 BLACKLIST_EMAIL_DOMAINS = set([])
 
