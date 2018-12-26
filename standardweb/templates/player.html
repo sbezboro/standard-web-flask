@@ -101,7 +101,8 @@
                     </div>
                 </div>
                 {% if player.user %}
-                    {% with profile = player.user.forum_profile, last_post = profile.last_post %}
+                    {% with profile = player.user.forum_profile %}
+                        {% set last_post = profile.last_post %}
                         {% if profile and profile.post_count and last_post %}
                             <br>
                             <div class="section-stat">

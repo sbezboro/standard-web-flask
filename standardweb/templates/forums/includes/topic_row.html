@@ -50,7 +50,8 @@
             </div>
         </td>
         <td class="last-post-cell">
-            {% with last_post = topic.last_post, last_post_user = last_post.user %}
+            {% with last_post = topic.last_post %}
+            {% set last_post_user = last_post.user %}
             <div>
                 <b>Last post:</b> <a href="{{ last_post.url }}">{{ last_post.created|from_now }}</a>
             </div>

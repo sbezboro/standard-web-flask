@@ -97,7 +97,8 @@
                     {% continue %}
                 {% endif %}
 
-                {% with args = request.args.copy(), tmp = args.pop('p', None) %}
+                {% with args = request.args.copy() %}
+                    {% set tmp = args.pop('p', None) %}
                     {% if p == page %}
                         <span>{{ p }}</span>
                     {% elif p != 1 %}
