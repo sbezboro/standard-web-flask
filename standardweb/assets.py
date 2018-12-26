@@ -1,4 +1,4 @@
-from flask.ext.assets import Bundle, Environment
+from flask_assets import Bundle, Environment
 from react.jsx import JSXTransformer
 from webassets.filter import Filter, register_filter
 

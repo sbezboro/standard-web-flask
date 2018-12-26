@@ -1,12 +1,11 @@
-from datetime import timedelta
 import socket
 import traceback
 
 from celery import Celery
 from celery.schedules import crontab
 from flask import Flask, g, got_request_exception, Request
-from flask.ext.cdn import CDN
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_cdn import CDN
+from flask_sqlalchemy import SQLAlchemy
 from kombu import Queue, Exchange
 import rollbar
 from rollbar.contrib.flask import report_exception
