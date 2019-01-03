@@ -59,10 +59,14 @@ _ansi_mc_map = {
     u"\xa7r": u"\x1B[39;0m",    # Reset r
 }
 
+_ansi_mc_map_regexp = {}
+for code in _ansi_mc_map:
+    _ansi_mc_map_regexp[code] = re.compile(re.escape(code), re.IGNORECASE)
+
 
 def ansi_to_html(ansi):
     for code in _ansi_mc_map:
-        ansi = ansi.replace(code, _ansi_mc_map[code])
+        ansi = _ansi_mc_map_regexp[code].sub(_ansi_mc_map[code], ansi)
     html = _ansi_converter.convert(ansi, full=False)
     count = html.count('<span') - html.count('</span')
     return '<span class="ansi-container">' + html + ('</span>' * count) + '</span>'
