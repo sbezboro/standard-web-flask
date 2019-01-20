@@ -150,7 +150,7 @@ def messages_json(username):
         joinedload(Message.to_player)
     ).order_by(
         Message.sent_at.desc()
-    ).limit(40).all()
+    ).limit(200).all()
 
     Message.query.filter(
         recipient_filter,
