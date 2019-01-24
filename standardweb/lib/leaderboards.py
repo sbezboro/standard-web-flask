@@ -72,7 +72,7 @@ def get_leaderboard_data(server):
     _get_ore_leaderboards(server, 'EMERALD_ORE', 'Emerald Ore Discoveries', ore_leaderboards)
     _get_ore_leaderboards(server, 'LAPIS_ORE', 'Lapis Ore Discoveries', ore_leaderboards)
     _get_ore_leaderboards(server, 'REDSTONE_ORE', 'Redstone Ore Discoveries', ore_leaderboards)
-    _get_ore_leaderboards(server, 'QUARTZ_ORE', 'Quartz Ore Discoveries', ore_leaderboards)
+    _get_ore_leaderboards(server, 'NETHER_QUARTZ_ORE', 'Quartz Ore Discoveries', ore_leaderboards)
     _get_ore_leaderboards(server, 'COAL_ORE', 'Coal Ore Discoveries', ore_leaderboards)
 
     return kill_leaderboards, ore_leaderboards
