@@ -31,6 +31,8 @@
 
       $(window).on('popstate', this.handlePopState);
 
+      $(document).on('mousemove', this.handlePotentialReadInput);
+
       StandardWeb.realtime.subscribe('user', function (error, socket) {
         if (error) {
           return;
@@ -139,7 +141,7 @@
       this.selectContact(contact);
     },
 
-    handleReplyKeyDown: function() {
+    handlePotentialReadInput: function() {
       var contact = this.getContact(this.state.selectedUsername);
 
       if (contact && contact.new_message) {
@@ -278,7 +280,7 @@
             mode={this.state.mode}
             messages={this.state.messages}
             onSendMessage={this.handleSendMessage}
-            onReplyKeyDown={this.handleReplyKeyDown}
+            onReplyKeyDown={this.handlePotentialReadInput}
             onNewMessageToUser={this.handleNewMessageToUser}
           />
         </div>

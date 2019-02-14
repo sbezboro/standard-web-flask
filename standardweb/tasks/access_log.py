@@ -1,5 +1,9 @@
+import re
+
 from standardweb import celery
 from standardweb.models import AccessLog
+
+_crawler_pat = re.compile('bot/|googlebot/|crawler|spider', re.IGNORECASE)
 
 
 @celery.task()
@@ -7,7 +11,10 @@ def log(
         client_uuid, user_id, method, route, request_path, request_referrer,
         response_code, response_time, user_agent, ip_address
 ):
-    log = AccessLog(
+    if _crawler_pat.search(user_agent):
+        return
+
+    access_log = AccessLog(
         client_uuid=client_uuid,
         user_id=user_id,
         method=method,
@@ -20,4 +27,4 @@ def log(
         ip_address=ip_address
     )
 
-    log.save(commit=True)
+    access_log.save(commit=True)
