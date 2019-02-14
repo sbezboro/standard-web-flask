@@ -47,7 +47,7 @@
                             {% endif %}
                             {% if player.user %}
                                 {% if player.user.forum_ban %}
-                                    Forum banned
+                                    <a class="btn btn-lite confirm" href="{{ url_for('forum_unban', user_id=player.user.id) }}">Forum Unban</a>
                                 {% else %}
                                     <a class="btn btn-lite btn-danger confirm" href="{{ url_for('forum_ban', user_id=player.user.id) }}">Forum Ban</a>
                                 {% endif %}

@@ -883,6 +883,8 @@ class AuditLog(db.Model, Base):
     PLAYER_UNBAN = 'player_unban'
     QUICK_USER_CREATE = 'quick_user_create'
     INVALID_LOGIN = 'invalid_login'
+    USER_FORUM_BAN = 'user_forum_ban'
+    USER_FORUM_UNBAN = 'user_forum_unban'
 
     @classmethod
     def create(cls, type, data=None, server_id=None, user_id=None, player_id=None, commit=True, **kw):

@@ -798,14 +798,48 @@ def all_topics_read():
 @app.route('/forums/ban')
 @login_required(only_moderator=True)
 def forum_ban():
-    user = g.user
+    by_user = g.user
 
     user_id = request.args['user_id']
 
-    ban = ForumBan(user_id=user_id, by_user_id=user.id)
+    AuditLog.create(
+        AuditLog.USER_FORUM_BAN,
+        user_id=user_id,
+        by_user_id=by_user.id,
+        commit=False
+    )
+
+    ban = ForumBan(user_id=user_id, by_user_id=by_user.id)
     ban.save(commit=True)
 
     flash('User banned from forums', 'success')
+
+    return redirect(request.referrer)
+
+
+@app.route('/forums/unban')
+@login_required(only_moderator=True)
+def forum_unban():
+    by_user = g.user
+
+    user_id = request.args['user_id']
+
+    ban = ForumBan.query.filter_by(user_id=user_id).first()
+
+    if not ban:
+        flash('User not forum banned', 'error')
+        return redirect(request.referrer)
+
+    AuditLog.create(
+        AuditLog.USER_FORUM_UNBAN,
+        user_id=user_id,
+        by_user_id=by_user.id,
+        commit=False
+    )
+
+    db.session.delete(ban)
+
+    flash('User unbanned from forums', 'success')
 
     return redirect(request.referrer)
 
