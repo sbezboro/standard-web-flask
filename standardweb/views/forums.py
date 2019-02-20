@@ -838,6 +838,7 @@ def forum_unban():
     )
 
     db.session.delete(ban)
+    db.session.commit()
 
     flash('User unbanned from forums', 'success')
 
