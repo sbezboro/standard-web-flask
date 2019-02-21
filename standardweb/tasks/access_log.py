@@ -11,7 +11,7 @@ def log(
         client_uuid, user_id, method, route, request_path, request_referrer,
         response_code, response_time, user_agent, ip_address
 ):
-    if _crawler_pat.search(user_agent):
+    if user_agent and _crawler_pat.search(user_agent):
         return
 
     access_log = AccessLog(
