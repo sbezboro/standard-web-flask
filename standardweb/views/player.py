@@ -74,28 +74,6 @@ def player(username, server_id=None):
     retval.update(data)
 
     if user and user.admin_or_moderator:
-        ip_tracking_list = IPTracking.query.filter_by(
-            player=player
-        ).distinct(
-            IPTracking.ip
-        ).order_by(IPTracking.timestamp.desc()).all()
-
-        ip_addresses = [ip_tracking.ip for ip_tracking in ip_tracking_list]
-
-        same_ip_player_list = Player.query.join(
-            IPTracking
-        ).filter(
-            IPTracking.ip.in_(ip_addresses),
-            IPTracking.player != player
-        ).distinct(
-            IPTracking.player_id
-        ).order_by(IPTracking.timestamp.desc()).all()
-
-        retval.update({
-            'ip_tracking_list': ip_tracking_list,
-            'same_ip_player_list': same_ip_player_list
-        })
-
         if player.banned:
             latest_audit = player.audit_logs.filter(
                 AuditLog.player == player,
@@ -117,6 +95,29 @@ def player(username, server_id=None):
                     retval['ban_source'] = latest_audit.data['source']
                 elif 'spam' in latest_audit.type:
                     retval['ban_source'] = 'spam'
+
+        if user.admin:
+            ip_tracking_list = IPTracking.query.filter_by(
+                player=player
+            ).distinct(
+                IPTracking.ip
+            ).order_by(IPTracking.timestamp.desc()).all()
+
+            ip_addresses = [ip_tracking.ip for ip_tracking in ip_tracking_list]
+
+            same_ip_player_list = Player.query.join(
+                IPTracking
+            ).filter(
+                IPTracking.ip.in_(ip_addresses),
+                IPTracking.player != player
+            ).distinct(
+                IPTracking.player_id
+            ).order_by(IPTracking.timestamp.desc()).all()
+
+            retval.update({
+                'ip_tracking_list': ip_tracking_list,
+                'same_ip_player_list': same_ip_player_list
+            })
 
     return render_template(template, **retval)
 
