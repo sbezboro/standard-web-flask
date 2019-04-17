@@ -107,6 +107,10 @@ class User(db.Model, Base):
     def admin_or_moderator(self):
         return self.admin or self.moderator
 
+    @property
+    def ip_lookup_whitelist(self):
+        return self.id in app.config['IP_LOOKUP_WHITELIST']
+
     @classmethod
     def create(cls, player, plaintext_password, email):
         user = cls(player=player, uuid=player.uuid)

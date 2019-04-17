@@ -39,6 +39,8 @@ ABYSMAL_SCORE_THRESHOLD = -3.0
 
 MINIMUM_FORUM_POST_PLAYER_TIME = 1440
 
+IP_LOOKUP_WHITELIST = set([])
+
 try:
     from local_settings import *
 except ImportError:

@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import abort, g, render_template
 from sqlalchemy.orm import joinedload
 
 from standardweb import app
@@ -7,8 +7,13 @@ from standardweb.views.decorators.auth import login_required
 
 
 @app.route('/ip/<address>')
-@login_required(only_admin=True)
+@login_required(only_moderator=True)
 def ip_lookup(address):
+    user = g.user
+
+    if user.moderator and not user.ip_lookup_whitelist:
+        abort(403)
+
     ip_tracking_list = IPTracking.query.options(
         joinedload(IPTracking.player)
     ).join(Player).filter(

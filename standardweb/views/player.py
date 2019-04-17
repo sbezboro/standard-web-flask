@@ -96,7 +96,7 @@ def player(username, server_id=None):
                 elif 'spam' in latest_audit.type:
                     retval['ban_source'] = 'spam'
 
-        if user.admin:
+        if user.admin or user.ip_lookup_whitelist:
             ip_tracking_list = IPTracking.query.filter_by(
                 player=player
             ).distinct(
