@@ -41,27 +41,25 @@ MINIMUM_FORUM_POST_PLAYER_TIME = 1440
 
 IP_LOOKUP_WHITELIST = set([])
 
-# entity identifier, label
 KILL_LEADERBOARDS = (
-    ('creeper', 'Creeper Kills'),
-    ('witch', 'Witch Kills'),
-    ('bat', 'Bat Kills'),
-    ('squid', 'Squid Kills'),
-    ('wither', 'Wither Kills'),
-    ('ghast', 'Ghast Kills'),
-    ('enderdragon', 'Ender Dragon Kills'),
-    ('elderguardian', 'Elder Guardian Kills'),
-    ('shulker', 'Shulker Kills'),
+    'creeper',
+    'witch',
+    'bat',
+    'squid',
+    'wither',
+    'ghast',
+    'enderdragon',
+    'elderguardian',
+    'shulker',
 )
 
-# meterial identifier, label
 ORE_LEADERBOARDS = (
-    ('DIAMOND_ORE', 'Diamond Ore Discoveries'),
-    ('EMERALD_ORE', 'Emerald Ore Discoveries'),
-    ('LAPIS_ORE', 'Lapis Ore Discoveries'),
-    ('REDSTONE_ORE', 'Redstone Ore Discoveries'),
-    ('NETHER_QUARTZ_ORE', 'Quartz Ore Discoveries'),
-    ('COAL_ORE', 'Coal Ore Discoveries'),
+    'DIAMOND_ORE',
+    'EMERALD_ORE',
+    'LAPIS_ORE',
+    'REDSTONE_ORE',
+    'NETHER_QUARTZ_ORE',
+    'COAL_ORE',
 )
 
 try:

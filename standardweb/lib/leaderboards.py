@@ -63,10 +63,19 @@ def get_leaderboard_data(server):
     kill_leaderboards = []
     ore_leaderboards = []
 
-    for identifier, label in app.config['KILL_LEADERBOARDS']:
-        _get_kill_leaderboards(server, identifier, label, kill_leaderboards)
+    kill_identifiers = app.config['KILL_LEADERBOARDS']
+    material_identifiers = app.config['ORE_LEADERBOARDS']
 
-    for identifier, label in app.config['ORE_LEADERBOARDS']:
-        _get_ore_leaderboards(server, identifier, label, ore_leaderboards)
+    kill_types = KillType.query.all()
+    kill_type_name_map = {kill_type.type: kill_type.displayname for kill_type in kill_types}
+
+    material_types = MaterialType.query.all()
+    meterial_type_name_map = {material_type.type: material_type.displayname for material_type in material_types}
+
+    for identifier in kill_identifiers:
+        _get_kill_leaderboards(server, identifier, '%s Kills' % kill_type_name_map[identifier], kill_leaderboards)
+
+    for identifier in material_identifiers:
+        _get_ore_leaderboards(server, identifier, '%s Discoveries' % meterial_type_name_map[identifier], ore_leaderboards)
 
     return kill_leaderboards, ore_leaderboards
