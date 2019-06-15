@@ -51,6 +51,7 @@ KILL_LEADERBOARDS = (
     'enderdragon',
     'elderguardian',
     'shulker',
+    'drowned',
 )
 
 ORE_LEADERBOARDS = (
