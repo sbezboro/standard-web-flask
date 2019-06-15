@@ -1,5 +1,6 @@
 from sqlalchemy.orm import joinedload
 
+from standardweb import app
 from standardweb.lib import cache
 from standardweb.models import KillType, KillCount, MaterialType, OreDiscoveryCount
 
@@ -62,17 +63,10 @@ def get_leaderboard_data(server):
     kill_leaderboards = []
     ore_leaderboards = []
 
-    _get_kill_leaderboards(server, 'creeper', 'Creeper Kills', kill_leaderboards)
-    _get_kill_leaderboards(server, 'witch', 'Witch Kills', kill_leaderboards)
-    _get_kill_leaderboards(server, 'bat', 'Bat Kills', kill_leaderboards)
-    _get_kill_leaderboards(server, 'wither', 'Wither Kills', kill_leaderboards)
-    _get_kill_leaderboards(server, 'ghast', 'Ghast Kills', kill_leaderboards)
-    _get_kill_leaderboards(server, 'enderdragon', 'Ender Dragon Kills', kill_leaderboards)
-    _get_ore_leaderboards(server, 'DIAMOND_ORE', 'Diamond Ore Discoveries', ore_leaderboards)
-    _get_ore_leaderboards(server, 'EMERALD_ORE', 'Emerald Ore Discoveries', ore_leaderboards)
-    _get_ore_leaderboards(server, 'LAPIS_ORE', 'Lapis Ore Discoveries', ore_leaderboards)
-    _get_ore_leaderboards(server, 'REDSTONE_ORE', 'Redstone Ore Discoveries', ore_leaderboards)
-    _get_ore_leaderboards(server, 'NETHER_QUARTZ_ORE', 'Quartz Ore Discoveries', ore_leaderboards)
-    _get_ore_leaderboards(server, 'COAL_ORE', 'Coal Ore Discoveries', ore_leaderboards)
+    for identifier, label in app.config['KILL_LEADERBOARDS']:
+        _get_kill_leaderboards(server, identifier, label, kill_leaderboards)
+
+    for identifier, label in app.config['ORE_LEADERBOARDS']:
+        _get_ore_leaderboards(server, identifier, label, ore_leaderboards)
 
     return kill_leaderboards, ore_leaderboards
