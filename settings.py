@@ -50,7 +50,8 @@ KILL_LEADERBOARDS = (
     ('wither', 'Wither Kills'),
     ('ghast', 'Ghast Kills'),
     ('enderdragon', 'Ender Dragon Kills'),
-    ('elderguardian', 'Elder Guardian Kills')
+    ('elderguardian', 'Elder Guardian Kills'),
+    ('shulker', 'Shulker Kills'),
 )
 
 # meterial identifier, label
