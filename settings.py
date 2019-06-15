@@ -46,9 +46,11 @@ KILL_LEADERBOARDS = (
     ('creeper', 'Creeper Kills'),
     ('witch', 'Witch Kills'),
     ('bat', 'Bat Kills'),
+    ('squid', 'Squid Kills'),
     ('wither', 'Wither Kills'),
     ('ghast', 'Ghast Kills'),
     ('enderdragon', 'Ender Dragon Kills'),
+    ('elderguardian', 'Elder Guardian Kills')
 )
 
 # meterial identifier, label
