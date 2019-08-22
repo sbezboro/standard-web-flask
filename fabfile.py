@@ -3,7 +3,6 @@ import logging
 from fabric.api import abort, run, local, cd, env, roles, execute, prefix
 import requests
 from webassets.script import CommandLineEnvironment
-from werkzeug import script
 
 from standardweb import app
 from standardweb.assets import env as assets_env
@@ -36,7 +35,9 @@ def serve():
 
 
 def shell():
-    script.make_shell(lambda: {'app': app}, use_ipython=True)()
+    from IPython.frontend.terminal.embed import InteractiveShellEmbed
+    sh = InteractiveShellEmbed.instance(banner1="standard-web-flask shell")
+    sh(local_ns={'application': app})
 
 
 def build_assets():
