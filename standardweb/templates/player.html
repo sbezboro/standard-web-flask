@@ -34,7 +34,7 @@
                                 {% if ban_by_user %} | Ban given by: <b>
                                     {% if ban_by_user.player %}
                                         <a href="{{ url_for('player', server_id=server.id, username=ban_by_user.player.username) }}">
-                                            {{ ban_by_user.player.username|face_thumb(scaled_size=12) }}
+                                            {{ ban_by_user.player.uuid|face_thumb(scaled_size=12) }}
                                             {{ ban_by_user.player.displayname_html|safe }}
                                         </a>
                                     {% else %}
@@ -61,7 +61,7 @@
                         <a class="btn btn-lite" href="{{ url_for('messages', username=player.username) }}">Send Message</a>
                     {% endif %}
                 </div>
-                {{ player.username|face_large }}
+                {{ player.uuid|face_large }}
                 <div class="player-detail">
                     <h2>
                         {{ player.displayname_html|safe }}
@@ -300,7 +300,7 @@
                 <div class="stat-name">
                     {% if value.player %}
                         <a href="{{ url_for('player', server_id=server.id, username=value.player.username) }}">
-                            {{ value.player.username|face_thumb(scaled_size=12) }}
+                            {{ value.player.uuid|face_thumb(scaled_size=12) }}
                             {{ value.player.displayname_html|safe }}
                         </a>
                     {% else %}

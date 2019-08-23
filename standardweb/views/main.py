@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from datetime import timedelta
 import os
@@ -147,8 +148,8 @@ def leaderboards(server_id=None):
     return render_template('leaderboards.html', **retval)
 
 
-def _face_last_modified(username, size=16):
-    path = '%s/standardweb/faces/%s/%s.png' % (PROJECT_PATH, size, username)
+def _face_last_modified(uuid, size=16):
+    path = '%s/standardweb/faces/%s/%s.png' % (PROJECT_PATH, size, uuid.replace('-', ''))
 
     try:
         return datetime.utcfromtimestamp(os.path.getmtime(path))
@@ -157,19 +158,21 @@ def _face_last_modified(username, size=16):
 
 
 @redirect_route('/faces/<username>.png')
-@redirect_route('/faces/<int:size>/<username>.png')
-@app.route('/face/<username>.png')
-@app.route('/face/<int:size>/<username>.png')
+@redirect_route('/faces/<int:size>/<uuid>.png')
+@app.route('/face/<uuid>.png')
+@app.route('/face/<int:size>/<uuid>.png')
 @last_modified(_face_last_modified)
-def face(username, size=16):
+def face(uuid, size=16):
     size = int(size)
 
     if size not in (16, 64):
         abort(404)
 
-    path = '%s/standardweb/faces/%s/%s.png' % (PROJECT_PATH, size, username)
+    uuid = uuid.replace('-', '')
 
-    url = 'http://skins.minecraft.net/MinecraftSkins/%s.png' % username
+    path = '%s/standardweb/faces/%s/%s.png' % (PROJECT_PATH, size, uuid)
+
+    profile_url = 'https://sessionserver.mojang.com/session/minecraft/profile/%s' % uuid
 
     image = None
 
@@ -178,22 +181,39 @@ def face(username, size=16):
     except Exception:
         file_date = None
 
+    # if the image exists on disk already and it's not too old, just load it
     if file_date and datetime.utcnow() - file_date < timedelta(hours=12):
         image = Image.open(path)
+    # otherwise query the player's profile through the mojang api and get the skin url
     else:
         try:
-            resp = requests.get(url, timeout=1)
-        except Exception:
+            resp = requests.get(profile_url)
+
+            # rate limited, don't save default image to disk in this case
+            if resp.status_code == 429:
+                return send_file(_write_face_img_result(_get_default_skin(size)), mimetype="image/png")
+
+            result = resp.json()
+        except:
             pass
         else:
-            if resp.status_code == 200:
-                image = libplayer.extract_face(Image.open(StringIO.StringIO(resp.content)), size)
-                image.save(path, optimize=True)
+            properties = result.get('properties', [])
 
-                try:
-                    subprocess.Popen(['optipng', path], stderr=subprocess.PIPE)
-                except OSError:
-                    rollbar.report_exc_info(request=request)
+            for property in properties:
+                if property and property.get('name') == 'textures':
+                    value = property['value'].decode('base64')
+                    value_dict = json.loads(value)
+                    skin_url = value_dict.get('textures', {}).get('SKIN', {}).get('url')
+
+                    if skin_url:
+                        try:
+                            resp = requests.get(skin_url, timeout=1)
+                        except Exception:
+                            pass
+                        else:
+                            if resp.status_code == 200:
+                                images = _save_skin_images(resp.content, uuid)
+                                image = images[size]
 
     if not image:
         try:
@@ -203,14 +223,42 @@ def face(username, size=16):
             pass
 
     if not image:
-        image = libplayer.extract_face(Image.open(PROJECT_PATH + '/standardweb/static/images/char.png'), size)
+        image = _get_default_skin(size)
         image.save(path)
 
+    return send_file(_write_face_img_result(image), mimetype="image/png")
+
+
+def _write_face_img_result(image):
     tmp = StringIO.StringIO()
     image.save(tmp, 'PNG', optimize=True)
     tmp.seek(0)
+    return tmp
 
-    return send_file(tmp, mimetype="image/png")
+
+def _get_default_skin(size):
+    return libplayer.extract_face(Image.open(PROJECT_PATH + '/standardweb/static/images/char.png'), size)
+
+
+def _save_skin_images(image, uuid):
+    return {
+        16: _save_skin_image(image, 16, uuid),
+        64: _save_skin_image(image, 64, uuid)
+    }
+
+
+def _save_skin_image(image_content, size, uuid):
+    path = '%s/standardweb/faces/%s/%s.png' % (PROJECT_PATH, size, uuid)
+
+    image = libplayer.extract_face(Image.open(StringIO.StringIO(image_content)), size)
+    image.save(path, optimize=True)
+
+    try:
+        subprocess.Popen(['optipng', path], stderr=subprocess.PIPE)
+    except OSError:
+        rollbar.report_exc_info(request=request)
+
+    return image
 
 
 @app.route('/chat')

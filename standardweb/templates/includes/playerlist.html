@@ -8,7 +8,7 @@
         <div>
           <a href="{{url_for('player', username=player.username, server_id=stats.server_id)}}">
             <span>
-              {{ player.username|face_thumb }}
+              {{ player.uuid|face_thumb }}
               {{ player.displayname_html|safe }}
             </span>
           </a>

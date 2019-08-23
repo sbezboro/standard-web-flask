@@ -41,7 +41,7 @@
                     <h2>Members</h2>
                     <h3>Leader</h3>
                     <a href="{{ url_for('player', server_id=server.id, username=leader.username) }}">
-                        {{ leader.username|face_thumb }}
+                        {{ leader.uuid|face_thumb }}
                         {{ leader.displayname_html|safe }}
                     </a>
 
@@ -49,7 +49,7 @@
                         <h3>Moderators</h3>
                         {% for moderator in moderators %}
                             <a href="{{ url_for('player', server_id=server.id, username=moderator.username) }}">
-                                {{ moderator.username|face_thumb }}
+                                {{ moderator.uuid|face_thumb }}
                                 {{ moderator.displayname_html|safe }}
                             </a>
                             <br>
@@ -60,7 +60,7 @@
                         <h3>Others</h3>
                         {% for member in members %}
                             <a href="{{ url_for('player', server_id=server.id, username=member.username) }}">
-                                {{ member.username|face_thumb }}
+                                {{ member.uuid|face_thumb }}
                                 {{ member.displayname_html|safe }}
                             </a>
                             <br>

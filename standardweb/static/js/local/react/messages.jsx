@@ -520,7 +520,7 @@
           <div className="contact">
             {contact.player_id ? (
               <div>
-                <img src={'/face/16/' + contact.username + '.png'} className="face-thumb" width="16" height="16" alt={contact.username}>
+                <img src={'/face/16/' + contact.uuid + '.png'} className="face-thumb" width="16" height="16" alt={contact.username}>
                 </img> <span dangerouslySetInnerHTML={{__html: contact.displayname_html}}/>
                 {contact.nickname ? '(' + contact.username + ')' : ''}
               </div>
@@ -595,7 +595,7 @@
         return (
           <h4>
             <a href={'/player/' + fromUser.player.uuid}>
-              <img src={'/face/16/' + fromUser.player.username + '.png'} className="face-thumb" width="16" height="16" alt={fromUser.player.username}>
+              <img src={'/face/16/' + fromUser.player.uuid + '.png'} className="face-thumb" width="16" height="16" alt={fromUser.player.username}>
               </img> <span dangerouslySetInnerHTML={{__html: fromUser.player.displayname_html}}></span>
             </a> {fromUser.player.nickname ? '(' + fromUser.player.username + ')' : ''}
           </h4>

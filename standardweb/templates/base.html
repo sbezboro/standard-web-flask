@@ -111,7 +111,7 @@
                             <div class="dropdown">
                                 {% if current_user.player %}
                                     <a class="{% block select_player %}{% endblock %} toggle" href="#">
-                                        {{ current_user.player.username|face_thumb }}{{ current_user.player.username }}
+                                        {{ current_user.player.uuid|face_thumb }}{{ current_user.player.username }}
                                         <span class="caret"></span>
                                     </a>
                                 {% else %}

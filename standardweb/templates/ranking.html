@@ -27,7 +27,7 @@
                 </td>
                 <td class="username">
                     <a href="/{{ server.id }}/player/{{ player.username }}">
-                        {{ player.username|face_thumb }}
+                        {{ player.uuid|face_thumb }}
                         {{ player.displayname_html|safe }}
                     </a>
                     {% if online_now %}

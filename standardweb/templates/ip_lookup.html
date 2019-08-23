@@ -10,7 +10,7 @@
         {% for ip_tracking in ip_tracking_list %}
             <li>
                 <a href="{{ url_for('player', username=ip_tracking.player.username) }}">
-                    {{ ip_tracking.player.username|face_thumb }}
+                    {{ ip_tracking.player.uuid|face_thumb }}
                     {{ ip_tracking.player.displayname_html|safe }}
                     {% if ip_tracking.player.nickname %}
                         ({{ ip_tracking.player.username }})

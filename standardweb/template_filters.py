@@ -5,22 +5,22 @@ from jinja2.nodes import Markup
 from standardweb import app
 
 
-def _face_image(username, size, scaled_size=None):
+def _face_image(uuid, size, scaled_size=None):
     scaled_size = scaled_size or size
 
     cls = 'face-thumb' if size == 16 else 'face-large'
-    return '<img src="/face/%(size)d/%(username)s.png" class="%(cls)s" width="%(scaled_size)d" height="%(scaled_size)d" alt="%(username)s">' \
-           % {'size': size, 'scaled_size': scaled_size, 'cls': cls, 'username': username}
+    return '<img src="/face/%(size)d/%(uuid)s.png" class="%(cls)s" width="%(scaled_size)d" height="%(scaled_size)d">' \
+           % {'size': size, 'scaled_size': scaled_size, 'cls': cls, 'uuid': uuid}
 
 
 @app.template_filter('face_thumb')
-def face_thumb(username, scaled_size=16):
-    return Markup(_face_image(username, 16, scaled_size=scaled_size))
+def face_thumb(uuid, scaled_size=16):
+    return Markup(_face_image(uuid, 16, scaled_size=scaled_size))
 
 
 @app.template_filter('face_large')
-def face_large(username):
-    return Markup(_face_image(username, 64))
+def face_large(uuid):
+    return Markup(_face_image(uuid, 64))
 
 
 @app.template_filter('from_now')

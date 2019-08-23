@@ -131,6 +131,7 @@
       var username = user.username;
       var nickname = user.nickname;
       var address = user.address;
+      var uuid = user.uuid;
 
       var displayName = (nickname ? nickname : username);
 
@@ -142,7 +143,7 @@
       return (
         <div key={'cell-' + cellNum} className={'col-1-4 player-cell ' + activeClass}>
           <a href={'/' + StandardWeb.chat.serverId + '/player/' + username} target="_blank">
-            <span><img className="face-thumb" src={'/face/16/' + username + '.png'}/>{displayName}</span>
+            <span><img className="face-thumb" src={'/face/16/' + uuid + '.png'}/>{displayName}</span>
           </a>
           <span className="address">{address ? address : ''}</span>
         </div>

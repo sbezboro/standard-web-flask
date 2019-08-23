@@ -9,7 +9,7 @@
             {% else %}
                 {% if message.from_user.player %}
                     <a href="{{ url_for('player', username=message.from_user.player.username) }}">
-                        {{ message.from_user.player.username|face_thumb }}
+                        {{ message.from_user.player.uuid|face_thumb }}
                         {{ message.from_user.player.displayname_html|safe }}
                     </a>
                     {% if message.from_user.player.nickname %}

@@ -15,7 +15,7 @@
             <div class="description">
                 {% if topic.user.player %}
                     <a href="{{ url_for('player', username=topic.user.player.username) }}">
-                        {{ topic.user.player.username|face_thumb }} {{ topic.user.player.displayname_html|safe }}
+                        {{ topic.user.player.uuid|face_thumb }} {{ topic.user.player.displayname_html|safe }}
                     </a>
                 {% else %}
                     {{ topic.user.username }}
@@ -58,7 +58,7 @@
             <div>
                 {% if last_post_user.player %}
                     <a href="{{ url_for('player', username=last_post_user.player.username) }}">
-                        {{ last_post_user.player.username|face_thumb }} {{ last_post_user.player.displayname_html|safe }}
+                        {{ last_post_user.player.uuid|face_thumb }} {{ last_post_user.player.displayname_html|safe }}
                     </a>
                 {% else %}
                     {{ last_post_user.username }}

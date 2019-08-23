@@ -218,7 +218,7 @@
       return (
         <a href={'/player/' + user.uuid} target="_blank">
           <div className={'user ' + activeClass}>
-            <img className="face-thumb" src={'/face/16/' + user.username + '.png'} />
+            <img className="face-thumb" src={'/face/16/' + user.uuid + '.png'} />
             {displayName}
             <span className="address">{address ? address : ''}</span>
           </div>
@@ -242,7 +242,7 @@
       return (
         <a href="#" onClick={this.handlePlayerClick}>
           <div className={'player ' + (this.props.selected ? 'selected' : '')}>
-            <img className="face-thumb" src={'/face/16/' + player.username + '.png'} />
+            <img className="face-thumb" src={'/face/16/' + player.uuid + '.png'} />
             <span className="ansi-container" dangerouslySetInnerHTML={{__html: displayName}}></span>
             <span className="rank">{'#' + player.rank}</span>
           </div>
@@ -303,7 +303,7 @@
             <a className="close" href="#" onClick={this.handleClose}>
               <i className="fa fa-times"></i>
             </a>
-            <img className="face" src={'/face/64/' + player.username + '.png'} />
+            <img className="face" src={'/face/64/' + player.uuid + '.png'} />
             <h3 className="display-name">
               <a className="link" target="_blank" href={'/' + this.props.serverId + '/player/' + player.username}>
                 {displayname}

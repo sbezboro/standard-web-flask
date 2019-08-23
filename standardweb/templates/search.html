@@ -20,7 +20,7 @@
             {% for player in results %}
                 <li>
                     <a href="{{ url_for('player', username=player.username) }}">
-                        {{ player.username|face_thumb }}
+                        {{ player.uuid|face_thumb }}
                         {{ player.displayname_html|safe }}
                         {% if player.nickname %}
                             ({{ player.username }})

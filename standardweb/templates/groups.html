@@ -36,7 +36,7 @@
                                 </h4>
                                 {% for member in group.members %}
                                     <a class="tooltip" href="{{ url_for('player', server_id=server.id, username=member.username) }}" title="{{ member.displayname }}">
-                                        {{ member.username|face_thumb }}
+                                        {{ member.uuid|face_thumb }}
                                     </a>
                                 {% endfor %}
                             </td>

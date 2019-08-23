@@ -19,7 +19,7 @@
                  data-username="{{ post.user.player.username if post.user.player else post.user.username }}">
                 {% if post.user.player %}
                     <a href="{{ url_for('player', username=post.user.player.username) }}">
-                        {{ post.user.player.username | face_large }}
+                        {{ post.user.player.uuid | face_large }}
                     </a>
                     <div class="post-author-details">
                         <h5>
