@@ -11,7 +11,7 @@ import rollbar
 import StringIO
 
 from standardweb import app
-from standardweb.lib import leaderboards as libleaderboards
+from standardweb.lib import leaderboards as libleaderboards, mojang, exceptions
 from standardweb.lib import player as libplayer
 from standardweb.lib import server as libserver
 from standardweb.models import Server, ServerStatus, MojangStatus
@@ -172,8 +172,6 @@ def face(uuid, size=16):
 
     path = '%s/standardweb/faces/%s/%s.png' % (PROJECT_PATH, size, uuid)
 
-    profile_url = 'https://sessionserver.mojang.com/session/minecraft/profile/%s' % uuid
-
     image = None
 
     try:
@@ -187,17 +185,14 @@ def face(uuid, size=16):
     # otherwise query the player's profile through the mojang api and get the skin url
     else:
         try:
-            resp = requests.get(profile_url)
-
+            profile = mojang.get_player_profile(uuid)
+        except exceptions.RemoteRateLimitException:
             # rate limited, don't save default image to disk in this case
-            if resp.status_code == 429:
-                return send_file(_write_face_img_result(_get_default_skin(size)), mimetype="image/png")
-
-            result = resp.json()
+            return send_file(_write_face_img_result(_get_default_skin(size)), mimetype="image/png")
         except:
             pass
         else:
-            properties = result.get('properties', [])
+            properties = profile.get('properties', [])
 
             for property in properties:
                 if property and property.get('name') == 'textures':

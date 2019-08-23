@@ -1,0 +1,3 @@
+
+class RemoteRateLimitException(Exception):
+    pass
