@@ -56,7 +56,7 @@ def get_player_list_data(server):
     players.sort(key=lambda p: p.displayname.lower())
 
     try:
-        tps = int(math.ceil(float(server_status['tps'])))
+        tps = int(round(float(server_status['tps'])))
     except ValueError:
         tps = 'N/A'
 
