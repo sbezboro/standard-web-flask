@@ -1,4 +1,4 @@
-standard-web-flask
+standard-web-flask - AMAZING WEBSITE
 ==================
 
 Flask-powered website for the [Standard Survival Minecraft Server](http://standardsurvival.com).
