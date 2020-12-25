@@ -80,7 +80,7 @@
             colors: ["#7E9BFF", "#F00"],
             series: {lines: { fill: true }},
             xaxes: [{mode: "time", minTickSize: [1, "day"], timeformat: "%b %d"}],
-            yaxes: [{min: 0, max: maxPlayers, tickSize: 20, position: "right"}, {min: 0, max: 40}]
+            yaxes: [{min: 0, max: maxPlayers, tickSize: 10, position: "right"}, {min: 0, max: 40}]
           });
         },
         error: function(data) {
