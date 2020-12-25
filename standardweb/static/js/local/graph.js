@@ -14,7 +14,7 @@
 
       var offset = new Date().getTimezoneOffset() * 1000 * 60;
       var serverId = 10;
-      var maxPlayers = 100;
+      var maxPlayers = 30;
 
       var data = {};
 
