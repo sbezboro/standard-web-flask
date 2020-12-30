@@ -591,7 +591,7 @@ class MaterialType(db.Model, Base):
     displayname = db.Column(db.String(64))
 
     ORES = (
-        'ANCIENT_DEBRIS', 'DIAMOND_ORE', 'EMERALD_ORE', 'LAPIS_ORE', 'REDSTONE_ORE', 'NETHER_QUARTZ_ORE', 'COAL_ORE'
+        'DIAMOND_ORE', 'EMERALD_ORE', 'LAPIS_ORE', 'REDSTONE_ORE', 'NETHER_QUARTZ_ORE', 'COAL_ORE'
     )
 
     @classmethod
