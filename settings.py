@@ -52,7 +52,12 @@ KILL_LEADERBOARDS = (
     'elderguardian',
     'shulker',
     'drowned',
-    'phantom'
+    'phantom',
+    'piglin',
+    'hoglin',,
+    'piglinbrute',
+    'strider',
+    'zoglin',
 )
 
 ORE_LEADERBOARDS = (
