@@ -54,7 +54,7 @@ KILL_LEADERBOARDS = (
     'drowned',
     'phantom',
     'piglin',
-    'hoglin',,
+    'hoglin',
     'piglinbrute',
     'strider',
     'zoglin',
