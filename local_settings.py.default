@@ -1,0 +1,47 @@
+DEBUG = True
+DEBUG_TB_INTERCEPT_REDIRECTS = False
+
+ASSETS_DEBUG = True
+ASSETS_AUTO_BUILD = True
+
+DB_USER = 'db'
+DB_PASSWORD = 'password'
+DB_NAME = 'dbname'
+SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://%s:%s@localhost/%s?charset=utf8mb4' % (DB_USER, DB_PASSWORD, DB_NAME)
+
+DB_BACKUP_USER = 'backup_user'
+DB_BACKUP_PASSWORD = 'backup_password'
+
+SECRET_KEY = 'secret'
+
+SESSION_COOKIE_HTTPONLY = False
+
+MAIN_SERVER_ID = 1
+
+MC_API_PORT = 20000
+MC_API_USERNAME = 'username'
+MC_API_PASSWORD = 'password'
+MC_API_SALT = 'salt'
+
+RTS_BASE_URL = 'http://127.0.0.1:3000'
+RTS_PREFIX = ''
+RTS_SECRET = 'rts_secret'
+
+REPLY_TOKEN_SECRET = 'secret'
+
+UNSUBSCRIBE_SECRET = 'secret'
+
+SERVER_NAME = '127.0.0.1:5000'
+
+MAILGUN_API_KEY = 'api_key'
+
+AWS_ACCESS_KEY_ID = 'key_id'
+AWS_SECRET_ACCESS_KEY = 'access_key'
+BACKUP_BUCKET_NAME = 'bucket_name'
+
+MINIMUM_FORUM_POST_PLAYER_TIME = 100
+MINIMUM_REGISTER_PLAYER_TIME = 100
+
+CELERY_ALWAYS_EAGER = True
+
+IP_LOOKUP_WHITELIST = set([])
