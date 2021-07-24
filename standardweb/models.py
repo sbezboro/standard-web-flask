@@ -992,7 +992,7 @@ class ForumTopic(db.Model, Base):
 
     id = db.Column(db.Integer, primary_key=True)
     forum_id = db.Column(db.Integer, db.ForeignKey('forum.id'))
-    name = db.Column(db.String(255))
+    name = db.Column(db.String(100))
     created = db.Column(db.DateTime, default=datetime.utcnow)
     updated = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
