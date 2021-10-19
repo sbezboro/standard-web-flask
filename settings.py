@@ -42,22 +42,17 @@ MINIMUM_FORUM_POST_PLAYER_TIME = 1440
 IP_LOOKUP_WHITELIST = set([])
 
 KILL_LEADERBOARDS = (
-    'creeper',
-    'witch',
-    'bat',
-    'squid',
-    'wither',
-    'ghast',
     'enderdragon',
-    'elderguardian',
-    'shulker',
-    'drowned',
-    'phantom',
-    'piglin',
-    'hoglin',
+    'wither',
+    'ravager',
     'piglinbrute',
-    'strider',
+    'elderguardian',
+    'creeper',
+    'ghast',
+    'shulker',
+    'phantom',
     'zoglin',
+    'bat',
 )
 
 ORE_LEADERBOARDS = (
