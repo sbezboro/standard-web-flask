@@ -334,8 +334,3 @@ def minute_query():
             duration = int(round(time.time() * 1000)) - start
             durations.append((server.id, duration))
             print 'Done with server %d in %d milliseconds' % (server.id, duration)
-
-    extra_data = {'server.%d.ms' % server_id: duration for server_id, duration in durations}
-    extra_data['session'] = mojang_status.session
-    rollbar.report_message('Server queries complete', 'debug',
-                           extra_data=extra_data)
